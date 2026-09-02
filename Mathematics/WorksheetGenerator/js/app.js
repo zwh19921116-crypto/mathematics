@@ -41,6 +41,8 @@ const MODULE_TOPICS = {
     { value: 'mixed', label: 'Mixed Operations' },
   ],
   fractions: [
+    { value: 'recognising-fractions', label: 'Recognising Fractions' },
+    { value: 'comparing-fractions', label: 'Comparing & Ordering Fractions' },
     { value: 'equivalent-fractions', label: 'Equivalent Fractions' },
     { value: 'simplifying-fractions', label: 'Simplifying Fractions' },
     { value: 'mixed-fractions', label: 'Mixed Fractions' },
@@ -55,6 +57,8 @@ const MODULE_TOPICS = {
     { value: 'decimal-operations', label: 'Decimal Operations' },
   ],
   percentages: [
+    { value: 'percentage-of-amount', label: 'Percentage of an Amount' },
+    { value: 'fraction-decimal-percentage', label: 'Fractions, Decimals & Percentages' },
     { value: 'percentage-increase', label: 'Percentage Increase' },
     { value: 'percentage-decrease', label: 'Percentage Decrease' },
     { value: 'percentage-to-decimal', label: 'Converting Percentage to Decimal' },
@@ -64,6 +68,8 @@ const MODULE_TOPICS = {
     { value: '3d-shapes', label: '3D Shapes' },
     { value: 'angles', label: 'Angles' },
     { value: 'symmetry', label: 'Symmetry' },
+    { value: 'position-direction', label: 'Position and Direction' },
+    { value: 'coordinates', label: 'Maps and Coordinates' },
     { value: 'transformations', label: 'Transformations' },
     { value: 'congruence', label: 'Congruence' },
     { value: 'similarity', label: 'Similarity' },
@@ -80,10 +86,20 @@ const MODULE_TOPICS = {
     { value: 'capacity', label: 'Capacity' },
     { value: 'mass', label: 'Mass' },
     { value: 'time', label: 'Time' },
+    { value: 'calendars', label: 'Calendars' },
+    { value: 'temperature', label: 'Temperature' },
     { value: 'unit-conversions', label: 'Unit Conversions' },
   ],
+  money: [
+    { value: 'making-change', label: 'Making Change' },
+    { value: 'adding-money', label: 'Adding Money' },
+    { value: 'money-word-problems', label: 'Money Word Problems' },
+  ],
   statistics: [
+    { value: 'collecting-data', label: 'Collecting Data' },
     { value: 'tables', label: 'Tables' },
+    { value: 'picture-graphs', label: 'Picture Graphs' },
+    { value: 'bar-graphs', label: 'Bar/Column Graphs' },
     { value: 'graphs', label: 'Graphs' },
     { value: 'mean', label: 'Mean' },
     { value: 'median', label: 'Median' },
@@ -93,6 +109,8 @@ const MODULE_TOPICS = {
     { value: 'standard-deviation', label: 'Standard Deviation' },
     { value: 'data-analysis', label: 'Data Analysis' },
     { value: 'regression', label: 'Regression' },
+    { value: 'chance-language', label: 'Chance (Likely/Unlikely/Certain)' },
+    { value: 'simple-probability', label: 'Simple Probability' },
   ],
   trigonometry: [
     { value: 'right-angle-trigonometry', label: 'Right Angle Trigonometry' },
@@ -120,7 +138,12 @@ const MODULE_TOPICS = {
   number: [
     { value: 'whole-numbers', label: 'Whole Numbers' },
     { value: 'place-value', label: 'Place Value' },
+    { value: 'odd-even', label: 'Odd and Even Numbers' },
+    { value: 'comparing-numbers', label: 'Comparing Numbers' },
     { value: 'ordering-numbers', label: 'Ordering Numbers' },
+    { value: 'missing-numbers', label: 'Missing Numbers' },
+    { value: 'number-sentences', label: 'Number Sentences' },
+    { value: 'equality', label: 'Understanding Equality' },
     { value: 'factors', label: 'Factors' },
     { value: 'multiples', label: 'Multiples' },
     { value: 'prime-numbers', label: 'Prime Numbers' },
@@ -130,12 +153,23 @@ const MODULE_TOPICS = {
     { value: 'scientific-notation', label: 'Scientific Notation' },
     { value: 'surds', label: 'Surds' },
   ],
+  ratio: [
+    { value: 'writing-ratios', label: 'Writing Ratios' },
+    { value: 'equivalent-ratios', label: 'Equivalent Ratios' },
+    { value: 'dividing-in-a-ratio', label: 'Dividing in a Ratio' },
+    { value: 'proportion', label: 'Proportion' },
+  ],
 };
 
 const NUMBER_TOPICS = new Set([
   'whole-numbers',
   'place-value',
+  'odd-even',
+  'comparing-numbers',
   'ordering-numbers',
+  'missing-numbers',
+  'number-sentences',
+  'equality',
   'factors',
   'multiples',
   'prime-numbers',
@@ -147,6 +181,8 @@ const NUMBER_TOPICS = new Set([
 ]);
 
 const FRACTION_TOPICS = new Set([
+  'recognising-fractions',
+  'comparing-fractions',
   'equivalent-fractions',
   'simplifying-fractions',
   'mixed-fractions',
@@ -170,6 +206,8 @@ const DECIMAL_TOPICS = new Set([
 ]);
 
 const PERCENTAGE_TOPICS = new Set([
+  'percentage-of-amount',
+  'fraction-decimal-percentage',
   'percentage-increase',
   'percentage-decrease',
   'percentage-to-decimal',
@@ -180,6 +218,8 @@ const GEOMETRY_TOPICS = new Set([
   '3d-shapes',
   'angles',
   'symmetry',
+  'position-direction',
+  'coordinates',
   'transformations',
   'congruence',
   'similarity',
@@ -214,6 +254,8 @@ const MEASUREMENT_TOPICS = new Set([
   'capacity',
   'mass',
   'time',
+  'calendars',
+  'temperature',
   'unit-conversions',
   'scale-drawings',
 ]);
@@ -225,8 +267,22 @@ const TRIGONOMETRY_TOPICS = new Set([
   'bearings',
   'applications-of-trigonometry',
 ]);
+const MONEY_TOPICS = new Set([
+  'making-change',
+  'adding-money',
+  'money-word-problems',
+]);
+const RATIO_TOPICS = new Set([
+  'writing-ratios',
+  'equivalent-ratios',
+  'dividing-in-a-ratio',
+  'proportion',
+]);
 const STATISTICS_TOPICS = new Set([
+  'collecting-data',
   'tables',
+  'picture-graphs',
+  'bar-graphs',
   'graphs',
   'mean',
   'median',
@@ -236,6 +292,8 @@ const STATISTICS_TOPICS = new Set([
   'standard-deviation',
   'data-analysis',
   'regression',
+  'chance-language',
+  'simple-probability',
 ]);
 
 let allPages    = [];
@@ -693,10 +751,12 @@ function moduleLabel(module) {
     percentages: 'Percentages',
     geometry: 'Geometry',
     measurement: 'Measurement',
-    statistics: 'Statistics',
+    statistics: 'Statistics & Probability',
     trigonometry: 'Trigonometry',
     algebra: 'Algebra',
     number: 'Number',
+    money: 'Money',
+    ratio: 'Ratio & Proportion',
   };
   return map[module] || 'Mathematics';
 }
@@ -712,7 +772,12 @@ function topicLabel(topic, timesTable) {
     mixed: 'Mixed Operations Practice',
     'whole-numbers': 'Whole Numbers Practice',
     'place-value': 'Place Value Practice',
+    'odd-even': 'Odd and Even Numbers Practice',
+    'comparing-numbers': 'Comparing Numbers Practice',
     'ordering-numbers': 'Ordering Numbers Practice',
+    'missing-numbers': 'Missing Numbers Practice',
+    'number-sentences': 'Number Sentences Practice',
+    equality: 'Understanding Equality Practice',
     factors: 'Factors Practice',
     multiples: 'Multiples Practice',
     'prime-numbers': 'Prime Numbers Practice',
@@ -721,6 +786,15 @@ function topicLabel(topic, timesTable) {
     indices: 'Indices Practice',
     'scientific-notation': 'Scientific Notation Practice',
     surds: 'Surds Practice',
+    'making-change': 'Making Change Practice',
+    'adding-money': 'Adding Money Practice',
+    'money-word-problems': 'Money Word Problems Practice',
+    'writing-ratios': 'Writing Ratios Practice',
+    'equivalent-ratios': 'Equivalent Ratios Practice',
+    'dividing-in-a-ratio': 'Dividing in a Ratio Practice',
+    proportion: 'Proportion Practice',
+    'recognising-fractions': 'Recognising Fractions Practice',
+    'comparing-fractions': 'Comparing Fractions Practice',
     'equivalent-fractions': 'Equivalent Fractions Practice',
     'simplifying-fractions': 'Simplifying Fractions Practice',
     'mixed-fractions': 'Mixed Fractions Practice',
@@ -731,10 +805,15 @@ function topicLabel(topic, timesTable) {
     'divide-fractions': 'Divide Fractions Practice',
     'decimal-place-value': 'Decimal Place Value Practice',
     'decimal-operations': 'Decimal Operations Practice',
+    'percentage-of-amount': 'Percentage of an Amount Practice',
+    'fraction-decimal-percentage': 'Fractions, Decimals & Percentages Practice',
     'percentage-increase': 'Percentage Increase Practice',
     'percentage-decrease': 'Percentage Decrease Practice',
     'percentage-to-decimal': 'Percentage to Decimal Practice',
+    'collecting-data': 'Collecting Data Practice',
     tables: 'Tables Practice',
+    'picture-graphs': 'Picture Graphs Practice',
+    'bar-graphs': 'Bar/Column Graphs Practice',
     graphs: 'Graphs Practice',
     mean: 'Mean Practice',
     median: 'Median Practice',
@@ -744,10 +823,14 @@ function topicLabel(topic, timesTable) {
     'standard-deviation': 'Standard Deviation Practice',
     'data-analysis': 'Data Analysis Practice',
     regression: 'Regression Practice',
+    'chance-language': 'Chance Practice',
+    'simple-probability': 'Simple Probability Practice',
     '2d-shapes': '2D Shapes Practice',
     '3d-shapes': '3D Shapes Practice',
     angles: 'Angles Practice',
     symmetry: 'Symmetry Practice',
+    'position-direction': 'Position and Direction Practice',
+    coordinates: 'Maps and Coordinates Practice',
     transformations: 'Transformations Practice',
     congruence: 'Congruence Practice',
     similarity: 'Similarity Practice',
@@ -776,6 +859,8 @@ function topicLabel(topic, timesTable) {
     capacity: 'Capacity Practice',
     mass: 'Mass Practice',
     time: 'Time Practice',
+    calendars: 'Calendars Practice',
+    temperature: 'Temperature Practice',
     'unit-conversions': 'Unit Conversions Practice',
     'scale-drawings': 'Scale Drawings Practice',
     'right-angle-trigonometry': 'Right Angle Trigonometry Practice',
@@ -1676,6 +1761,7 @@ function renderSolutionHTML(question) {
 function buildQuestions(topic, min, max, count, timesTable, denominatorMode) {
   const mixedOps = ['addition', 'subtraction', 'multiplication', 'division'];
   const questions = [];
+  const seenSignatures = new Set();
 
   if (GEOMETRY_TOPICS.has(topic)) {
     return buildGeometryQuestions(topic, count);
@@ -1683,90 +1769,137 @@ function buildQuestions(topic, min, max, count, timesTable, denominatorMode) {
 
   if (ALGEBRA_TOPICS.has(topic)) {
     for (let i = 0; i < count; i++) {
-      questions.push(buildAlgebraQuestion(topic));
+      pushUniqueQuestion(questions, seenSignatures, () => buildAlgebraQuestion(topic));
     }
     return questions;
   }
 
   if (MEASUREMENT_TOPICS.has(topic)) {
     for (let i = 0; i < count; i++) {
-      questions.push(buildMeasurementQuestion(topic, min, max));
+      pushUniqueQuestion(questions, seenSignatures, () => buildMeasurementQuestion(topic, min, max));
     }
     return questions;
   }
   if (STATISTICS_TOPICS.has(topic)) {
     for (let i = 0; i < count; i++) {
-      questions.push(buildStatisticsQuestion(topic, min, max));
+      pushUniqueQuestion(questions, seenSignatures, () => buildStatisticsQuestion(topic, min, max));
     }
     return questions;
   }
 
   if (TRIGONOMETRY_TOPICS.has(topic)) {
     for (let i = 0; i < count; i++) {
-      questions.push(buildTrigonometryQuestion(topic, min, max));
+      pushUniqueQuestion(questions, seenSignatures, () => buildTrigonometryQuestion(topic, min, max));
     }
     return questions;
   }
 
   if (PERCENTAGE_TOPICS.has(topic)) {
     for (let i = 0; i < count; i++) {
-      questions.push(buildPercentageQuestion(topic));
+      pushUniqueQuestion(questions, seenSignatures, () => buildPercentageQuestion(topic));
     }
     return questions;
   }
 
   if (DECIMAL_TOPICS.has(topic)) {
     for (let i = 0; i < count; i++) {
-      questions.push(buildDecimalQuestion(topic));
+      pushUniqueQuestion(questions, seenSignatures, () => buildDecimalQuestion(topic));
     }
     return questions;
   }
 
   if (FRACTION_TOPICS.has(topic)) {
     for (let i = 0; i < count; i++) {
-      questions.push(buildFractionQuestion(topic, denominatorMode));
+      pushUniqueQuestion(questions, seenSignatures, () => buildFractionQuestion(topic, denominatorMode));
     }
     return questions;
   }
 
   if (NUMBER_TOPICS.has(topic)) {
     for (let i = 0; i < count; i++) {
-      questions.push(buildNumberQuestion(topic, min, max));
+      pushUniqueQuestion(questions, seenSignatures, () => buildNumberQuestion(topic, min, max));
+    }
+    return questions;
+  }
+
+  if (MONEY_TOPICS.has(topic)) {
+    for (let i = 0; i < count; i++) {
+      pushUniqueQuestion(questions, seenSignatures, () => buildMoneyQuestion(topic, min, max));
+    }
+    return questions;
+  }
+
+  if (RATIO_TOPICS.has(topic)) {
+    for (let i = 0; i < count; i++) {
+      pushUniqueQuestion(questions, seenSignatures, () => buildRatioQuestion(topic, min, max));
     }
     return questions;
   }
 
   for (let i = 0; i < count; i++) {
-    let operation, a, b;
-
-    if (topic === 'times-tables') {
-      operation = 'multiplication';
-      a = timesTable;
-      b = randomInt(1, 12);
-    } else if (topic === 'bodmas') {
-      questions.push(buildBodmasQuestion(min, max));
-      continue;
-    } else if (topic === 'mixed') {
-      operation = mixedOps[randomInt(0, 3)];
-      a = randomInt(min, max);
-      b = randomInt(min, max);
-      if (operation === 'subtraction' && a < b) [a, b] = [b, a];
-      if (operation === 'division') {
-        ({ a, b } = buildExactDivisionOperands(min, max));
+    pushUniqueQuestion(questions, seenSignatures, () => {
+      if (topic === 'times-tables') {
+        return { a: timesTable, b: randomInt(1, 12), operation: 'multiplication' };
       }
-    } else {
-      operation = topic;
-      a = randomInt(min, max);
-      b = randomInt(min, max);
-      if (operation === 'subtraction' && a < b) [a, b] = [b, a];
-      if (operation === 'division') {
-        ({ a, b } = buildExactDivisionOperands(min, max));
-      }
-    }
 
-    questions.push({ a, b, operation });
+      if (topic === 'bodmas') {
+        return buildBodmasQuestion(min, max);
+      }
+
+      let operation, a, b;
+      if (topic === 'mixed') {
+        operation = mixedOps[randomInt(0, 3)];
+        a = randomInt(min, max);
+        b = randomInt(min, max);
+        if (operation === 'subtraction' && a < b) [a, b] = [b, a];
+        if (operation === 'division') {
+          ({ a, b } = buildExactDivisionOperands(min, max));
+        }
+      } else {
+        operation = topic;
+        a = randomInt(min, max);
+        b = randomInt(min, max);
+        if (operation === 'subtraction' && a < b) [a, b] = [b, a];
+        if (operation === 'division') {
+          ({ a, b } = buildExactDivisionOperands(min, max));
+        }
+      }
+
+      return { a, b, operation };
+    });
   }
   return questions;
+}
+
+function getQuestionSignature(question) {
+  if (question && typeof question === 'object') {
+    if ('operation' in question && 'a' in question && 'b' in question) {
+      return `${question.operation}:${question.a}:${question.b}`;
+    }
+    if (question.expression) {
+      return `bodmas:${question.expression}`;
+    }
+    if ('prompt' in question) {
+      return `${question.kind || ''}:${question.topic || ''}:${String(question.prompt)}`;
+    }
+  }
+  return JSON.stringify(question);
+}
+
+// Regenerates a question up to maxAttempts times to avoid repeats within a worksheet, then accepts a duplicate if the topic's pool is exhausted.
+function pushUniqueQuestion(questions, seenSignatures, generateQuestion, maxAttempts = 30) {
+  let question = generateQuestion();
+  let signature = getQuestionSignature(question);
+  let attempts = 0;
+
+  while (seenSignatures.has(signature) && attempts < maxAttempts) {
+    question = generateQuestion();
+    signature = getQuestionSignature(question);
+    attempts++;
+  }
+
+  seenSignatures.add(signature);
+  questions.push(question);
 }
 
 function buildExactDivisionOperands(min, max) {
@@ -1842,6 +1975,29 @@ function buildBodmasQuestion(min, max) {
 
 function buildFractionQuestion(topic, denominatorMode) {
   switch (topic) {
+    case 'recognising-fractions': {
+      const denominator = randomInt(2, 12);
+      const numerator = randomInt(1, denominator - 1);
+      return {
+        kind: 'fraction',
+        topic,
+        prompt: `${numerator} out of ${denominator} equal parts are shaded. Write this as a fraction.`,
+        answer: fractionToText({ numerator, denominator }),
+      };
+    }
+    case 'comparing-fractions': {
+      const d1 = randomInt(2, 12);
+      const n1 = randomInt(1, d1 - 1);
+      const d2 = randomInt(2, 12);
+      const n2 = randomInt(1, d2 - 1);
+      const symbol = (n1 / d1) > (n2 / d2) ? '>' : (n1 / d1) < (n2 / d2) ? '<' : '=';
+      return {
+        kind: 'fraction',
+        topic,
+        prompt: `${fractionToText({ numerator: n1, denominator: d1 })} ___ ${fractionToText({ numerator: n2, denominator: d2 })}`,
+        answer: symbol,
+      };
+    }
     case 'equivalent-fractions': {
       const fraction = createProperFraction();
       const multiplier = randomInt(2, 5);
@@ -2062,6 +2218,32 @@ function buildDecimalQuestion(topic) {
 
 function buildPercentageQuestion(topic) {
   switch (topic) {
+    case 'percentage-of-amount': {
+      const percent = pickRandomFromList([5, 10, 20, 25, 50, 75]);
+      const amount = randomInt(2, 40) * 10;
+      return {
+        kind: 'percentage',
+        topic,
+        prompt: `Find ${percent}% of ${amount}`,
+        answer: formatDecimalResult((percent / 100) * amount),
+      };
+    }
+    case 'fraction-decimal-percentage': {
+      const options = [
+        { n: 1, d: 2 }, { n: 1, d: 4 }, { n: 3, d: 4 }, { n: 1, d: 5 },
+        { n: 2, d: 5 }, { n: 3, d: 5 }, { n: 4, d: 5 }, { n: 1, d: 10 },
+        { n: 3, d: 10 }, { n: 7, d: 10 }, { n: 1, d: 20 }, { n: 1, d: 25 },
+      ];
+      const chosen = pickRandomFromList(options);
+      const decimal = chosen.n / chosen.d;
+      const percent = decimal * 100;
+      return {
+        kind: 'percentage',
+        topic,
+        prompt: `Write ${fractionToText({ numerator: chosen.n, denominator: chosen.d })} as a decimal and a percentage.`,
+        answer: `${formatDecimalResult(decimal)} and ${formatDecimalResult(percent)}%`,
+      };
+    }
     case 'percentage-increase': {
       const base = randomInt(2, 20) * 20;
       const percent = randomInt(1, 10) * 5;
@@ -2103,6 +2285,30 @@ function buildPercentageQuestion(topic) {
 
 function buildGeometryQuestion(topic) {
   switch (topic) {
+    case 'position-direction': {
+      const dirs = ['North', 'East', 'South', 'West'];
+      const startIdx = randomInt(0, 3);
+      const turn = pickRandomFromList([90, 180, 270]);
+      const clockwise = randomInt(0, 1) === 0;
+      const steps = turn / 90;
+      const newIdx = clockwise ? (startIdx + steps) % 4 : ((startIdx - steps) % 4 + 4) % 4;
+      return {
+        kind: 'geometry',
+        topic,
+        prompt: `Facing ${dirs[startIdx]}, turn ${turn}° ${clockwise ? 'clockwise' : 'anticlockwise'}. What direction do you now face?`,
+        answer: dirs[newIdx],
+      };
+    }
+    case 'coordinates': {
+      const x = randomInt(1, 10);
+      const y = randomInt(1, 10);
+      return {
+        kind: 'geometry',
+        topic,
+        prompt: `A point is ${x} units right and ${y} units up from the origin (0, 0). Write its coordinates.`,
+        answer: `(${x}, ${y})`,
+      };
+    }
     case '2d-shapes': {
       const shape = pickRandomFromList(get2dShapeFacts());
       const promptType = pickRandomFromList(['sides', 'vertices', 'symmetry']);
@@ -2308,6 +2514,70 @@ function buildStatisticsQuestion(topic, min, max) {
     const standardDeviation = Math.sqrt(meanSquared);
 
     switch (topic) {
+      case 'collecting-data': {
+        const scenarios = [
+          { prompt: "Which method is best to find out students' favourite colour?", answer: 'Survey' },
+          { prompt: 'Which method is best to record how many cars pass a school gate in an hour?', answer: 'Observation / Tally' },
+          { prompt: 'Which method is best to test whether plants grow faster with more sunlight?', answer: 'Experiment' },
+          { prompt: 'Which method is best to find out how students travel to school?', answer: 'Survey' },
+        ];
+        const scenario = pickRandomFromList(scenarios);
+        return { kind: 'statistics', topic, prompt: scenario.prompt, answer: scenario.answer };
+      }
+      case 'picture-graphs': {
+        const items = ['apples', 'books', 'stars', 'cars'];
+        const item = pickRandomFromList(items);
+        const key = pickRandomFromList([2, 5, 10]);
+        const symbols = randomInt(2, 8);
+        return {
+          kind: 'statistics',
+          topic,
+          data: `Each picture = ${key} ${item}`,
+          prompt: `If there are ${symbols} pictures shown, how many ${item} are there in total?`,
+          answer: `${symbols * key} ${item}`,
+        };
+      }
+      case 'bar-graphs': {
+        const categories = ['Red', 'Blue', 'Green', 'Yellow'].map((name) => ({ name, value: randomInt(2, 20) }));
+        const dataStr = categories.map((c) => `${c.name}: ${c.value}`).join(', ');
+        const highest = categories.reduce((a, b) => (a.value > b.value ? a : b));
+        return {
+          kind: 'statistics',
+          topic,
+          data: dataStr,
+          prompt: 'Which category has the highest value on the bar graph?',
+          answer: highest.name,
+        };
+      }
+      case 'chance-language': {
+        const statements = [
+          { prompt: 'Rolling a 7 on a standard six-sided die', answer: 'Impossible' },
+          { prompt: 'The sun rising tomorrow', answer: 'Certain' },
+          { prompt: 'Flipping a coin and it landing on heads', answer: 'Even chance' },
+          { prompt: 'It raining in a desert tomorrow', answer: 'Unlikely' },
+          { prompt: 'Picking a red ball from a bag of only red balls', answer: 'Certain' },
+          { prompt: 'Picking a blue ball from a bag with 9 red balls and 1 blue ball', answer: 'Unlikely' },
+          { prompt: 'Getting a number less than 7 when rolling a standard die', answer: 'Certain' },
+        ];
+        const statement = pickRandomFromList(statements);
+        return {
+          kind: 'statistics',
+          topic,
+          prompt: `Describe the chance: ${statement.prompt}. (Impossible, Unlikely, Even chance, Likely, or Certain)`,
+          answer: statement.answer,
+        };
+      }
+      case 'simple-probability': {
+        const totalOutcomes = randomInt(4, 10);
+        const favourable = randomInt(1, totalOutcomes - 1);
+        const scenario = pickRandomFromList(['marbles', 'cards', 'spinner sections']);
+        return {
+          kind: 'statistics',
+          topic,
+          prompt: `A bag has ${totalOutcomes} ${scenario}, ${favourable} of which are the winning colour. What is the probability of picking a winning one?`,
+          answer: reduceFraction(favourable, totalOutcomes),
+        };
+      }
       case 'tables': {
         const frequencyMap = new Map();
         values.forEach((value) => frequencyMap.set(value, (frequencyMap.get(value) || 0) + 1));
@@ -2690,6 +2960,38 @@ function buildMeasurementQuestion(topic, min, max) {
         answer: `${hours * 60 + minutes} min`,
       };
     }
+    case 'calendars': {
+      if (randomInt(0, 1) === 0) {
+        const weeks = randomInt(1, 10);
+        return {
+          kind: 'measurement',
+          topic,
+          prompt: `Convert ${weeks} weeks to days`,
+          answer: `${weeks * 7} days`,
+        };
+      }
+      const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+      const startIdx = randomInt(0, 6);
+      const add = randomInt(1, 20);
+      return {
+        kind: 'measurement',
+        topic,
+        prompt: `If today is ${days[startIdx]}, what day will it be in ${add} days?`,
+        answer: days[(startIdx + add) % 7],
+      };
+    }
+    case 'temperature': {
+      const start = randomInt(-10, 30);
+      const change = randomInt(1, 15);
+      const rises = randomInt(0, 1) === 0;
+      const result = rises ? start + change : start - change;
+      return {
+        kind: 'measurement',
+        topic,
+        prompt: `The temperature is ${start}°C and ${rises ? 'rises' : 'falls'} by ${change}°C. What is the new temperature?`,
+        answer: `${result}°C`,
+      };
+    }
     case 'unit-conversions': {
       const conversionType = pickRandomFromList(['length', 'mass', 'capacity']);
       if (conversionType === 'length') {
@@ -2840,8 +3142,9 @@ function buildTrigonometryQuestion(topic, min, max) {
 function buildGeometryQuestions(topic, count) {
   if (topic !== '2d-shapes' && topic !== '3d-shapes') {
     const items = [];
+    const seenSignatures = new Set();
     for (let i = 0; i < count; i++) {
-      items.push(buildGeometryQuestion(topic));
+      pushUniqueQuestion(items, seenSignatures, () => buildGeometryQuestion(topic));
     }
     return items;
   }
@@ -3110,6 +3413,89 @@ function buildAlgebraQuestion(topic) {
 
 function buildNumberQuestion(topic, min, max) {
   switch (topic) {
+    case 'odd-even': {
+      const safeMin = Number.isFinite(min) ? min : 1;
+      const safeMax = Number.isFinite(max) ? max : 100;
+      const value = randomInt(Math.min(safeMin, safeMax), Math.max(safeMin, safeMax));
+      return {
+        kind: 'number',
+        topic,
+        prompt: `Is ${value} odd or even?`,
+        answer: value % 2 === 0 ? 'Even' : 'Odd',
+      };
+    }
+    case 'comparing-numbers': {
+      const safeMin = Number.isFinite(min) ? min : 1;
+      const safeMax = Number.isFinite(max) ? max : 100;
+      const a = randomInt(Math.min(safeMin, safeMax), Math.max(safeMin, safeMax));
+      const b = randomInt(Math.min(safeMin, safeMax), Math.max(safeMin, safeMax));
+      const symbol = a > b ? '>' : a < b ? '<' : '=';
+      return {
+        kind: 'number',
+        topic,
+        prompt: `Compare: ${a} ___ ${b}`,
+        answer: symbol,
+      };
+    }
+    case 'missing-numbers': {
+      const safeMin = Number.isFinite(min) ? Math.max(1, min) : 1;
+      const safeMax = Number.isFinite(max) ? Math.max(safeMin, max) : 20;
+      const first = randomInt(safeMin, safeMax);
+      const second = randomInt(safeMin, safeMax);
+      const total = first + second;
+      const blankPosition = pickRandomFromList(['first', 'second', 'total']);
+      const prompt = blankPosition === 'first'
+        ? `? + ${second} = ${total}`
+        : blankPosition === 'second'
+          ? `${first} + ? = ${total}`
+          : `${first} + ${second} = ?`;
+      const answer = blankPosition === 'first' ? first : blankPosition === 'second' ? second : total;
+      return { kind: 'number', topic, prompt, answer };
+    }
+    case 'number-sentences': {
+      const safeMin = Number.isFinite(min) ? Math.max(1, min) : 1;
+      const safeMax = Number.isFinite(max) ? Math.max(safeMin, max) : 20;
+      const op = pickRandomFromList(['+', '-', '×']);
+      let first = randomInt(safeMin, safeMax);
+      let second = randomInt(safeMin, safeMax);
+      if (op === '-' && first < second) {
+        [first, second] = [second, first];
+      }
+      const total = op === '+' ? first + second : op === '-' ? first - second : first * second;
+      const blankPosition = pickRandomFromList(['first', 'second', 'total']);
+      const prompt = blankPosition === 'first'
+        ? `? ${op} ${second} = ${total}`
+        : blankPosition === 'second'
+          ? `${first} ${op} ? = ${total}`
+          : `${first} ${op} ${second} = ?`;
+      const answer = blankPosition === 'first' ? first : blankPosition === 'second' ? second : total;
+      return { kind: 'number', topic, prompt, answer };
+    }
+    case 'equality': {
+      const safeMin = Number.isFinite(min) ? Math.max(1, min) : 1;
+      const safeMax = Number.isFinite(max) ? Math.max(safeMin, max) : 20;
+      const leftA = randomInt(safeMin, safeMax);
+      const leftB = randomInt(safeMin, safeMax);
+      const leftTotal = leftA + leftB;
+      const makeTrue = randomInt(0, 1) === 0;
+      let rightA = randomInt(safeMin, safeMax);
+      let rightB = makeTrue ? leftTotal - rightA : randomInt(safeMin, safeMax);
+      if (makeTrue && rightB < 0) {
+        rightA = randomInt(0, leftTotal);
+        rightB = leftTotal - rightA;
+      }
+      if (!makeTrue) {
+        while (rightA + rightB === leftTotal) {
+          rightB = randomInt(safeMin, safeMax);
+        }
+      }
+      return {
+        kind: 'number',
+        topic,
+        prompt: `Is ${leftA} + ${leftB} = ${rightA} + ${rightB} true or false?`,
+        answer: (leftTotal === rightA + rightB) ? 'True' : 'False',
+      };
+    }
     case 'whole-numbers': {
       const value = randomInt(100, 9999);
       return {
@@ -3219,6 +3605,118 @@ function buildNumberQuestion(topic, min, max) {
         topic,
         prompt: `Simplify √(${rootFactor * rootFactor * radicand}).`,
         answer: `${rootFactor}√${radicand}`,
+      };
+    }
+    default:
+      return {
+        kind: 'number',
+        topic,
+        prompt: 'Write the answer.',
+        answer: '',
+      };
+  }
+}
+
+function buildMoneyQuestion(topic, min, max) {
+  switch (topic) {
+    case 'making-change': {
+      const priceDollars = randomInt(1, 20);
+      const priceCents = pickRandomFromList([0, 25, 50, 75]);
+      const price = priceDollars + priceCents / 100;
+      const notes = [5, 10, 20, 50];
+      const validNotes = notes.filter((note) => note > price);
+      const paid = pickRandomFromList(validNotes.length ? validNotes : [Math.ceil(price) + 5]);
+      const change = paid - price;
+      return {
+        kind: 'number',
+        topic,
+        prompt: `You buy an item for $${price.toFixed(2)} and pay with a $${paid} note. How much change do you get?`,
+        answer: `$${change.toFixed(2)}`,
+      };
+    }
+    case 'adding-money': {
+      const safeMin = Number.isFinite(min) ? Math.max(1, min) : 1;
+      const safeMax = Number.isFinite(max) ? Math.max(safeMin, max) : 50;
+      const aCents = randomInt(safeMin, safeMax) * 100 + pickRandomFromList([0, 25, 50, 75]);
+      const bCents = randomInt(safeMin, safeMax) * 100 + pickRandomFromList([0, 25, 50, 75]);
+      return {
+        kind: 'number',
+        topic,
+        prompt: `$${(aCents / 100).toFixed(2)} + $${(bCents / 100).toFixed(2)}`,
+        answer: `$${((aCents + bCents) / 100).toFixed(2)}`,
+      };
+    }
+    case 'money-word-problems': {
+      const safeMin = Number.isFinite(min) ? Math.max(2, min) : 10;
+      const safeMax = Number.isFinite(max) ? Math.max(safeMin + 1, max) : 100;
+      const start = randomInt(safeMin + 1, safeMax);
+      const spend = randomInt(1, start - 1);
+      return {
+        kind: 'number',
+        topic,
+        prompt: `Sam has $${start}. He spends $${spend} on a toy. How much money does he have left?`,
+        answer: `$${start - spend}`,
+      };
+    }
+    default:
+      return {
+        kind: 'number',
+        topic,
+        prompt: 'Write the answer.',
+        answer: '',
+      };
+  }
+}
+
+function buildRatioQuestion(topic) {
+  switch (topic) {
+    case 'writing-ratios': {
+      const a = randomInt(2, 12);
+      const b = randomInt(2, 12);
+      const items = pickRandomFromList([
+        ['red balls', 'blue balls'],
+        ['boys', 'girls'],
+        ['cats', 'dogs'],
+        ['apples', 'oranges'],
+      ]);
+      return {
+        kind: 'number',
+        topic,
+        prompt: `There are ${a} ${items[0]} and ${b} ${items[1]}. Write the ratio of ${items[0]} to ${items[1]}.`,
+        answer: `${a}:${b}`,
+      };
+    }
+    case 'equivalent-ratios': {
+      const a = randomInt(1, 10);
+      const b = randomInt(1, 10);
+      const multiplier = randomInt(2, 5);
+      return {
+        kind: 'number',
+        topic,
+        prompt: `Find an equivalent ratio to ${a}:${b} (multiply by ${multiplier}).`,
+        answer: `${a * multiplier}:${b * multiplier}`,
+      };
+    }
+    case 'dividing-in-a-ratio': {
+      const partA = randomInt(1, 9);
+      const partB = randomInt(1, 9);
+      const perPart = randomInt(2, 10);
+      return {
+        kind: 'number',
+        topic,
+        prompt: `Share $${(partA + partB) * perPart} in the ratio ${partA}:${partB}.`,
+        answer: `$${partA * perPart} and $${partB * perPart}`,
+      };
+    }
+    case 'proportion': {
+      const items = randomInt(2, 6);
+      const cost = items * randomInt(1, 5);
+      const newItems = randomInt(2, 10);
+      return {
+        kind: 'number',
+        topic,
+        prompt: `If ${items} items cost $${cost}, how much do ${newItems} items cost?`,
+        answer: `$${((cost / items) * newItems).toFixed(2)}`,
       };
     }
     default:
@@ -3585,6 +4083,106 @@ function formatPercentageChange(base, percent, direction) {
 }
 
 function getPageInstruction(topic) {
+  if (topic === 'odd-even') {
+    return 'State whether each number is odd or even:';
+  }
+
+  if (topic === 'comparing-numbers') {
+    return 'Compare the numbers using <, > or =:';
+  }
+
+  if (topic === 'missing-numbers') {
+    return 'Find the missing number in each number sentence:';
+  }
+
+  if (topic === 'number-sentences') {
+    return 'Find the missing number in each number sentence:';
+  }
+
+  if (topic === 'equality') {
+    return 'State whether each number sentence is true or false:';
+  }
+
+  if (topic === 'recognising-fractions') {
+    return 'Write the fraction represented by each description:';
+  }
+
+  if (topic === 'comparing-fractions') {
+    return 'Compare the fractions using <, > or =:';
+  }
+
+  if (topic === 'percentage-of-amount') {
+    return 'Find the percentage of each amount:';
+  }
+
+  if (topic === 'fraction-decimal-percentage') {
+    return 'Convert each fraction to a decimal and a percentage:';
+  }
+
+  if (topic === 'position-direction') {
+    return 'Work out the new direction after each turn:';
+  }
+
+  if (topic === 'coordinates') {
+    return 'Write the coordinates for each point:';
+  }
+
+  if (topic === 'temperature') {
+    return 'Find each new temperature:';
+  }
+
+  if (topic === 'calendars') {
+    return 'Answer each question about days and weeks:';
+  }
+
+  if (topic === 'collecting-data') {
+    return 'Choose the best method to collect the data:';
+  }
+
+  if (topic === 'picture-graphs') {
+    return 'Use the picture graph key to answer each question:';
+  }
+
+  if (topic === 'bar-graphs') {
+    return 'Use the bar graph data to answer each question:';
+  }
+
+  if (topic === 'chance-language') {
+    return 'Describe the chance of each event:';
+  }
+
+  if (topic === 'simple-probability') {
+    return 'Find the probability of each event as a fraction:';
+  }
+
+  if (topic === 'making-change') {
+    return 'Find the change for each purchase:';
+  }
+
+  if (topic === 'adding-money') {
+    return 'Add the following amounts of money:';
+  }
+
+  if (topic === 'money-word-problems') {
+    return 'Solve each money word problem:';
+  }
+
+  if (topic === 'writing-ratios') {
+    return 'Write each ratio in simplest form:';
+  }
+
+  if (topic === 'equivalent-ratios') {
+    return 'Find an equivalent ratio:';
+  }
+
+  if (topic === 'dividing-in-a-ratio') {
+    return 'Divide each amount according to the ratio:';
+  }
+
+  if (topic === 'proportion') {
+    return 'Use proportional reasoning to solve each problem:';
+  }
+
   if (topic === 'decimal-place-value') {
     return 'What is the value of the highlighted digit in the following decimal:';
   }
