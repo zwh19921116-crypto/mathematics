@@ -1153,6 +1153,45 @@ body.is-fullscreen .preview.is-dragging {
   text-align: left;
 }
 
+.conversion-formula-content {
+  flex: 1;
+  padding: 8mm 2mm 0;
+}
+
+.conversion-formula-content h2 {
+  margin-bottom: 8mm;
+  color: #173f90;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.conversion-formula-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 7mm;
+}
+
+.conversion-formula-group {
+  border: 1.5px solid #8d9ab0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.conversion-formula-group h3 {
+  padding: 0.45rem 0.7rem;
+  background: #1f4ea2;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.conversion-formula-group ul {
+  padding: 0.75rem 0.85rem 0.85rem 2rem;
+  color: #1f2c40;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.7;
+}
+
 .fraction-inline {
   display: inline-flex;
   flex-direction: column;

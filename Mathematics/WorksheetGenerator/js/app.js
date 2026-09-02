@@ -27,7 +27,7 @@ const solutionsCheckbox = document.getElementById('solutionsRequired');
 const initialDocumentTitle = document.title;
 const DEFAULT_PREVIEW_ZOOM = 68;
 const MIN_PREVIEW_ZOOM = 40;
-const MAX_PREVIEW_ZOOM = 140;
+const MAX_PREVIEW_ZOOM = 250;
 const PREVIEW_ZOOM_STEP = 10;
 
 const MODULE_TOPICS = {
@@ -81,7 +81,6 @@ const MODULE_TOPICS = {
     { value: 'mass', label: 'Mass' },
     { value: 'time', label: 'Time' },
     { value: 'unit-conversions', label: 'Unit Conversions' },
-    { value: 'scale-drawings', label: 'Scale Drawings' },
   ],
   statistics: [
     { value: 'tables', label: 'Tables' },
@@ -415,29 +414,66 @@ function setFullscreenFallbackActive(nextValue) {
   window.scrollTo(0, scrollPositionBeforeFullscreen);
 }
 
-function changePreviewZoom(delta) {
-  setPreviewZoom(previewZoom + delta);
+function changePreviewZoom(delta, anchorPoint = getPreviewViewportCenterAnchor()) {
+  setPreviewZoom(previewZoom + delta, anchorPoint);
 }
 
 function resetPreviewZoom() {
-  setPreviewZoom(DEFAULT_PREVIEW_ZOOM);
+  setPreviewZoom(DEFAULT_PREVIEW_ZOOM, getPreviewViewportCenterAnchor());
 }
 
-function setPreviewZoom(nextZoom) {
+function setPreviewZoom(nextZoom, anchorPoint = null) {
   const boundedZoom = Math.max(MIN_PREVIEW_ZOOM, Math.min(MAX_PREVIEW_ZOOM, nextZoom));
   if (boundedZoom === previewZoom) {
     return;
   }
 
+  const previousZoom = previewZoom;
   previewZoom = boundedZoom;
-  applyPreviewZoom();
+  applyPreviewZoom(previousZoom, anchorPoint);
 }
 
-function applyPreviewZoom() {
+function applyPreviewZoom(previousZoom = previewZoom, anchorPoint = null) {
   preview.style.setProperty('--page-zoom', String(previewZoom / 100));
   zoomResetBtn.textContent = `${previewZoom}%`;
   zoomOutBtn.disabled = previewZoom <= MIN_PREVIEW_ZOOM;
   zoomInBtn.disabled = previewZoom >= MAX_PREVIEW_ZOOM;
+
+  if (anchorPoint) {
+    adjustPreviewScrollForZoom(previousZoom, previewZoom, anchorPoint);
+  }
+}
+
+function adjustPreviewScrollForZoom(previousZoomValue, nextZoomValue, anchorPoint) {
+  const previousScale = previousZoomValue / 100;
+  const nextScale = nextZoomValue / 100;
+  if (previousScale <= 0 || nextScale <= 0) {
+    return;
+  }
+
+  const anchorX = Math.max(0, Math.min(preview.clientWidth, Number(anchorPoint.x) || 0));
+  const anchorY = Math.max(0, Math.min(preview.clientHeight, Number(anchorPoint.y) || 0));
+
+  const contentX = (preview.scrollLeft + anchorX) / previousScale;
+  const contentY = (preview.scrollTop + anchorY) / previousScale;
+
+  preview.scrollLeft = (contentX * nextScale) - anchorX;
+  preview.scrollTop = (contentY * nextScale) - anchorY;
+}
+
+function getPreviewViewportCenterAnchor() {
+  return {
+    x: preview.clientWidth / 2,
+    y: preview.clientHeight / 2,
+  };
+}
+
+function getPreviewAnchorFromClientPoint(clientX, clientY) {
+  const rect = preview.getBoundingClientRect();
+  return {
+    x: clientX - rect.left,
+    y: clientY - rect.top,
+  };
 }
 
 function handlePreviewWheel(event) {
@@ -450,7 +486,8 @@ function handlePreviewWheel(event) {
     return;
   }
 
-  changePreviewZoom(wheelDirection < 0 ? PREVIEW_ZOOM_STEP : -PREVIEW_ZOOM_STEP);
+  const anchor = getPreviewAnchorFromClientPoint(event.clientX, event.clientY);
+  changePreviewZoom(wheelDirection < 0 ? PREVIEW_ZOOM_STEP : -PREVIEW_ZOOM_STEP, anchor);
   event.preventDefault();
 }
 
@@ -527,7 +564,11 @@ function handlePreviewTouchMove(event) {
   }
 
   const scale = nextDistance / previewPinchStartDistance;
-  setPreviewZoom(Math.round(previewPinchStartZoom * scale));
+  const anchor = getPreviewAnchorFromClientPoint(
+    (event.touches[0].clientX + event.touches[1].clientX) / 2,
+    (event.touches[0].clientY + event.touches[1].clientY) / 2
+  );
+  setPreviewZoom(Math.round(previewPinchStartZoom * scale), anchor);
   event.preventDefault();
 }
 
@@ -751,6 +792,10 @@ function paginateQuestions(questions, title, module, includeSolutions) {
   const questionsPerPage = getQuestionsPerPage(questions);
   const worksheetPageCount = Math.ceil(questions.length / questionsPerPage);
 
+  if (questions[0]?.topic === 'unit-conversions') {
+    pageModels.push({ type: 'formula-sheet', title, module });
+  }
+
   for (let p = 0; p < worksheetPageCount; p++) {
     const slice    = questions.slice(p * questionsPerPage, (p + 1) * questionsPerPage);
     const startIdx = p * questionsPerPage;
@@ -781,6 +826,10 @@ function paginateQuestions(questions, title, module, includeSolutions) {
 
   const totalPages = pageModels.length;
   return pageModels.map((pageModel, index) => {
+    if (pageModel.type === 'formula-sheet') {
+      return buildUnitConversionFormulaSheetHTML(pageModel.title, pageModel.module, index + 1, totalPages);
+    }
+
     if (pageModel.type === 'solutions') {
       return buildSolutionsPageHTML(pageModel.questions, pageModel.startIdx, pageModel.title, pageModel.module, index + 1, totalPages);
     }
@@ -794,6 +843,53 @@ function paginateQuestions(questions, title, module, includeSolutions) {
       totalPages
     );
   });
+}
+
+function buildUnitConversionFormulaSheetHTML(title, module, pageNum, totalPages) {
+  const conversionGroups = [
+    {
+      heading: 'Length',
+      rules: ['km → m: multiply by 1,000', 'm → km: divide by 1,000', 'm → cm: multiply by 100', 'cm → m: divide by 100', 'cm → mm: multiply by 10', 'mm → cm: divide by 10'],
+    },
+    {
+      heading: 'Mass',
+      rules: ['tonnes → kg: multiply by 1,000', 'kg → tonnes: divide by 1,000', 'kg → g: multiply by 1,000', 'g → kg: divide by 1,000', 'g → mg: multiply by 1,000', 'mg → g: divide by 1,000'],
+    },
+    {
+      heading: 'Capacity',
+      rules: ['L → mL: multiply by 1,000', 'mL → L: divide by 1,000', 'mL → cm³: multiply by 1', 'cm³ → mL: multiply by 1'],
+    },
+    {
+      heading: 'Time',
+      rules: ['hours → minutes: multiply by 60', 'minutes → hours: divide by 60', 'minutes → seconds: multiply by 60', 'seconds → minutes: divide by 60', 'days → hours: multiply by 24', 'hours → days: divide by 24'],
+    },
+  ];
+
+  const groupsHTML = conversionGroups.map((group) => `
+    <section class="conversion-formula-group">
+      <h3>${group.heading}</h3>
+      <ul>${group.rules.map((rule) => `<li>${rule}</li>`).join('')}</ul>
+    </section>`).join('');
+
+  return `
+    <div class="a4-page conversion-formula-page">
+      <div class="worksheet-header">
+        ${buildWorksheetHeaderBrandHTML(title, module)}
+        <div class="worksheet-info-strip">
+          ${buildInfoStripItem('book', 'Module', moduleLabel(module))}
+          ${buildInfoStripItem('clipboard', 'Topic', 'Unit Conversions')}
+          ${buildInfoStripBlankItem('calendar', 'Date', 'date')}
+        </div>
+      </div>
+      <div class="conversion-formula-content">
+        <h2>Unit Conversion Formula Sheet</h2>
+        <div class="conversion-formula-grid">${groupsHTML}</div>
+      </div>
+      <div class="page-footer">
+        <div class="page-footer-left">${buildFooterLegalHTML()}</div>
+        <span class="page-footer-right">Page ${pageNum} of ${totalPages}</span>
+      </div>
+    </div>`;
 }
 
 function getQuestionsPerPage(questions) {
@@ -1656,8 +1752,7 @@ function buildQuestions(topic, min, max, count, timesTable, denominatorMode) {
       b = randomInt(min, max);
       if (operation === 'subtraction' && a < b) [a, b] = [b, a];
       if (operation === 'division') {
-        b = randomInt(1, max);
-        a = b * randomInt(1, Math.max(1, Math.floor(max / b)));
+        ({ a, b } = buildExactDivisionOperands(min, max));
       }
     } else {
       operation = topic;
@@ -1665,14 +1760,32 @@ function buildQuestions(topic, min, max, count, timesTable, denominatorMode) {
       b = randomInt(min, max);
       if (operation === 'subtraction' && a < b) [a, b] = [b, a];
       if (operation === 'division') {
-        b = randomInt(1, max);
-        a = b * randomInt(1, Math.max(1, Math.floor(max / b)));
+        ({ a, b } = buildExactDivisionOperands(min, max));
       }
     }
 
     questions.push({ a, b, operation });
   }
   return questions;
+}
+
+function buildExactDivisionOperands(min, max) {
+  const lowerBound = Math.max(2, min);
+  const nonTrivialPairs = [];
+
+  for (let dividend = lowerBound; dividend <= max; dividend++) {
+    for (let divisor = 2; divisor <= Math.floor(dividend / 2); divisor++) {
+      if (dividend % divisor === 0) {
+        nonTrivialPairs.push({ a: dividend, b: divisor });
+      }
+    }
+  }
+
+  if (nonTrivialPairs.length > 0) {
+    return pickRandomFromList(nonTrivialPairs);
+  }
+
+  return { a: 1, b: 1 };
 }
 
 function buildBodmasQuestion(min, max) {
@@ -2813,14 +2926,31 @@ function get3dShapeFacts() {
 function buildAlgebraQuestion(topic) {
   switch (topic) {
     case 'patterns': {
-      const start = randomInt(1, 12);
+      const patternType = pickRandomFromList(['add', 'multiply-add']);
+      const start = patternType === 'add' ? randomInt(1, 12) : randomInt(1, 8);
       const step = randomInt(2, 9);
-      const values = [start, start + step, start + (step * 2), start + (step * 3)];
+      const multiplier = randomInt(2, 3);
+      const adjustment = randomInt(1, 3);
+      const values = [start];
+
+      for (let index = 0; index < 3; index++) {
+        const previousValue = values[values.length - 1];
+        values.push(
+          patternType === 'add'
+            ? previousValue + step
+            : (previousValue * multiplier) + adjustment
+        );
+      }
+
+      const answer = patternType === 'add'
+        ? values[3] + step
+        : (values[3] * multiplier) + adjustment;
+
       return {
         kind: 'algebra',
         topic,
         prompt: `${values.join(', ')}, __`,
-        answer: values[3] + step,
+        answer,
       };
     }
     case 'variables': {
@@ -2851,7 +2981,7 @@ function buildAlgebraQuestion(topic) {
       return {
         kind: 'algebra',
         topic,
-        prompt: `Evaluate ${coefficient}${variable} + ${constant} when ${variable} = ${value}.`,
+        prompt: `${coefficient}${variable} + ${constant}, where ${variable} = ${value}.`,
         answer: coefficient * value + constant,
       };
     }
