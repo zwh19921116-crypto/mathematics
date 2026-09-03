@@ -17,14 +17,77 @@ const zoomOutBtn       = document.getElementById('zoomOutBtn');
 const zoomResetBtn     = document.getElementById('zoomResetBtn');
 const zoomInBtn        = document.getElementById('zoomInBtn');
 const moduleSelect     = document.getElementById('module');
+const yearLevelSelect  = document.getElementById('yearLevel');
+const moduleTopicSearch = document.getElementById('moduleTopicSearch');
+const moduleTopicSearchResults = document.getElementById('moduleTopicSearchResults');
+const moduleTopicSearchToggle = document.getElementById('moduleTopicSearchToggle');
+const moduleTopicSearchPopup = document.getElementById('moduleTopicSearchPopup');
+const moduleTopicSearchBackdrop = document.getElementById('moduleTopicSearchBackdrop');
 const topicSelect      = document.getElementById('topic');
 const denominatorGroup = document.getElementById('denominatorGroup');
 const denominatorSelect = document.getElementById('denominatorMode');
 const timesTableGroup  = document.getElementById('timesTableGroup');
+const magicSquareSizeGroup = document.getElementById('magicSquareSizeGroup');
+const magicSquareSizeSelect = document.getElementById('magicSquareSize');
 const rangeRow         = document.getElementById('rangeRow');
 const titleInput       = document.getElementById('title');
 const solutionsCheckbox = document.getElementById('solutionsRequired');
+const coverPageCheckbox = document.getElementById('coverPageRequired');
+const coverPageTitleGroup = document.getElementById('coverPageTitleGroup');
+const coverPageTitleInput = document.getElementById('coverPageTitle');
+const whiteLabelCheckbox = document.getElementById('whiteLabelCheckbox');
+const whiteLabelLogoInput = document.getElementById('whiteLabelLogoInput');
+const whiteLabelUploadGroup = document.getElementById('whiteLabelUploadGroup');
+const whiteLabelLogoPreview = document.getElementById('whiteLabelLogoPreview');
+const headerLogoImg    = document.getElementById('headerLogoImg');
+const controlsLogoImg  = document.getElementById('controlsLogoImg');
 const initialDocumentTitle = document.title;
+const bulkAddBtn        = document.getElementById('bulkAddBtn');
+const bulkModalOverlay  = document.getElementById('bulkModalOverlay');
+const bulkModalCloseBtn = document.getElementById('bulkModalCloseBtn');
+const bulkCancelBtn     = document.getElementById('bulkCancelBtn');
+const bulkGenerateBtn   = document.getElementById('bulkGenerateBtn');
+const bulkAddItemBtn    = document.getElementById('bulkAddItemBtn');
+const bulkItemsList     = document.getElementById('bulkItemsList');
+const bulkItemsEmpty    = document.getElementById('bulkItemsEmpty');
+const bulkProgress      = document.getElementById('bulkProgress');
+const bulkBatchNameInput = document.getElementById('bulkBatchName');
+const bulkFolderCountInput = document.getElementById('bulkFolderCount');
+const bulkModuleSelect  = document.getElementById('bulkModule');
+const bulkTopicSelect   = document.getElementById('bulkTopic');
+const bulkDenominatorGroup = document.getElementById('bulkDenominatorGroup');
+const bulkDenominatorSelect = document.getElementById('bulkDenominatorMode');
+const bulkTimesTableGroup = document.getElementById('bulkTimesTableGroup');
+const bulkTimesTableSelect = document.getElementById('bulkTimesTable');
+const bulkMagicSquareSizeGroup = document.getElementById('bulkMagicSquareSizeGroup');
+const bulkMagicSquareSizeSelect = document.getElementById('bulkMagicSquareSize');
+const bulkRangeRow      = document.getElementById('bulkRangeRow');
+const bulkMinNumInput   = document.getElementById('bulkMinNum');
+const bulkMaxNumInput   = document.getElementById('bulkMaxNum');
+const bulkNumQuestionsInput = document.getElementById('bulkNumQuestions');
+const bulkTitleInput    = document.getElementById('bulkTitle');
+const bulkSolutionsCheckbox = document.getElementById('bulkSolutions');
+const bulkPresetSelect  = document.getElementById('bulkPresetSelect');
+const bulkLoadPresetBtn = document.getElementById('bulkLoadPresetBtn');
+const bulkDeletePresetBtn = document.getElementById('bulkDeletePresetBtn');
+const bulkPresetNameInput = document.getElementById('bulkPresetNameInput');
+const bulkSavePresetBtn = document.getElementById('bulkSavePresetBtn');
+const bulkDayLabelInput = document.getElementById('bulkDayLabelInput');
+const bulkDayIndicator  = document.getElementById('bulkDayIndicator');
+const bulkPrevDayBtn    = document.getElementById('bulkPrevDayBtn');
+const bulkNextDayBtn    = document.getElementById('bulkNextDayBtn');
+const bulkAddDayBtn     = document.getElementById('bulkAddDayBtn');
+const bulkDuplicateDayBtn = document.getElementById('bulkDuplicateDayBtn');
+const bulkRemoveDayBtn  = document.getElementById('bulkRemoveDayBtn');
+const bulkDayFormulaCheckbox = document.getElementById('bulkDayFormulaCheckbox');
+const bulkDayFormulaModule = document.getElementById('bulkDayFormulaModule');
+const formulaLookupBtn  = document.getElementById('formulaLookupBtn');
+const formulaModalOverlay = document.getElementById('formulaModalOverlay');
+const formulaModalCloseBtn = document.getElementById('formulaModalCloseBtn');
+const formulaModalCancelBtn = document.getElementById('formulaModalCancelBtn');
+const formulaPrintBtn  = document.getElementById('formulaPrintBtn');
+const formulaModuleSelect = document.getElementById('formulaModuleSelect');
+const formulaLookupPreview = document.getElementById('formulaLookupPreview');
 const DEFAULT_PREVIEW_ZOOM = 68;
 const MIN_PREVIEW_ZOOM = 40;
 const MAX_PREVIEW_ZOOM = 250;
@@ -35,15 +98,22 @@ const MODULE_TOPICS = {
     { value: 'addition', label: 'Addition (+)' },
     { value: 'subtraction', label: 'Subtraction (−)' },
     { value: 'multiplication', label: 'Multiplication (×)' },
+    { value: 'multiplication-groups', label: 'Multiplication Groups & Arrays' },
+    { value: 'multiplication-strategies', label: 'Multiplication Strategies' },
     { value: 'division', label: 'Division (÷)' },
+      { value: 'division-strategies', label: 'Division Strategies' },
+    { value: 'word-problems', label: 'Word Problems' },
+    { value: 'multi-step-word-problems', label: 'Multi-step Word Problems' },
+    { value: 'fact-families', label: 'Fact Families' },
     { value: 'times-tables', label: 'Times Tables' },
     { value: 'bodmas', label: 'B.O.D.M.A.S' },
     { value: 'mixed', label: 'Mixed Operations' },
   ],
-  fractions: [
+    fractions: [
     { value: 'recognising-fractions', label: 'Recognising Fractions' },
     { value: 'comparing-fractions', label: 'Comparing & Ordering Fractions' },
     { value: 'equivalent-fractions', label: 'Equivalent Fractions' },
+    { value: 'fraction-models', label: 'Visual Fraction Models' },
     { value: 'simplifying-fractions', label: 'Simplifying Fractions' },
     { value: 'mixed-fractions', label: 'Mixed Fractions' },
     { value: 'improper-fractions', label: 'Improper Fractions' },
@@ -76,6 +146,8 @@ const MODULE_TOPICS = {
     { value: 'circle-geometry', label: 'Circle Geometry' },
     { value: 'geometric-reasoning', label: 'Geometric Reasoning' },
     { value: 'proof', label: 'Proof' },
+    { value: 'pythagoras', label: 'Pythagoras' },
+    { value: 'shape-properties', label: '2D & 3D Shape Properties' },
   ],
   measurement: [
     { value: 'length', label: 'Length' },
@@ -89,11 +161,18 @@ const MODULE_TOPICS = {
     { value: 'calendars', label: 'Calendars' },
     { value: 'temperature', label: 'Temperature' },
     { value: 'unit-conversions', label: 'Unit Conversions' },
+      { value: 'measurement-conversions', label: 'Measurement Conversions' },
+    { value: 'elapsed-time', label: 'Elapsed Time' },
   ],
   money: [
     { value: 'making-change', label: 'Making Change' },
     { value: 'adding-money', label: 'Adding Money' },
     { value: 'money-word-problems', label: 'Money Word Problems' },
+    { value: 'financial-mathematics', label: 'Financial Mathematics' },
+    { value: 'saving-money', label: 'Saving Money' },
+    { value: 'budgeting', label: 'Budgeting' },
+    { value: 'best-buy', label: 'Best Buy' },
+      { value: 'discounts', label: 'Discounts' },
   ],
   statistics: [
     { value: 'collecting-data', label: 'Collecting Data' },
@@ -111,6 +190,8 @@ const MODULE_TOPICS = {
     { value: 'regression', label: 'Regression' },
     { value: 'chance-language', label: 'Chance (Likely/Unlikely/Certain)' },
     { value: 'simple-probability', label: 'Simple Probability' },
+    { value: 'advanced-probability', label: 'Advanced Probability' },
+    { value: 'data-interpretation', label: 'Data Interpretation' },
   ],
   trigonometry: [
     { value: 'right-angle-trigonometry', label: 'Right Angle Trigonometry' },
@@ -133,10 +214,17 @@ const MODULE_TOPICS = {
     { value: 'functions', label: 'Functions' },
     { value: 'exponential-functions', label: 'Exponential Functions' },
     { value: 'logarithmic-functions', label: 'Logarithmic Functions' },
+    { value: 'quadratics', label: 'Quadratics' },
+    { value: 'calculus', label: 'Calculus' },
+    { value: 'vectors', label: 'Vectors' },
+    { value: 'matrices', label: 'Matrices' },
     { value: 'sequences', label: 'Sequences' },
   ],
   number: [
     { value: 'whole-numbers', label: 'Whole Numbers' },
+    { value: 'writing-numbers-sequence', label: 'Writing Number (Sequence)' },
+    { value: 'writing-numbers-random', label: 'Writing Number (Random)' },
+    { value: 'identifying-numbers', label: 'Identifying Numbers' },
     { value: 'place-value', label: 'Place Value' },
     { value: 'odd-even', label: 'Odd and Even Numbers' },
     { value: 'comparing-numbers', label: 'Comparing Numbers' },
@@ -152,6 +240,9 @@ const MODULE_TOPICS = {
     { value: 'indices', label: 'Indices' },
     { value: 'scientific-notation', label: 'Scientific Notation' },
     { value: 'surds', label: 'Surds' },
+    { value: 'complex-numbers', label: 'Complex Numbers' },
+    { value: 'magic-squares', label: 'Magic Squares' },
+    { value: 'sudoku', label: 'Sudoku' },
   ],
   ratio: [
     { value: 'writing-ratios', label: 'Writing Ratios' },
@@ -161,8 +252,27 @@ const MODULE_TOPICS = {
   ],
 };
 
+const MODULES_BY_YEAR_LEVEL = {
+  primary: new Set(['algebra', 'arithmetic', 'decimals', 'fractions', 'geometry', 'measurement', 'money', 'number', 'percentages', 'ratio', 'statistics']),
+  secondary: new Set(['algebra', 'arithmetic', 'decimals', 'fractions', 'geometry', 'measurement', 'money', 'number', 'percentages', 'ratio', 'statistics', 'trigonometry']),
+  vce: new Set(['algebra', 'arithmetic', 'decimals', 'fractions', 'geometry', 'measurement', 'money', 'number', 'percentages', 'ratio', 'statistics', 'trigonometry']),
+};
+
+const PRIMARY_TOPIC_LIMITS = {
+  algebra: new Set(['patterns', 'variables', 'sequences']),
+  geometry: new Set(['2d-shapes', '3d-shapes', 'angles', 'symmetry', 'position-direction', 'coordinates', 'transformations', 'shape-properties']),
+  money: new Set(['making-change', 'adding-money', 'money-word-problems', 'saving-money', 'budgeting', 'best-buy', 'discounts']),
+  number: new Set(['whole-numbers', 'writing-numbers-sequence', 'writing-numbers-random', 'identifying-numbers', 'place-value', 'odd-even', 'comparing-numbers', 'ordering-numbers', 'missing-numbers', 'number-sentences', 'equality', 'factors', 'multiples', 'magic-squares', 'sudoku']),
+  statistics: new Set(['collecting-data', 'tables', 'picture-graphs', 'bar-graphs', 'chance-language', 'simple-probability', 'data-interpretation']),
+  fractions: new Set(['recognising-fractions', 'comparing-fractions', 'equivalent-fractions', 'fraction-models']),
+  measurement: new Set(['length', 'area', 'perimeter', 'volume', 'capacity', 'mass', 'time', 'calendars', 'temperature', 'unit-conversions', 'measurement-conversions', 'elapsed-time']),
+};
+
 const NUMBER_TOPICS = new Set([
   'whole-numbers',
+  'writing-numbers-sequence',
+  'writing-numbers-random',
+  'identifying-numbers',
   'place-value',
   'odd-even',
   'comparing-numbers',
@@ -178,6 +288,27 @@ const NUMBER_TOPICS = new Set([
   'indices',
   'scientific-notation',
   'surds',
+  'complex-numbers',
+  'magic-squares',
+  'sudoku',
+]);
+
+const MULTIPLICATION_GROUPING_TOPICS = new Set(['multiplication-groups']);
+const WORD_PROBLEM_TOPICS = new Set(['word-problems']);
+const PRIMARY_ADDITIONAL_TOPICS = new Set([
+  'multiplication-strategies', 'division-strategies', 'multi-step-word-problems', 'fact-families',
+  'fraction-models', 'measurement-conversions', 'elapsed-time', 'shape-properties', 'discounts',
+  'data-interpretation',
+]);
+const ADVANCED_WORKSHEET_TOPICS = new Set([
+  'quadratics',
+  'calculus',
+  'vectors',
+  'matrices',
+  'complex-numbers',
+  'financial-mathematics',
+  'advanced-probability',
+  'pythagoras',
 ]);
 
 const FRACTION_TOPICS = new Set([
@@ -226,6 +357,7 @@ const GEOMETRY_TOPICS = new Set([
   'circle-geometry',
   'geometric-reasoning',
   'proof',
+  'pythagoras',
 ]);
 
 const ALGEBRA_TOPICS = new Set([
@@ -242,6 +374,10 @@ const ALGEBRA_TOPICS = new Set([
   'functions',
   'exponential-functions',
   'logarithmic-functions',
+  'quadratics',
+  'calculus',
+  'vectors',
+  'matrices',
   'sequences',
 ]);
 
@@ -271,6 +407,10 @@ const MONEY_TOPICS = new Set([
   'making-change',
   'adding-money',
   'money-word-problems',
+  'saving-money',
+  'budgeting',
+  'best-buy',
+  'financial-mathematics',
 ]);
 const RATIO_TOPICS = new Set([
   'writing-ratios',
@@ -294,6 +434,7 @@ const STATISTICS_TOPICS = new Set([
   'regression',
   'chance-language',
   'simple-probability',
+  'advanced-probability',
 ]);
 
 let allPages    = [];
@@ -321,6 +462,45 @@ moduleSelect.addEventListener('change', () => {
   updateTitleInput();
 });
 
+moduleTopicSearch.addEventListener('input', updateModuleTopicSearchResults);
+moduleTopicSearchResults.addEventListener('change', applyModuleTopicSearchResult);
+moduleTopicSearchToggle.addEventListener('click', toggleModuleTopicSearch);
+moduleTopicSearchBackdrop.addEventListener('click', closeModuleTopicSearch);
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && moduleTopicSearchPopup.style.display !== 'none') {
+    closeModuleTopicSearch();
+  }
+});
+
+function toggleModuleTopicSearch() {
+  const isOpen = moduleTopicSearchPopup.style.display !== 'none';
+  if (isOpen) {
+    closeModuleTopicSearch();
+    return;
+  }
+
+  moduleTopicSearchPopup.style.display = 'block';
+  moduleTopicSearchBackdrop.style.display = 'block';
+  moduleTopicSearchToggle.setAttribute('aria-expanded', 'true');
+  moduleTopicSearch.focus();
+}
+
+function closeModuleTopicSearch() {
+  moduleTopicSearchPopup.style.display = 'none';
+  moduleTopicSearchBackdrop.style.display = 'none';
+  moduleTopicSearchToggle.setAttribute('aria-expanded', 'false');
+  moduleTopicSearch.value = '';
+  moduleTopicSearchResults.innerHTML = '';
+  moduleTopicSearchResults.style.display = 'none';
+}
+
+yearLevelSelect.addEventListener('change', () => {
+  populateModulesForYearLevel();
+  populateTopics();
+  updateTopicControls();
+  updateTitleInput(true);
+});
+
 topicSelect.addEventListener('change', () => {
   updateTopicControls();
   updateTitleInput();
@@ -334,6 +514,61 @@ denominatorSelect.addEventListener('change', () => {
   updateTitleInput();
 });
 
+coverPageCheckbox.addEventListener('change', () => {
+  coverPageTitleGroup.style.display = coverPageCheckbox.checked ? 'block' : 'none';
+});
+
+const DEFAULT_LOGO_SRC = 'assets/logo/edgeducate-logo.png';
+let customLogoDataUrl = null;
+
+function getActiveLogoSrc() {
+  return whiteLabelCheckbox.checked && customLogoDataUrl ? customLogoDataUrl : DEFAULT_LOGO_SRC;
+}
+
+function updateLiveLogos() {
+  const logoSrc = getActiveLogoSrc();
+  headerLogoImg.src = logoSrc;
+  controlsLogoImg.src = logoSrc;
+
+  if (whiteLabelCheckbox.checked && customLogoDataUrl) {
+    whiteLabelLogoPreview.src = customLogoDataUrl;
+    whiteLabelLogoPreview.style.display = 'block';
+  } else {
+    whiteLabelLogoPreview.removeAttribute('src');
+    whiteLabelLogoPreview.style.display = 'none';
+  }
+
+  if (lastGeneratedQuestions.length > 0) {
+    renderWorksheetPages(lastGeneratedQuestions);
+  }
+
+  if (formulaModalOverlay.style.display !== 'none') {
+    renderFormulaLookupPreview();
+  }
+}
+
+whiteLabelCheckbox.addEventListener('change', () => {
+  whiteLabelUploadGroup.style.display = whiteLabelCheckbox.checked ? 'block' : 'none';
+  if (!whiteLabelCheckbox.checked) {
+    customLogoDataUrl = null;
+  }
+  updateLiveLogos();
+});
+
+whiteLabelLogoInput.addEventListener('change', () => {
+  const file = whiteLabelLogoInput.files && whiteLabelLogoInput.files[0];
+  if (!file) {
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    customLogoDataUrl = reader.result;
+    updateLiveLogos();
+  };
+  reader.readAsDataURL(file);
+});
+
 function ensureTrigonometryModuleOption() {
   if (!moduleSelect || moduleSelect.querySelector('option[value="trigonometry"]')) {
     return;
@@ -345,26 +580,147 @@ function ensureTrigonometryModuleOption() {
   moduleSelect.appendChild(option);
 }
 
-function populateTopics() {
-  const topics = MODULE_TOPICS[moduleSelect.value] || [];
-  topicSelect.innerHTML = topics
+function populateTopicsFor(moduleEl, topicEl) {
+  let topics = MODULE_TOPICS[moduleEl.value] || [];
+  if (moduleEl === moduleSelect) {
+    const allowedTopics = PRIMARY_TOPIC_LIMITS[yearLevelSelect.value === 'primary' ? moduleEl.value : ''];
+    if (allowedTopics) {
+      topics = topics.filter((topic) => allowedTopics.has(topic.value));
+    }
+  }
+  topicEl.innerHTML = topics
     .map((topic) => `<option value="${topic.value}">${topic.label}</option>`)
     .join('');
 }
 
-// Show/hide controls based on topic
-function updateTopicControls() {
-  const topic = topicSelect.value;
-  const isTimesTable = topic === 'times-tables';
-  const hasDenominatorMode = DENOMINATOR_MODE_TOPICS.has(topic);
+function populateTopics() {
+  populateTopicsFor(moduleSelect, topicSelect);
+}
 
-  timesTableGroup.style.display = isTimesTable ? 'block' : 'none';
-  rangeRow.style.display        = isTimesTable ? 'none' : 'flex';
-  denominatorGroup.style.display = hasDenominatorMode ? 'block' : 'none';
+function populateModulesForYearLevel() {
+  const availableModules = MODULES_BY_YEAR_LEVEL[yearLevelSelect.value] || MODULES_BY_YEAR_LEVEL.primary;
+  const currentModule = moduleSelect.value;
+  Array.from(moduleSelect.options).forEach((option) => {
+    option.hidden = !availableModules.has(option.value);
+  });
+
+  if (!availableModules.has(currentModule)) {
+    const firstAvailableOption = Array.from(moduleSelect.options).find((option) => availableModules.has(option.value));
+    moduleSelect.value = firstAvailableOption ? firstAvailableOption.value : '';
+  }
+}
+
+function getAvailableModuleTopicSearchResults() {
+  const results = [];
+
+  [
+    { value: 'primary', label: 'Primary' },
+    { value: 'secondary', label: 'Secondary' },
+    { value: 'vce', label: 'VCE' },
+  ].forEach((yearLevel) => {
+    results.push({ yearLevel: yearLevel.value, module: '', topic: '', label: `Year Level > ${yearLevel.label}`, searchText: yearLevel.label });
+    const availableModules = MODULES_BY_YEAR_LEVEL[yearLevel.value] || MODULES_BY_YEAR_LEVEL.primary;
+
+    Array.from(moduleSelect.options)
+      .filter((option) => availableModules.has(option.value))
+      .forEach((moduleOption) => {
+        const moduleValue = moduleOption.value;
+        const moduleName = moduleOption.textContent;
+        const yearName = yearLevel.label;
+        results.push({ yearLevel: yearLevel.value, module: moduleValue, topic: '', label: `${yearName} > ${moduleName}`, searchText: `${yearName} ${moduleName}` });
+
+        const allowedTopics = PRIMARY_TOPIC_LIMITS[yearLevel.value === 'primary' ? moduleValue : ''];
+        const topics = allowedTopics
+          ? (MODULE_TOPICS[moduleValue] || []).filter((topic) => allowedTopics.has(topic.value))
+          : (MODULE_TOPICS[moduleValue] || []);
+        topics.forEach((topic) => {
+          results.push({
+            yearLevel: yearLevel.value,
+            module: moduleValue,
+            topic: topic.value,
+            label: `${yearName} > ${moduleName} > ${topic.label}`,
+            searchText: `${yearName} ${moduleName} ${topic.label}`,
+          });
+        });
+      });
+  });
+
+  return results;
+}
+
+function updateModuleTopicSearchResults() {
+  const query = moduleTopicSearch.value.trim().toLowerCase();
+  if (!query) {
+    moduleTopicSearchResults.innerHTML = '';
+    moduleTopicSearchResults.style.display = 'none';
+    return;
+  }
+
+  const matches = getAvailableModuleTopicSearchResults()
+    .filter((result) => result.searchText.toLowerCase().includes(query));
+  moduleTopicSearchResults.innerHTML = matches
+    .map((result, index) => `<option value="${index}">${escapeHtml(result.label)}</option>`)
+    .join('');
+  moduleTopicSearchResults._searchResults = matches;
+  moduleTopicSearchResults.style.display = matches.length > 0 ? 'block' : 'none';
+}
+
+function applyModuleTopicSearchResult() {
+  const result = moduleTopicSearchResults._searchResults?.[Number(moduleTopicSearchResults.value)];
+  if (!result) {
+    return;
+  }
+
+  if (result.yearLevel) {
+    yearLevelSelect.value = result.yearLevel;
+    populateModulesForYearLevel();
+  }
+
+  if (!result.module) {
+    populateTopics();
+    updateTopicControls();
+    updateTitleInput(true);
+    moduleTopicSearch.value = '';
+    moduleTopicSearchResults.innerHTML = '';
+    moduleTopicSearchResults.style.display = 'none';
+    closeModuleTopicSearch();
+    return;
+  }
+
+  moduleSelect.value = result.module;
+  populateTopics();
+  if (result.topic) {
+    topicSelect.value = result.topic;
+  }
+  updateTopicControls();
+  updateTitleInput(true);
+  moduleTopicSearch.value = '';
+  moduleTopicSearchResults.innerHTML = '';
+  moduleTopicSearchResults.style.display = 'none';
+  closeModuleTopicSearch();
+}
+
+// Show/hide controls based on topic
+function updateTopicControlsFor(topicEl, timesTableGroupEl, rangeRowEl, denominatorGroupEl, denominatorSelectEl) {
+  const topic = topicEl.value;
+  const isTimesTable = topic === 'times-tables';
+  const isMagicSquare = topic === 'magic-squares';
+  const isSudoku = topic === 'sudoku';
+  const hasDenominatorMode = DENOMINATOR_MODE_TOPICS.has(topic);
+  const magicSquareGroup = topicEl === topicSelect ? magicSquareSizeGroup : bulkMagicSquareSizeGroup;
+
+  timesTableGroupEl.style.display = isTimesTable ? 'block' : 'none';
+  rangeRowEl.style.display        = isTimesTable || isMagicSquare || isSudoku ? 'none' : 'flex';
+  denominatorGroupEl.style.display = hasDenominatorMode ? 'block' : 'none';
+  magicSquareGroup.style.display = isMagicSquare ? 'block' : 'none';
 
   if (hasDenominatorMode) {
-    denominatorSelect.value = getDefaultDenominatorMode(topic, denominatorSelect.value);
+    denominatorSelectEl.value = getDefaultDenominatorMode(topic, denominatorSelectEl.value);
   }
+}
+
+function updateTopicControls() {
+  updateTopicControlsFor(topicSelect, timesTableGroup, rangeRow, denominatorGroup, denominatorSelect);
 }
 
 function updateTitleInput(force = false) {
@@ -375,18 +731,34 @@ function updateTitleInput(force = false) {
 }
 
 function defaultTitleSuffix() {
-  const defaultTopicTitle = topicLabel(
+  return buildDefaultTitle(
+    moduleSelect.value,
     topicSelect.value,
     parseInt(document.getElementById('timesTable').value, 10)
-  ).replace(/ Practice$/, '');
+  );
+}
 
-  return `${moduleLabel(moduleSelect.value)} - ${defaultTopicTitle}`;
+function buildDefaultTitle(module, topic, timesTable) {
+  const defaultTopicTitle = topicLabel(topic, timesTable).replace(/ Practice$/, '');
+  return `${moduleLabel(module)} - ${defaultTopicTitle}`;
 }
 
 ensureTrigonometryModuleOption();
+populateModulesForYearLevel();
 populateTopics();
 updateTopicControls();
 updateTitleInput(true);
+
+populateTopicsFor(bulkModuleSelect, bulkTopicSelect);
+updateTopicControlsFor(bulkTopicSelect, bulkTimesTableGroup, bulkRangeRow, bulkDenominatorGroup, bulkDenominatorSelect);
+
+bulkModuleSelect.addEventListener('change', () => {
+  populateTopicsFor(bulkModuleSelect, bulkTopicSelect);
+  updateTopicControlsFor(bulkTopicSelect, bulkTimesTableGroup, bulkRangeRow, bulkDenominatorGroup, bulkDenominatorSelect);
+});
+bulkTopicSelect.addEventListener('change', () => {
+  updateTopicControlsFor(bulkTopicSelect, bulkTimesTableGroup, bulkRangeRow, bulkDenominatorGroup, bulkDenominatorSelect);
+});
 
 generateBtn.addEventListener('click', generateWorksheet);
 refreshBtn.addEventListener('click', refreshWorksheet);
@@ -715,7 +1087,7 @@ function generateWorksheet() {
     return;
   }
 
-  const questions = buildQuestions(topic, minNum, maxNum, numQ, timesTable, denominatorMode);
+  const questions = buildQuestions(topic, minNum, maxNum, numQ, timesTable, denominatorMode, parseInt(magicSquareSizeSelect.value, 10));
   lastGeneratedQuestions = questions;
   renderWorksheetPages(questions);
 }
@@ -731,12 +1103,17 @@ function refreshWorksheet() {
 
 function renderWorksheetPages(questions) {
   const module      = moduleSelect.value;
+  const topic       = topicSelect.value;
+  const timesTable  = parseInt(document.getElementById('timesTable').value, 10);
   const titleSuffix = titleInput.value.trim() || defaultTitleSuffix();
   const title       = titleSuffix;
   const includeSolutions = solutionsCheckbox.checked;
+  const coverPage = coverPageCheckbox.checked
+    ? { title: coverPageTitleInput.value.trim() || title }
+    : null;
 
   lastRenderedTitle = title;
-  allPages = paginateQuestions(questions, title, module, includeSolutions);
+  allPages = paginateQuestions(questions, title, module, includeSolutions, topic, timesTable, coverPage);
   currentPage = 0;
   showPage(0);
   printBtn.disabled = false;
@@ -763,14 +1140,30 @@ function moduleLabel(module) {
 
 function topicLabel(topic, timesTable) {
   const map = {
+    'multiplication-strategies': 'Multiplication Strategies Practice',
+    'division-strategies': 'Division Strategies Practice',
+    'multi-step-word-problems': 'Multi-step Word Problems Practice',
+    'fact-families': 'Fact Families Practice',
+    'fraction-models': 'Visual Fraction Models Practice',
+    'measurement-conversions': 'Measurement Conversions Practice',
+    'elapsed-time': 'Elapsed Time Practice',
+    'shape-properties': '2D & 3D Shape Properties Practice',
+    discounts: 'Discounts Practice',
+    'data-interpretation': 'Data Interpretation Practice',
     addition: 'Addition Practice',
     subtraction: 'Subtraction Practice',
     multiplication: 'Multiplication Practice',
+    'word-problems': 'Word Problems Practice',
+    'multiplication-groups': 'Multiplication Groups & Arrays Practice',
+    'multiplication-strategies': 'Multiplication Strategies Practice',
     division: 'Division Practice',
     'times-tables': `${timesTable} Times Table`,
     bodmas: 'B.O.D.M.A.S Practice',
     mixed: 'Mixed Operations Practice',
     'whole-numbers': 'Whole Numbers Practice',
+    'writing-numbers-sequence': 'Writing Number (Sequence) Practice',
+    'writing-numbers-random': 'Writing Number (Random) Practice',
+    'identifying-numbers': 'Identifying Numbers Practice',
     'place-value': 'Place Value Practice',
     'odd-even': 'Odd and Even Numbers Practice',
     'comparing-numbers': 'Comparing Numbers Practice',
@@ -786,9 +1179,16 @@ function topicLabel(topic, timesTable) {
     indices: 'Indices Practice',
     'scientific-notation': 'Scientific Notation Practice',
     surds: 'Surds Practice',
+    'complex-numbers': 'Complex Numbers Practice',
+    'magic-squares': 'Magic Squares Practice',
+    sudoku: 'Sudoku Practice',
     'making-change': 'Making Change Practice',
     'adding-money': 'Adding Money Practice',
     'money-word-problems': 'Money Word Problems Practice',
+    'financial-mathematics': 'Financial Mathematics Practice',
+    'saving-money': 'Saving Money Practice',
+    budgeting: 'Budgeting Practice',
+    'best-buy': 'Best Buy Practice',
     'writing-ratios': 'Writing Ratios Practice',
     'equivalent-ratios': 'Equivalent Ratios Practice',
     'dividing-in-a-ratio': 'Dividing in a Ratio Practice',
@@ -825,6 +1225,7 @@ function topicLabel(topic, timesTable) {
     regression: 'Regression Practice',
     'chance-language': 'Chance Practice',
     'simple-probability': 'Simple Probability Practice',
+    'advanced-probability': 'Advanced Probability Practice',
     '2d-shapes': '2D Shapes Practice',
     '3d-shapes': '3D Shapes Practice',
     angles: 'Angles Practice',
@@ -837,6 +1238,7 @@ function topicLabel(topic, timesTable) {
     'circle-geometry': 'Circle Geometry Practice',
     'geometric-reasoning': 'Geometric Reasoning Practice',
     proof: 'Proof Practice',
+    pythagoras: 'Pythagoras Practice',
     patterns: 'Patterns Practice',
     variables: 'Variables Practice',
     expressions: 'Expressions Practice',
@@ -850,6 +1252,10 @@ function topicLabel(topic, timesTable) {
     functions: 'Functions Practice',
     'exponential-functions': 'Exponential Functions Practice',
     'logarithmic-functions': 'Logarithmic Functions Practice',
+    quadratics: 'Quadratics Practice',
+    calculus: 'Calculus Practice',
+    vectors: 'Vectors Practice',
+    matrices: 'Matrices Practice',
     sequences: 'Sequences Practice',
     length: 'Length Practice',
     area: 'Area Practice',
@@ -872,10 +1278,14 @@ function topicLabel(topic, timesTable) {
   return map[topic] || 'Math Practice';
 }
 
-function paginateQuestions(questions, title, module, includeSolutions) {
+function paginateQuestions(questions, title, module, includeSolutions, topic, timesTable, coverPage) {
   const pageModels = [];
   const questionsPerPage = getQuestionsPerPage(questions);
   const worksheetPageCount = Math.ceil(questions.length / questionsPerPage);
+
+  if (coverPage) {
+    pageModels.push({ type: 'cover', title: coverPage.title, module, topic, timesTable });
+  }
 
   if (questions[0]?.topic === 'unit-conversions') {
     pageModels.push({ type: 'formula-sheet', title, module });
@@ -890,11 +1300,13 @@ function paginateQuestions(questions, title, module, includeSolutions) {
       startIdx,
       title,
       module,
+      topic,
+      timesTable,
     });
   }
 
   if (includeSolutions) {
-    const solutionsPerPage = 20;
+    const solutionsPerPage = topic === 'sudoku' ? 1 : 20;
     const solutionPageCount = Math.ceil(questions.length / solutionsPerPage);
     for (let p = 0; p < solutionPageCount; p++) {
       const slice = questions.slice(p * solutionsPerPage, (p + 1) * solutionsPerPage);
@@ -911,6 +1323,10 @@ function paginateQuestions(questions, title, module, includeSolutions) {
 
   const totalPages = pageModels.length;
   return pageModels.map((pageModel, index) => {
+    if (pageModel.type === 'cover') {
+      return buildCoverPageHTML(pageModel.title, pageModel.module, pageModel.topic, pageModel.timesTable, index + 1, totalPages);
+    }
+
     if (pageModel.type === 'formula-sheet') {
       return buildUnitConversionFormulaSheetHTML(pageModel.title, pageModel.module, index + 1, totalPages);
     }
@@ -925,9 +1341,37 @@ function paginateQuestions(questions, title, module, includeSolutions) {
       pageModel.title,
       pageModel.module,
       index + 1,
-      totalPages
+      totalPages,
+      pageModel.topic,
+      pageModel.timesTable
     );
   });
+}
+
+function buildCoverPageHTML(title, module, topic, timesTable, pageNum, totalPages) {
+  const topicText = topicLabel(topic, timesTable).replace(/ Practice$/, '');
+
+  return `
+    <div class="a4-page cover-page">
+      <div class="worksheet-header">
+        ${buildWorksheetHeaderBrandHTML('', module)}
+      </div>
+      <div class="cover-page-content">
+        <h1 class="cover-page-title">${escapeHtml(title)}</h1>
+        <div class="cover-page-meta">
+          ${buildInfoStripItem('book', 'Module', moduleLabel(module))}
+          ${buildInfoStripItem('clipboard', 'Topic', topicText)}
+        </div>
+        <div class="cover-page-fields">
+          ${buildInfoStripBlankItem('user', 'Name', 'name')}
+          ${buildInfoStripBlankItem('calendar', 'Date', 'date')}
+        </div>
+      </div>
+      <div class="page-footer">
+        <div class="page-footer-left">${buildFooterLegalHTML()}</div>
+        <span class="page-footer-right">Page ${pageNum} of ${totalPages}</span>
+      </div>
+    </div>`;
 }
 
 function buildUnitConversionFormulaSheetHTML(title, module, pageNum, totalPages) {
@@ -981,11 +1425,26 @@ function getQuestionsPerPage(questions) {
   const multiplicationOnly = questions.length > 0 && questions.every((question) => question.operation === 'multiplication');
   const bodmasOnly = questions.length > 0 && questions.every((question) => question.operation === 'bodmas');
   const numberOnly = questions.length > 0 && questions.every((question) => question.kind === 'number');
+  const magicSquareOnly = questions.length > 0 && questions.every((question) => question.kind === 'magic-square');
+  const sudokuOnly = questions.length > 0 && questions.every((question) => question.kind === 'sudoku');
+  const numberWritingOnly = questions.length > 0 && questions.every((question) => question.kind === 'number-writing');
   const fractionOnly = questions.length > 0 && questions.every((question) => question.kind === 'fraction');
   const visualOnly = questions.length > 0 && questions.every((question) => usesLargeVisualLayout(question));
   const hasDoubleDigitByDoubleDigit = questions.some((question) => question.a >= 10 && question.b >= 10);
 
+  if (sudokuOnly) {
+    return 1;
+  }
+
+  if (numberWritingOnly) {
+    return 6;
+  }
+
   if (visualOnly) {
+    return 4;
+  }
+
+  if (magicSquareOnly) {
     return 4;
   }
 
@@ -1014,6 +1473,14 @@ function usesLargeVisualLayout(question) {
   }
 
   if (question.kind === 'trigonometry') {
+    return true;
+  }
+
+  if (question.kind === 'magic-square') {
+    return true;
+  }
+
+  if (question.kind === 'number-writing') {
     return true;
   }
 
@@ -1097,7 +1564,7 @@ function sanitizeFileNamePart(value) {
     .replace(/^_+|_+$/g, '') || 'worksheet';
 }
 
-function buildPageHTML(questions, startIdx, title, module, pageNum, totalPages) {
+function buildPageHTML(questions, startIdx, title, module, pageNum, totalPages, topic, timesTable) {
   const opSymbol = { addition: '+', subtraction: '−', multiplication: '×', division: '÷' };
   const pageTopic = questions[0]?.topic;
   const pageInstruction = getPageInstruction(pageTopic);
@@ -1110,7 +1577,7 @@ function buildPageHTML(questions, startIdx, title, module, pageNum, totalPages) 
   html += `<div class="worksheet-header">`;
   html += buildWorksheetHeaderBrandHTML(title, module);
   if (pageNum === 1) {
-    const headerTopic = buildWorksheetTopicLabel(questions);
+    const headerTopic = buildWorksheetTopicLabel(questions, topic, timesTable);
     html += `<div class="worksheet-info-strip">
       ${buildInfoStripItem('book', 'Module', moduleLabel(module))}
       ${buildInfoStripItem('clipboard', 'Topic', headerTopic)}
@@ -1125,7 +1592,12 @@ function buildPageHTML(questions, startIdx, title, module, pageNum, totalPages) 
   html += `</div>`;
 
   // Questions grid
-  html += `<div class="questions-grid">`;
+  const questionsGridClass = questions.every((question) => question.kind === 'sudoku')
+    ? 'questions-grid sudoku-questions-grid'
+    : questions.every((question) => question.kind === 'number-writing')
+      ? 'questions-grid number-writing-questions-grid'
+    : 'questions-grid';
+  html += `<div class="${questionsGridClass}">`;
   questions.forEach((q, idx) => {
     const num    = startIdx + idx + 1;
     html += renderVerticalQuestion(num, q, opSymbol[q.operation]);
@@ -1156,7 +1628,10 @@ function buildSolutionsPageHTML(questions, startIdx, title, module, pageNum, tot
   }
   html += `</div>`;
 
-  html += `<div class="solutions-grid">`;
+  const solutionsGridClass = questions.every((question) => question.kind === 'sudoku')
+    ? 'solutions-grid sudoku-solutions-grid'
+    : 'solutions-grid';
+  html += `<div class="${solutionsGridClass}">`;
   questions.forEach((question, idx) => {
     const num = startIdx + idx + 1;
     html += `<div class="solution-item"><span class="solution-number">${num}.</span><span class="solution-answer">${renderSolutionHTML(question)}</span></div>`;
@@ -1212,7 +1687,7 @@ function buildWorksheetHeaderBrandHTML(titleText, module, isSolutions = false) {
   return `
     <div class="worksheet-brand">
       <div class="worksheet-brand-left">
-        <img class="worksheet-logo" src="assets/logo/edgeducate-logo.png" alt="Edgeducate logo" />
+        <img class="worksheet-logo" src="${getActiveLogoSrc()}" alt="Edgeducate logo" />
       </div>
       <span class="worksheet-brand-divider" aria-hidden="true"></span>
       <div class="worksheet-brand-right">
@@ -1244,11 +1719,12 @@ function buildInfoStripBlankItem(iconType, label, fieldKind) {
     </span>`;
 }
 
-function buildWorksheetTopicLabel(questions) {
-  const defaultLabel = topicLabel(
-    topicSelect.value,
-    parseInt(document.getElementById('timesTable').value, 10)
-  ).replace(/ Practice$/, '');
+function buildWorksheetTopicLabel(questions, topic, timesTable) {
+  const resolvedTopic = topic !== undefined ? topic : topicSelect.value;
+  const resolvedTimesTable = timesTable !== undefined
+    ? timesTable
+    : parseInt(document.getElementById('timesTable').value, 10);
+  const defaultLabel = topicLabel(resolvedTopic, resolvedTimesTable).replace(/ Practice$/, '');
 
   if (!Array.isArray(questions) || questions.length === 0) {
     return defaultLabel;
@@ -1315,6 +1791,22 @@ function buildInfoIconSVG(iconType) {
 }
 
 function renderVerticalQuestion(num, question, symbol) {
+  if (question.kind === 'number-writing') {
+    return renderNumberWritingQuestion(num, question);
+  }
+
+  if (question.kind === 'sudoku') {
+    return renderSudokuQuestion(num, question);
+  }
+
+  if (question.kind === 'multiplication-grouping') {
+    return renderMultiplicationGroupingQuestion(num, question);
+  }
+
+  if (question.kind === 'magic-square') {
+    return renderMagicSquareQuestion(num, question);
+  }
+
   if (question.kind === 'number') {
     return renderNumberQuestion(num, question);
   }
@@ -1706,6 +2198,22 @@ function renderMeasurementShapeSVG(question) {
 
 function renderSolutionHTML(question) {
   if (question.kind !== 'number') {
+    if (question.kind === 'sudoku') {
+      return `${renderSudokuLegendHTML()}${renderSudokuGridHTML(question.solution, true, question.puzzle)}`;
+    }
+
+    if (question.kind === 'multiplication-grouping') {
+      return `${renderMultiplicationArrayHTML(question, true)} = ${escapeHtml(question.answer)}`;
+    }
+
+    if (question.kind === 'number-writing') {
+      return renderNumberWritingSVG(question, true);
+    }
+
+    if (question.kind === 'magic-square') {
+      return renderMagicSquareGridHTML(question.solution, true);
+    }
+
     if (question.kind === 'fraction') {
       return `${renderFractionTextHTML(question.prompt)} = ${renderFractionTextHTML(String(question.answer))}`;
     }
@@ -1758,10 +2266,24 @@ function renderSolutionHTML(question) {
   return `${renderNumberPromptHTML(question)} = ${escapeHtml(String(question.answer))}`;
 }
 
-function buildQuestions(topic, min, max, count, timesTable, denominatorMode) {
+function buildQuestions(topic, min, max, count, timesTable, denominatorMode, magicSquareSize = 3) {
   const mixedOps = ['addition', 'subtraction', 'multiplication', 'division'];
   const questions = [];
   const seenSignatures = new Set();
+
+  if (PRIMARY_ADDITIONAL_TOPICS.has(topic)) {
+    for (let i = 0; i < count; i++) {
+      pushUniqueQuestion(questions, seenSignatures, () => buildPrimaryAdditionalQuestion(topic, min, max));
+    }
+    return questions;
+  }
+
+  if (ADVANCED_WORKSHEET_TOPICS.has(topic)) {
+    for (let i = 0; i < count; i++) {
+      pushUniqueQuestion(questions, seenSignatures, () => buildAdvancedWorksheetQuestion(topic));
+    }
+    return questions;
+  }
 
   if (GEOMETRY_TOPICS.has(topic)) {
     return buildGeometryQuestions(topic, count);
@@ -1816,8 +2338,36 @@ function buildQuestions(topic, min, max, count, timesTable, denominatorMode) {
   }
 
   if (NUMBER_TOPICS.has(topic)) {
+    if (topic === 'sudoku') {
+      for (let i = 0; i < count; i++) {
+        pushUniqueQuestion(questions, seenSignatures, buildSudokuQuestion);
+      }
+      return questions;
+    }
+
+    if (topic === 'magic-squares') {
+      for (let i = 0; i < count; i++) {
+        pushUniqueQuestion(questions, seenSignatures, () => buildMagicSquareQuestion(magicSquareSize));
+      }
+      return questions;
+    }
+
     for (let i = 0; i < count; i++) {
-      pushUniqueQuestion(questions, seenSignatures, () => buildNumberQuestion(topic, min, max));
+      pushUniqueQuestion(questions, seenSignatures, () => buildNumberQuestion(topic, min, max, i));
+    }
+    return questions;
+  }
+
+  if (MULTIPLICATION_GROUPING_TOPICS.has(topic)) {
+    for (let i = 0; i < count; i++) {
+      pushUniqueQuestion(questions, seenSignatures, () => buildMultiplicationGroupingQuestion(topic));
+    }
+    return questions;
+  }
+
+  if (WORD_PROBLEM_TOPICS.has(topic)) {
+    for (let i = 0; i < count; i++) {
+      pushUniqueQuestion(questions, seenSignatures, () => buildWordProblemQuestion(min, max));
     }
     return questions;
   }
@@ -1871,6 +2421,139 @@ function buildQuestions(topic, min, max, count, timesTable, denominatorMode) {
   return questions;
 }
 
+function buildMagicSquareQuestion(size) {
+  const squareSize = [3, 4, 5].includes(size) ? size : 3;
+  const solution = createMagicSquare(squareSize);
+  const puzzle = solution.map((row) => row.slice());
+  const blankCount = squareSize === 3 ? 4 : squareSize === 4 ? 7 : 10;
+  const positions = Array.from({ length: squareSize * squareSize }, (_, index) => index);
+
+  for (let index = positions.length - 1; index > 0; index--) {
+    const swapIndex = randomInt(0, index);
+    [positions[index], positions[swapIndex]] = [positions[swapIndex], positions[index]];
+  }
+
+  positions.slice(0, blankCount).forEach((position) => {
+    puzzle[Math.floor(position / squareSize)][position % squareSize] = null;
+  });
+
+  return { kind: 'magic-square', topic: 'magic-squares', size: squareSize, puzzle, solution };
+}
+
+function createMagicSquare(size) {
+  if (size % 2 === 1) {
+    const square = Array.from({ length: size }, () => Array(size).fill(0));
+    let row = 0;
+    let column = Math.floor(size / 2);
+    for (let value = 1; value <= size * size; value++) {
+      square[row][column] = value;
+      const nextRow = (row - 1 + size) % size;
+      const nextColumn = (column + 1) % size;
+      if (square[nextRow][nextColumn]) {
+        row = (row + 1) % size;
+      } else {
+        row = nextRow;
+        column = nextColumn;
+      }
+    }
+    return square;
+  }
+
+  const square = Array.from({ length: size }, (_, row) =>
+    Array.from({ length: size }, (_, column) => (row * size) + column + 1)
+  );
+  for (let row = 0; row < size; row++) {
+    for (let column = 0; column < size; column++) {
+      const inPattern = (row % 4 === column % 4)
+        || ((row % 4) + (column % 4) === 3);
+      if (inPattern) {
+        square[row][column] = (size * size) + 1 - square[row][column];
+      }
+    }
+  }
+  return square;
+}
+
+function renderMagicSquareQuestion(num, question) {
+  const magicNumber = (question.size * ((question.size * question.size) + 1)) / 2;
+  return `
+    <div class="question question-magic-square">
+      <div class="question-number">${num}.</div>
+      <div class="magic-square-body">
+        <div class="magic-square-prompt">Complete the ${question.size} × ${question.size} magic square. <span class="magic-square-number">Magic number: ${magicNumber}</span></div>
+        ${renderMagicSquareGridHTML(question.puzzle)}
+      </div>
+    </div>`;
+}
+
+function renderMagicSquareGridHTML(grid, isSolution = false) {
+  const cellHTML = grid.map((row) => `<tr>${row.map((value) => `
+    <td class="${value === null ? 'magic-square-blank' : ''}">${value === null ? '&nbsp;' : escapeHtml(String(value))}</td>`).join('')}</tr>`).join('');
+  return `<table class="magic-square-grid${isSolution ? ' magic-square-grid-solution' : ''}" aria-label="Magic square">${cellHTML}</table>`;
+}
+
+function buildSudokuQuestion() {
+  const solution = createSudokuSolution();
+  const puzzle = solution.map((row) => row.slice());
+  const positions = Array.from({ length: 81 }, (_, index) => index);
+
+  for (let index = positions.length - 1; index > 0; index--) {
+    const swapIndex = randomInt(0, index);
+    [positions[index], positions[swapIndex]] = [positions[swapIndex], positions[index]];
+  }
+
+  positions.slice(0, 45).forEach((position) => {
+    puzzle[Math.floor(position / 9)][position % 9] = null;
+  });
+
+  return { kind: 'sudoku', topic: 'sudoku', size: 9, puzzle, solution };
+}
+
+function createSudokuSolution() {
+  const basePattern = (row, column) => ((row * 3) + Math.floor(row / 3) + column) % 9;
+  const shuffledNumbers = shuffleList([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+  const rowGroups = shuffleList([0, 1, 2]);
+  const rows = rowGroups.flatMap((group) => shuffleList([0, 1, 2]).map((row) => (group * 3) + row));
+  const columnGroups = shuffleList([0, 1, 2]);
+  const columns = columnGroups.flatMap((group) => shuffleList([0, 1, 2]).map((column) => (group * 3) + column));
+
+  return rows.map((row) => columns.map((column) => shuffledNumbers[basePattern(row, column)]));
+}
+
+function shuffleList(values) {
+  const shuffled = values.slice();
+  for (let index = shuffled.length - 1; index > 0; index--) {
+    const swapIndex = randomInt(0, index);
+    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+  }
+  return shuffled;
+}
+
+function renderSudokuQuestion(num, question) {
+  return `
+    <div class="question question-sudoku">
+      <div class="question-number">${num}.</div>
+      <div class="sudoku-body">
+        <div class="sudoku-prompt">Complete the 9 × 9 Sudoku.</div>
+        ${renderSudokuGridHTML(question.puzzle)}
+      </div>
+    </div>`;
+}
+
+function renderSudokuGridHTML(grid, isSolution = false, puzzle = null) {
+  const cellHTML = grid.map((row, rowIndex) => `<tr>${row.map((value, columnIndex) => {
+    const wasProvided = Array.isArray(puzzle) && puzzle[rowIndex]?.[columnIndex] !== null;
+    const cellClass = value === null ? 'sudoku-blank' : (wasProvided ? 'sudoku-given' : 'sudoku-answer');
+    return `
+    <td class="${cellClass}">${value === null ? '&nbsp;' : escapeHtml(String(value))}</td>`;
+  }).join('')}</tr>`).join('');
+  return `<table class="sudoku-grid${isSolution ? ' sudoku-grid-solution' : ''}" aria-label="Sudoku">${cellHTML}</table>`;
+}
+
+function renderSudokuLegendHTML() {
+  return `<div class="sudoku-solution-legend"><span><i class="sudoku-legend-swatch sudoku-legend-given"></i> Given number</span><span><i class="sudoku-legend-swatch sudoku-legend-answer"></i> Answer</span></div>`;
+}
+
 function getQuestionSignature(question) {
   if (question && typeof question === 'object') {
     if ('operation' in question && 'a' in question && 'b' in question) {
@@ -1878,6 +2561,12 @@ function getQuestionSignature(question) {
     }
     if (question.expression) {
       return `bodmas:${question.expression}`;
+    }
+    if (question.kind === 'magic-square') {
+      return `magic-square:${JSON.stringify(question.puzzle)}`;
+    }
+    if (question.kind === 'sudoku') {
+      return `sudoku:${JSON.stringify(question.puzzle)}`;
     }
     if ('prompt' in question) {
       return `${question.kind || ''}:${question.topic || ''}:${String(question.prompt)}`;
@@ -3411,8 +4100,32 @@ function buildAlgebraQuestion(topic) {
   }
 }
 
-function buildNumberQuestion(topic, min, max) {
+function buildNumberQuestion(topic, min, max, questionIndex = 0) {
   switch (topic) {
+    case 'writing-numbers-sequence':
+    case 'writing-numbers-random': {
+      const safeMin = Math.max(0, Math.min(9, Number.isFinite(min) ? min : 0));
+      const safeMax = Math.max(safeMin, Math.min(9, Number.isFinite(max) ? max : 9));
+      const range = safeMax - safeMin + 1;
+      const value = topic === 'writing-numbers-sequence'
+        ? safeMin + (questionIndex % range)
+        : randomInt(safeMin, safeMax);
+      return {
+        kind: 'number-writing',
+        topic,
+        value,
+        answer: value,
+      };
+    }
+    case 'identifying-numbers': {
+      const value = randomInt(10, 9999);
+      return {
+        kind: 'number',
+        topic,
+        prompt: `Write the number: ${numberToWords(value)}.`,
+        answer: value,
+      };
+    }
     case 'odd-even': {
       const safeMin = Number.isFinite(min) ? min : 1;
       const safeMax = Number.isFinite(max) ? max : 100;
@@ -3617,6 +4330,216 @@ function buildNumberQuestion(topic, min, max) {
   }
 }
 
+function buildAdvancedWorksheetQuestion(topic) {
+  if (topic === 'quadratics') {
+    const first = randomInt(1, 9);
+    const second = randomInt(1, 9);
+    return { kind: 'number', topic, prompt: `Solve x² - ${first + second}x + ${first * second} = 0.`, answer: `x = ${Math.min(first, second)} or x = ${Math.max(first, second)}` };
+  }
+
+  if (topic === 'calculus') {
+    const coefficient = randomInt(2, 9);
+    const power = randomInt(2, 5);
+    const constant = randomInt(1, 12);
+    return { kind: 'number', topic, prompt: `Find the derivative of f(x) = ${coefficient}x^${power} + ${constant}.`, answer: `${coefficient * power}x^${power - 1}` };
+  }
+
+  if (topic === 'vectors') {
+    const first = [randomInt(-9, 9), randomInt(-9, 9)];
+    const second = [randomInt(-9, 9), randomInt(-9, 9)];
+    return { kind: 'number', topic, prompt: `Add the vectors (${first[0]}, ${first[1]}) + (${second[0]}, ${second[1]}).`, answer: `(${first[0] + second[0]}, ${first[1] + second[1]})` };
+  }
+
+  if (topic === 'matrices') {
+    const first = [[randomInt(1, 9), randomInt(1, 9)], [randomInt(1, 9), randomInt(1, 9)]];
+    const second = [[randomInt(1, 9), randomInt(1, 9)], [randomInt(1, 9), randomInt(1, 9)]];
+    const result = first.map((row, rowIndex) => row.map((value, columnIndex) => value + second[rowIndex][columnIndex]));
+    return { kind: 'number', topic, prompt: `Add [[${first[0].join(', ')}], [${first[1].join(', ')}]] + [[${second[0].join(', ')}], [${second[1].join(', ')}]].`, answer: `[[${result[0].join(', ')}], [${result[1].join(', ')}]]` };
+  }
+
+  if (topic === 'complex-numbers') {
+    const realFirst = randomInt(-9, 9);
+    const imaginaryFirst = randomInt(1, 9);
+    const realSecond = randomInt(-9, 9);
+    const imaginarySecond = randomInt(1, 9);
+    return { kind: 'number', topic, prompt: `Simplify (${realFirst} + ${imaginaryFirst}i) + (${realSecond} + ${imaginarySecond}i).`, answer: `${realFirst + realSecond} + ${imaginaryFirst + imaginarySecond}i` };
+  }
+
+  if (topic === 'financial-mathematics') {
+    const principal = randomInt(2, 20) * 100;
+    const rate = pickRandomFromList([5, 10, 15]);
+    const years = randomInt(1, 4);
+    const interest = principal * (rate / 100) * years;
+    return { kind: 'number', topic, prompt: `Find the simple interest on $${principal} at ${rate}% per year for ${years} year${years === 1 ? '' : 's'}.`, answer: `$${interest.toFixed(2)}` };
+  }
+
+  if (topic === 'advanced-probability') {
+    const favourable = randomInt(2, 8);
+    const total = randomInt(favourable + 1, 12);
+    return { kind: 'number', topic, prompt: `A bag has ${total} counters and ${favourable} are blue. What is the probability of choosing a blue counter?`, answer: fractionToText({ numerator: favourable, denominator: total }) };
+  }
+
+  const legA = randomInt(3, 12);
+  const legB = randomInt(3, 12);
+  const hypotenuse = Math.sqrt((legA * legA) + (legB * legB));
+  return { kind: 'number', topic, prompt: `A right triangle has legs ${legA} and ${legB}. Find the hypotenuse to 2 decimal places.`, answer: hypotenuse.toFixed(2) };
+}
+
+function buildPrimaryAdditionalQuestion(topic, min, max) {
+  const safeMin = Number.isFinite(min) ? Math.max(1, min) : 1;
+  const safeMax = Number.isFinite(max) ? Math.max(safeMin + 1, max) : 20;
+
+  if (topic === 'multiplication-strategies') {
+    const first = randomInt(2, 10);
+    const second = randomInt(2, 10);
+    return { kind: 'number', topic, prompt: `Use a multiplication strategy to solve ${first} × ${second}.`, answer: first * second };
+  }
+  if (topic === 'division-strategies') {
+    const divisor = randomInt(2, 10);
+    const quotient = randomInt(2, 10);
+    return { kind: 'number', topic, prompt: `Use a division strategy to solve ${divisor * quotient} ÷ ${divisor}.`, answer: quotient };
+  }
+  if (topic === 'multi-step-word-problems') {
+    const start = randomInt(safeMin + 5, safeMax + 15);
+    const first = randomInt(2, Math.max(2, Math.floor(start / 3)));
+    const second = randomInt(2, Math.max(2, Math.floor(start / 3)));
+    return { kind: 'number', topic, prompt: `Luca has ${start} cards, gets ${first} more, then gives away ${second}. How many cards are left?`, answer: start + first - second };
+  }
+  if (topic === 'fact-families') {
+    const first = randomInt(2, 9);
+    const second = randomInt(2, 9);
+    return { kind: 'number', topic, prompt: `Write the fact family for ${first}, ${second} and ${first * second}.`, answer: `${first} × ${second} = ${first * second}; ${second} × ${first} = ${first * second}` };
+  }
+  if (topic === 'fraction-models') {
+    const denominator = randomInt(2, 8);
+    const numerator = randomInt(1, denominator - 1);
+    return { kind: 'fraction', topic, prompt: `${numerator} of ${denominator} equal parts are shaded. Write the fraction.`, answer: fractionToText({ numerator, denominator }) };
+  }
+  if (topic === 'measurement-conversions') {
+    const value = randomInt(2, 9);
+    return { kind: 'number', topic, prompt: `Convert ${value} metres to centimetres.`, answer: `${value * 100} cm` };
+  }
+  if (topic === 'elapsed-time') {
+    const startHour = randomInt(8, 15);
+    const minutes = randomInt(1, 5) * 15;
+    const endHour = startHour + Math.floor(minutes / 60);
+    const endMinutes = (minutes % 60);
+    return { kind: 'number', topic, prompt: `A lesson starts at ${startHour}:${String(0).padStart(2, '0')} and lasts ${minutes} minutes. What time does it finish?`, answer: `${endHour}:${String(endMinutes).padStart(2, '0')}` };
+  }
+  if (topic === 'shape-properties') {
+    const shape = pickRandomFromList([{ name: 'triangle', answer: '3' }, { name: 'square', answer: '4' }, { name: 'pentagon', answer: '5' }, { name: 'hexagon', answer: '6' }]);
+    return { kind: 'number', topic, prompt: `How many sides does a ${shape.name} have?`, answer: shape.answer };
+  }
+  if (topic === 'discounts') {
+    const price = randomInt(2, 10) * 10;
+    const discount = pickRandomFromList([10, 20, 50]);
+    return { kind: 'number', topic, prompt: `A $${price} item is reduced by ${discount}%. What is the sale price?`, answer: `$${(price * (1 - discount / 100)).toFixed(2)}` };
+  }
+
+  const data = [randomInt(2, 10), randomInt(2, 10), randomInt(2, 10)];
+  const labels = ['Monday', 'Tuesday', 'Wednesday'];
+  const highestIndex = data.indexOf(Math.max(...data));
+  return { kind: 'number', topic, prompt: `Books read: ${labels[0]} ${data[0]}, ${labels[1]} ${data[1]}, ${labels[2]} ${data[2]}. Which day had the most?`, answer: labels[highestIndex] };
+}
+
+function buildMultiplicationGroupingQuestion(topic) {
+  const rows = randomInt(2, 5);
+  const columns = randomInt(2, 5);
+  return {
+    kind: 'multiplication-grouping',
+    rows,
+    columns,
+    topic,
+    prompt: `There are ${rows} rows with ${columns} counters in each row. Write the multiplication sentence.`,
+    answer: `${rows} × ${columns} = ${rows * columns}`,
+  };
+}
+
+function buildWordProblemQuestion(min, max) {
+  const safeMin = Number.isFinite(min) ? Math.max(1, min) : 1;
+  const safeMax = Number.isFinite(max) ? Math.max(safeMin + 1, max) : 20;
+  const operation = pickRandomFromList(['addition', 'subtraction', 'multiplication', 'division']);
+  const name = pickRandomFromList(['Sam', 'Mia', 'Ava', 'Noah']);
+  const item = pickRandomFromList(['stickers', 'books', 'marbles', 'apples']);
+
+  if (operation === 'addition') {
+    const first = randomInt(safeMin, safeMax);
+    const second = randomInt(safeMin, safeMax);
+    return { kind: 'number', topic: 'word-problems', prompt: `${name} has ${first} ${item} and gets ${second} more. How many ${item} does ${name} have now?`, answer: first + second };
+  }
+
+  if (operation === 'subtraction') {
+    const start = randomInt(safeMin + 1, safeMax);
+    const used = randomInt(1, start - 1);
+    return { kind: 'number', topic: 'word-problems', prompt: `${name} has ${start} ${item} and gives away ${used}. How many ${item} are left?`, answer: start - used };
+  }
+
+  if (operation === 'multiplication') {
+    const groups = randomInt(2, 5);
+    const each = randomInt(2, Math.max(2, Math.min(10, safeMax)));
+    return { kind: 'number', topic: 'word-problems', prompt: `${name} puts ${each} ${item} in each of ${groups} groups. How many ${item} are there altogether?`, answer: groups * each };
+  }
+
+  const divisor = randomInt(2, Math.max(2, Math.min(10, safeMax)));
+  const quotient = randomInt(2, Math.max(2, Math.floor(safeMax / divisor)));
+  return { kind: 'number', topic: 'word-problems', prompt: `${name} shares ${divisor * quotient} ${item} equally among ${divisor} children. How many does each child get?`, answer: quotient };
+}
+
+function renderNumberWritingQuestion(num, question) {
+  return `
+    <div class="question question-number-writing">
+      <div class="question-number">${num}.</div>
+      <div class="number-writing-body">
+        ${renderNumberWritingSVG(question)}
+      </div>
+    </div>`;
+}
+
+function renderNumberWritingSVG(question, isSolution = false) {
+  const strokeClass = isSolution ? 'number-writing-solution-digit' : 'number-writing-trace-digit';
+  const digitPath = getNumberWritingPath(question.value);
+  return `<svg class="number-writing-svg" viewBox="0 0 300 150" preserveAspectRatio="none" role="img" aria-label="${isSolution ? `Number ${question.value}` : 'Trace the number'}">
+    <line x1="20" y1="32" x2="280" y2="32" class="number-writing-guide number-writing-top-guide" />
+    <line x1="20" y1="105" x2="280" y2="105" class="number-writing-guide number-writing-mid-guide" />
+    <line x1="20" y1="142" x2="280" y2="142" class="number-writing-guide number-writing-bottom-guide" />
+    <path d="${digitPath}" class="number-writing-digit-backdrop" />
+    <path d="${digitPath}" class="${strokeClass}" />
+  </svg>`;
+}
+
+function getNumberWritingPath(value) {
+  const paths = {
+    0: 'M150 32 C108 32 102 62 102 88 C102 116 114 136 150 136 C186 136 198 116 198 84 C198 52 186 32 150 32',
+    1: 'M122 52 L148 34 L148 136 M118 136 L178 136',
+    2: 'M100 55 C112 30 170 22 192 49 C214 77 193 94 170 108 L102 136 L200 136',
+    3: 'M105 43 C140 25 190 31 193 59 C195 78 176 87 150 87 C179 87 198 98 194 118 C188 145 132 145 103 128',
+    4: 'M178 136 L178 34 L92 100 L205 100',
+    5: 'M195 34 L108 34 L102 82 C130 70 191 72 195 105 C200 143 130 148 102 124',
+    6: 'M190 42 C165 26 120 36 105 76 C91 113 110 138 145 138 C180 138 197 120 194 96 C191 73 164 68 106 88',
+    7: 'M96 35 L202 35 L132 136',
+    8: 'M150 32 C112 32 105 52 116 70 C126 87 174 87 185 69 C196 50 187 32 150 32 M150 82 C110 82 101 106 113 124 C126 144 176 144 188 124 C199 105 190 82 150 82',
+    9: 'M194 84 C178 97 126 96 108 74 C91 52 108 30 143 30 C180 30 197 53 194 84 L184 136',
+  };
+  return paths[value] || paths[0];
+}
+
+function renderMultiplicationGroupingQuestion(num, question) {
+  return `
+    <div class="question question-multiplication-grouping">
+      <div class="question-number">${num}.</div>
+      <div class="multiplication-grouping-body">
+        <div class="multiplication-grouping-prompt">${escapeHtml(question.prompt)}</div>
+        ${renderMultiplicationArrayHTML(question)}
+        <div class="multiplication-grouping-answer-line"></div>
+      </div>
+    </div>`;
+}
+
+function renderMultiplicationArrayHTML(question, isSolution = false) {
+  const counters = Array.from({ length: question.rows * question.columns }, () => '<span class="multiplication-counter"></span>').join('');
+  return `<div class="multiplication-array${isSolution ? ' multiplication-array-solution' : ''}" style="--array-columns:${question.columns}" aria-label="${question.rows} rows of ${question.columns}">${counters}</div>`;
+}
+
 function buildMoneyQuestion(topic, min, max) {
   switch (topic) {
     case 'making-change': {
@@ -3656,6 +4579,42 @@ function buildMoneyQuestion(topic, min, max) {
         topic,
         prompt: `Sam has $${start}. He spends $${spend} on a toy. How much money does he have left?`,
         answer: `$${start - spend}`,
+      };
+    }
+    case 'saving-money': {
+      const target = randomInt(10, 50);
+      const saved = randomInt(1, target - 1);
+      return {
+        kind: 'number',
+        topic,
+        prompt: `Ava wants to save $${target}. She has saved $${saved}. How much more does she need?`,
+        answer: `$${target - saved}`,
+      };
+    }
+    case 'budgeting': {
+      const budget = randomInt(20, 80);
+      const firstSpend = randomInt(2, Math.floor(budget / 3));
+      const secondSpend = randomInt(2, Math.floor(budget / 3));
+      return {
+        kind: 'number',
+        topic,
+        prompt: `Mia has a $${budget} budget. She spends $${firstSpend} on lunch and $${secondSpend} on a book. How much is left?`,
+        answer: `$${budget - firstSpend - secondSpend}`,
+      };
+    }
+    case 'best-buy': {
+      const item = pickRandomFromList(['juice', 'cereal', 'pencils', 'apples']);
+      const smallQuantity = 2;
+      const smallPrice = randomInt(3, 8);
+      const largeQuantity = 4;
+      const largePrice = randomInt(smallPrice + 1, smallPrice * 2 + 2);
+      const smallUnitPrice = smallPrice / smallQuantity;
+      const largeUnitPrice = largePrice / largeQuantity;
+      return {
+        kind: 'number',
+        topic,
+        prompt: `Which is the better buy for ${item}: ${smallQuantity} for $${smallPrice.toFixed(2)} or ${largeQuantity} for $${largePrice.toFixed(2)}?`,
+        answer: smallUnitPrice <= largeUnitPrice ? `${smallQuantity} for $${smallPrice.toFixed(2)}` : `${largeQuantity} for $${largePrice.toFixed(2)}`,
       };
     }
     default:
@@ -4064,6 +5023,600 @@ function formatDecimalOperationText(question) {
   return `${question.left} ${operators[question.operation]} ${question.right}`;
 }
 
+// ===========================
+//  Bulk Add (multi-folder PDF export)
+// ===========================
+
+function createBulkDay(label) {
+  return { label, items: [], formulaSheetModule: '' };
+}
+
+let bulkDays = [createBulkDay('Day 1')];
+let currentBulkDayIndex = 0;
+
+function buildWorksheetPagesForConfig(config) {
+  const questions = buildQuestions(
+    config.topic,
+    config.minNum,
+    config.maxNum,
+    config.numQuestions,
+    config.timesTable,
+    config.denominatorMode,
+    config.magicSquareSize
+  );
+  const title = config.title || buildDefaultTitle(config.module, config.topic, config.timesTable);
+  return paginateQuestions(questions, title, config.module, config.includeSolutions, config.topic, config.timesTable);
+}
+
+function buildBulkItemLabel(config) {
+  const topicTitle = topicLabel(config.topic, config.timesTable).replace(/ Practice$/, '');
+  const sizeLabel = config.topic === 'magic-squares' ? `, ${config.magicSquareSize} × ${config.magicSquareSize}` : '';
+  return `${moduleLabel(config.module)} - ${topicTitle}${sizeLabel} (${config.numQuestions} Qs${config.includeSolutions ? ', solutions' : ''})`;
+}
+
+function openBulkModal() {
+  bulkModalOverlay.style.display = 'flex';
+}
+
+function closeBulkModal() {
+  bulkModalOverlay.style.display = 'none';
+}
+
+function getCurrentBulkDay() {
+  return bulkDays[currentBulkDayIndex];
+}
+
+function renderBulkDayNav() {
+  const day = getCurrentBulkDay();
+  bulkDayLabelInput.value = day.label;
+  bulkDayIndicator.textContent = `Day ${currentBulkDayIndex + 1} of ${bulkDays.length}`;
+  bulkPrevDayBtn.disabled = currentBulkDayIndex === 0;
+  bulkNextDayBtn.disabled = currentBulkDayIndex === bulkDays.length - 1;
+  bulkRemoveDayBtn.disabled = bulkDays.length <= 1;
+
+  const hasFormulaSheet = Boolean(day.formulaSheetModule);
+  bulkDayFormulaCheckbox.checked = hasFormulaSheet;
+  bulkDayFormulaModule.disabled = !hasFormulaSheet;
+  bulkDayFormulaModule.value = day.formulaSheetModule || bulkModuleSelect.value;
+}
+
+function renderBulkItemsList() {
+  const items = getCurrentBulkDay().items;
+
+  bulkItemsList.innerHTML = items
+    .map((item, index) => `
+      <li data-index="${index}">
+        <span>${escapeHtml(item.label)}</span>
+        <button type="button" class="bulk-item-remove" data-index="${index}">Remove</button>
+      </li>`)
+    .join('');
+
+  bulkItemsEmpty.style.display = items.length === 0 ? 'block' : 'none';
+  updateBulkGenerateButtonState();
+}
+
+function updateBulkGenerateButtonState() {
+  const hasAnyItems = bulkDays.some((day) => day.items.length > 0 || day.formulaSheetModule);
+  bulkGenerateBtn.disabled = !hasAnyItems;
+}
+
+function readBulkItemConfigFromForm() {
+  const module = bulkModuleSelect.value;
+  const topic = bulkTopicSelect.value;
+  const minNum = parseInt(bulkMinNumInput.value, 10);
+  const maxNum = parseInt(bulkMaxNumInput.value, 10);
+  const numQuestions = parseInt(bulkNumQuestionsInput.value, 10);
+  const timesTable = parseInt(bulkTimesTableSelect.value, 10);
+  const denominatorMode = bulkDenominatorSelect.value;
+  const magicSquareSize = parseInt(bulkMagicSquareSizeSelect.value, 10);
+  const includeSolutions = bulkSolutionsCheckbox.checked;
+  const title = bulkTitleInput.value.trim();
+
+  if (topic !== 'times-tables' && minNum > maxNum) {
+    alert('Min Number cannot be greater than Max Number.');
+    return null;
+  }
+
+  if (!Number.isFinite(numQuestions) || numQuestions < 1) {
+    alert('Number of Questions must be at least 1.');
+    return null;
+  }
+
+  return { module, topic, minNum, maxNum, numQuestions, timesTable, denominatorMode, magicSquareSize, includeSolutions, title };
+}
+
+function addBulkItem() {
+  const config = readBulkItemConfigFromForm();
+  if (!config) {
+    return;
+  }
+
+  config.label = buildBulkItemLabel(config);
+  getCurrentBulkDay().items.push(config);
+  renderBulkItemsList();
+}
+
+function removeBulkItem(index) {
+  getCurrentBulkDay().items.splice(index, 1);
+  renderBulkItemsList();
+}
+
+function goToBulkDay(index) {
+  if (index < 0 || index >= bulkDays.length) {
+    return;
+  }
+  currentBulkDayIndex = index;
+  renderBulkDayNav();
+  renderBulkItemsList();
+}
+
+function addBulkDay() {
+  bulkDays.push(createBulkDay(`Day ${bulkDays.length + 1}`));
+  goToBulkDay(bulkDays.length - 1);
+}
+
+function duplicateBulkDay() {
+  const current = getCurrentBulkDay();
+  const copy = {
+    label: `${current.label} (copy)`,
+    items: current.items.map((item) => ({ ...item })),
+    formulaSheetModule: current.formulaSheetModule,
+  };
+  bulkDays.splice(currentBulkDayIndex + 1, 0, copy);
+  goToBulkDay(currentBulkDayIndex + 1);
+}
+
+function removeBulkDay() {
+  if (bulkDays.length <= 1) {
+    alert('A program needs at least one day.');
+    return;
+  }
+
+  bulkDays.splice(currentBulkDayIndex, 1);
+  goToBulkDay(Math.min(currentBulkDayIndex, bulkDays.length - 1));
+}
+
+function renameBulkDay() {
+  const label = bulkDayLabelInput.value.trim() || `Day ${currentBulkDayIndex + 1}`;
+  getCurrentBulkDay().label = label;
+}
+
+function setBulkBusy(isBusy, message = '') {
+  updateBulkGenerateButtonState();
+  bulkGenerateBtn.disabled = isBusy || bulkGenerateBtn.disabled;
+  bulkCancelBtn.disabled = isBusy;
+  bulkAddItemBtn.disabled = isBusy;
+  bulkModalCloseBtn.disabled = isBusy;
+  bulkAddDayBtn.disabled = isBusy;
+  bulkDuplicateDayBtn.disabled = isBusy;
+  bulkRemoveDayBtn.disabled = isBusy || bulkDays.length <= 1;
+  bulkPrevDayBtn.disabled = isBusy || currentBulkDayIndex === 0;
+  bulkNextDayBtn.disabled = isBusy || currentBulkDayIndex === bulkDays.length - 1;
+  bulkProgress.style.display = message ? 'block' : 'none';
+  bulkProgress.textContent = message;
+}
+
+function getPdfCaptureSandbox() {
+  let sandbox = document.getElementById('pdfCaptureSandbox');
+  if (!sandbox) {
+    sandbox = document.createElement('div');
+    sandbox.id = 'pdfCaptureSandbox';
+    sandbox.className = 'pdf-capture-sandbox';
+    document.body.appendChild(sandbox);
+  }
+  return sandbox;
+}
+
+async function renderPagesIntoPdf(pdf, pageHtmlList, hasExistingPages) {
+  const sandbox = getPdfCaptureSandbox();
+  let addedFirstPage = hasExistingPages;
+
+  for (const pageHtml of pageHtmlList) {
+    sandbox.innerHTML = pageHtml;
+    const pageEl = sandbox.firstElementChild;
+
+    // Let the browser lay out/paint the page before capturing it.
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+    const canvas = await html2canvas(pageEl, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+    const imgData = canvas.toDataURL('image/jpeg', 0.92);
+
+    if (addedFirstPage) {
+      pdf.addPage('a4', 'portrait');
+    }
+    pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+    addedFirstPage = true;
+  }
+
+  sandbox.innerHTML = '';
+  return addedFirstPage;
+}
+
+function padFolderNumber(num, total) {
+  const digits = String(total).length;
+  return String(num).padStart(Math.max(digits, 2), '0');
+}
+
+async function generateBulkPdfs() {
+  const folderCount = parseInt(bulkFolderCountInput.value, 10);
+  const batchName = bulkBatchNameInput.value.trim() || 'Bulk Worksheets';
+
+  if (!Number.isFinite(folderCount) || folderCount < 1) {
+    alert('Number of Folders must be at least 1.');
+    return;
+  }
+
+  const emptyDay = bulkDays.find((day) => day.items.length === 0 && !day.formulaSheetModule);
+  if (emptyDay) {
+    alert(`"${emptyDay.label}" has no worksheets yet. Add at least one worksheet to every day, or remove empty days.`);
+    return;
+  }
+
+  const { jsPDF } = window.jspdf || {};
+  if (!jsPDF || typeof html2canvas !== 'function' || typeof JSZip !== 'function') {
+    alert('Bulk PDF generation requires an internet connection to load required libraries. Please check your connection and try again.');
+    return;
+  }
+
+  setBulkBusy(true, 'Preparing...');
+
+  try {
+    const zip = new JSZip();
+    const batchFolder = zip.folder(sanitizeFileNamePart(batchName));
+
+    for (let folderNum = 1; folderNum <= folderCount; folderNum++) {
+      const dayConfig = bulkDays[(folderNum - 1) % bulkDays.length];
+      setBulkBusy(true, `Generating folder ${folderNum} of ${folderCount} (${dayConfig.label})...`);
+
+      const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+      let hasPages = false;
+
+      if (dayConfig.formulaSheetModule) {
+        setBulkBusy(true, `Folder ${folderNum} of ${folderCount} (${dayConfig.label}) - adding formula sheet cover page...`);
+        hasPages = await renderPagesIntoPdf(pdf, [buildFormulaSheetHTML(dayConfig.formulaSheetModule)], hasPages);
+      }
+
+      for (let i = 0; i < dayConfig.items.length; i++) {
+        const config = dayConfig.items[i];
+        setBulkBusy(true, `Folder ${folderNum} of ${folderCount} (${dayConfig.label}) - worksheet ${i + 1} of ${dayConfig.items.length}...`);
+        const pages = buildWorksheetPagesForConfig(config);
+        hasPages = await renderPagesIntoPdf(pdf, pages, hasPages);
+      }
+
+      const folderLabel = `Day ${padFolderNumber(folderNum, folderCount)}`;
+      const pdfBlob = pdf.output('blob');
+      batchFolder.folder(folderLabel).file(`${sanitizeFileNamePart(dayConfig.label)}.pdf`, pdfBlob);
+    }
+
+    setBulkBusy(true, 'Packaging folders into a zip file...');
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+
+    const url = URL.createObjectURL(zipBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${sanitizeFileNamePart(batchName)}.zip`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+
+    bulkDays = [createBulkDay('Day 1')];
+    currentBulkDayIndex = 0;
+    renderBulkDayNav();
+    renderBulkItemsList();
+    closeBulkModal();
+  } catch (error) {
+    console.error('Bulk PDF generation failed:', error);
+    alert('Something went wrong while generating the bulk PDFs. Please try again.');
+  } finally {
+    setBulkBusy(false, '');
+  }
+}
+
+bulkAddBtn.addEventListener('click', openBulkModal);
+bulkModalCloseBtn.addEventListener('click', closeBulkModal);
+bulkCancelBtn.addEventListener('click', closeBulkModal);
+bulkModalOverlay.addEventListener('click', (event) => {
+  if (event.target === bulkModalOverlay) {
+    closeBulkModal();
+  }
+});
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && bulkModalOverlay.style.display !== 'none') {
+    closeBulkModal();
+  }
+});
+bulkAddItemBtn.addEventListener('click', addBulkItem);
+bulkItemsList.addEventListener('click', (event) => {
+  const button = event.target.closest('.bulk-item-remove');
+  if (button) {
+    removeBulkItem(parseInt(button.dataset.index, 10));
+  }
+});
+bulkGenerateBtn.addEventListener('click', generateBulkPdfs);
+bulkPrevDayBtn.addEventListener('click', () => goToBulkDay(currentBulkDayIndex - 1));
+bulkNextDayBtn.addEventListener('click', () => goToBulkDay(currentBulkDayIndex + 1));
+bulkAddDayBtn.addEventListener('click', addBulkDay);
+bulkDuplicateDayBtn.addEventListener('click', duplicateBulkDay);
+bulkRemoveDayBtn.addEventListener('click', removeBulkDay);
+bulkDayLabelInput.addEventListener('change', renameBulkDay);
+bulkDayFormulaCheckbox.addEventListener('change', () => {
+  const day = getCurrentBulkDay();
+  day.formulaSheetModule = bulkDayFormulaCheckbox.checked ? bulkDayFormulaModule.value : '';
+  bulkDayFormulaModule.disabled = !bulkDayFormulaCheckbox.checked;
+});
+bulkDayFormulaModule.addEventListener('change', () => {
+  if (bulkDayFormulaCheckbox.checked) {
+    getCurrentBulkDay().formulaSheetModule = bulkDayFormulaModule.value;
+  }
+});
+
+renderBulkDayNav();
+renderBulkItemsList();
+
+// ---- Saved filters (bulk programs), persisted in localStorage ----
+
+const BULK_PRESETS_STORAGE_KEY = 'worksheetGenerator.bulkPresets';
+
+function loadBulkPresets() {
+  try {
+    const raw = localStorage.getItem(BULK_PRESETS_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (error) {
+    console.error('Failed to read saved filters:', error);
+    return {};
+  }
+}
+
+function saveBulkPresets(presets) {
+  try {
+    localStorage.setItem(BULK_PRESETS_STORAGE_KEY, JSON.stringify(presets));
+  } catch (error) {
+    console.error('Failed to save filters:', error);
+    alert('Could not save the filter. Your browser storage may be full or unavailable.');
+  }
+}
+
+function renderBulkPresetOptions(selectedName = '') {
+  const presets = loadBulkPresets();
+  const names = Object.keys(presets).sort((a, b) => a.localeCompare(b));
+
+  bulkPresetSelect.innerHTML = '<option value="">-- Select a saved filter --</option>'
+    + names.map((name) => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
+  bulkPresetSelect.value = names.includes(selectedName) ? selectedName : '';
+
+  const hasSelection = Boolean(bulkPresetSelect.value);
+  bulkLoadPresetBtn.disabled = !hasSelection;
+  bulkDeletePresetBtn.disabled = !hasSelection;
+}
+
+function saveCurrentBulkPreset() {
+  const name = bulkPresetNameInput.value.trim();
+  if (!name) {
+    alert('Enter a name for this filter before saving.');
+    return;
+  }
+
+  const hasAnyItems = bulkDays.some((day) => day.items.length > 0 || day.formulaSheetModule);
+  if (!hasAnyItems) {
+    alert('Add at least one worksheet or formula sheet to at least one day before saving a filter.');
+    return;
+  }
+
+  const presets = loadBulkPresets();
+  if (presets[name] && !confirm(`A saved filter named "${name}" already exists. Overwrite it?`)) {
+    return;
+  }
+
+  presets[name] = {
+    batchName: bulkBatchNameInput.value.trim() || 'Bulk Worksheets',
+    folderCount: parseInt(bulkFolderCountInput.value, 10) || 1,
+    days: bulkDays.map((day) => ({
+      label: day.label,
+      items: day.items.map((item) => ({ ...item })),
+      formulaSheetModule: day.formulaSheetModule || '',
+    })),
+  };
+  saveBulkPresets(presets);
+  bulkPresetNameInput.value = '';
+  renderBulkPresetOptions(name);
+}
+
+function loadSelectedBulkPreset() {
+  const name = bulkPresetSelect.value;
+  if (!name) {
+    return;
+  }
+
+  const presets = loadBulkPresets();
+  const preset = presets[name];
+  if (!preset) {
+    return;
+  }
+
+  bulkBatchNameInput.value = preset.batchName || 'Bulk Worksheets';
+  bulkFolderCountInput.value = preset.folderCount || 1;
+
+  if (Array.isArray(preset.days) && preset.days.length > 0) {
+    bulkDays = preset.days.map((day) => ({
+      label: day.label,
+      items: (day.items || []).map((item) => ({ ...item })),
+      formulaSheetModule: day.formulaSheetModule || '',
+    }));
+  } else if (Array.isArray(preset.items)) {
+    // Back-compat with filters saved before the day-plan feature.
+    bulkDays = [{ label: 'Day 1', items: preset.items.map((item) => ({ ...item })), formulaSheetModule: '' }];
+  } else {
+    bulkDays = [createBulkDay('Day 1')];
+  }
+
+  currentBulkDayIndex = 0;
+  renderBulkDayNav();
+  renderBulkItemsList();
+}
+
+function deleteSelectedBulkPreset() {
+  const name = bulkPresetSelect.value;
+  if (!name) {
+    return;
+  }
+
+  if (!confirm(`Delete the saved filter "${name}"?`)) {
+    return;
+  }
+
+  const presets = loadBulkPresets();
+  delete presets[name];
+  saveBulkPresets(presets);
+  renderBulkPresetOptions();
+}
+
+bulkPresetSelect.addEventListener('change', () => {
+  const hasSelection = Boolean(bulkPresetSelect.value);
+  bulkLoadPresetBtn.disabled = !hasSelection;
+  bulkDeletePresetBtn.disabled = !hasSelection;
+});
+bulkSavePresetBtn.addEventListener('click', saveCurrentBulkPreset);
+bulkLoadPresetBtn.addEventListener('click', loadSelectedBulkPreset);
+bulkDeletePresetBtn.addEventListener('click', deleteSelectedBulkPreset);
+
+renderBulkPresetOptions();
+
+// ===========================
+//  Formula & Glossary Lookup
+// ===========================
+
+const FORMULA_SHEETS = {
+  arithmetic: [
+    { heading: 'Order of Operations (BODMAS)', rules: ['Brackets first', 'Orders (powers & roots) next', 'Division and Multiplication, left to right', 'Addition and Subtraction, left to right'] },
+    { heading: 'Basic Properties', rules: ['a + b = b + a (commutative addition)', 'a × b = b × a (commutative multiplication)', 'a × (b + c) = (a × b) + (a × c) (distributive law)'] },
+  ],
+  fractions: [
+    { heading: 'Equivalent Fractions', rules: ['Multiply or divide the numerator and denominator by the same number'] },
+    { heading: 'Add / Subtract', rules: ['Same denominator: a/c + b/c = (a+b)/c', 'Different denominators: find a common denominator first'] },
+    { heading: 'Multiply / Divide', rules: ['Multiply: a/b × c/d = (a×c)/(b×d)', 'Divide: a/b ÷ c/d = a/b × d/c (flip and multiply)'] },
+    { heading: 'Simplifying & Converting', rules: ['Simplify: divide numerator and denominator by their GCD', 'Mixed to improper: (whole × denominator) + numerator, over the denominator'] },
+  ],
+  decimals: [
+    { heading: 'Place Value', rules: ['Tenths, hundredths, thousandths (each column is ÷10 of the last)'] },
+    { heading: 'Operations', rules: ['Add/Subtract: line up the decimal points', 'Multiply: multiply as whole numbers, then count total decimal places', 'Divide: move the decimal point to make the divisor a whole number'] },
+  ],
+  percentages: [
+    { heading: 'Conversions', rules: ['% to decimal: divide by 100', 'Decimal to %: multiply by 100', 'Fraction to %: (numerator ÷ denominator) × 100'] },
+    { heading: 'Calculations', rules: ['Percentage of an amount: (percentage ÷ 100) × amount', 'Percentage increase: original + (percentage × original)', 'Percentage decrease: original − (percentage × original)'] },
+  ],
+  geometry: [
+    { heading: 'Angle Facts', rules: ['Angles on a straight line = 180°', 'Angles around a point = 360°', 'Angles in a triangle = 180°', 'Angles in a quadrilateral = 360°'] },
+    { heading: 'Circles', rules: ['Circumference = 2πr = πd', 'Area = πr²'] },
+  ],
+  measurement: [
+    { heading: 'Perimeter', rules: ['Rectangle = 2(l + w)', 'Square = 4s', 'Triangle = a + b + c'] },
+    { heading: 'Area', rules: ['Rectangle = l × w', 'Square = s²', 'Triangle = ½ × b × h', 'Circle = πr²', 'Parallelogram = b × h', 'Trapezium = ½(a + b) × h'] },
+    { heading: 'Volume & Surface Area', rules: ['Cube volume = s³, surface area = 6s²', 'Rectangular prism volume = l × w × h', 'Cylinder volume = πr²h'] },
+    { heading: 'Unit Conversions', rules: ['km ↔ m: ×1,000 / ÷1,000', 'm ↔ cm: ×100 / ÷100', 'kg ↔ g: ×1,000 / ÷1,000', 'L ↔ mL: ×1,000 / ÷1,000', 'hours ↔ minutes: ×60 / ÷60'] },
+  ],
+  money: [
+    { heading: 'Working with Money', rules: ['Adding money: line up the decimal points, add cents then dollars', 'Making change: amount paid − cost = change'] },
+  ],
+  number: [
+    { heading: 'Key Terms', rules: ['Factors: numbers that divide exactly into another number', 'Multiples: results of multiplying a number by whole numbers', 'Prime numbers: only divisible by 1 and itself (2, 3, 5, 7, 11, 13...)', 'Composite numbers: have more than two factors', 'Square numbers: n × n', 'Square root: √(n × n) = n'] },
+  ],
+  ratio: [
+    { heading: 'Ratios', rules: ['Writing ratios: a : b', 'Equivalent ratios: multiply or divide both sides by the same number', 'Dividing in a ratio: total parts = a + b, each part = total ÷ parts'] },
+    { heading: 'Proportion', rules: ['a/b = c/d, cross multiply: a × d = b × c'] },
+  ],
+  statistics: [
+    { heading: 'Averages', rules: ['Mean = sum of values ÷ number of values', 'Median = middle value when ordered (average the two middle values if even count)', 'Mode = most frequently occurring value', 'Range = highest value − lowest value'] },
+    { heading: 'Probability', rules: ['Probability = favourable outcomes ÷ total outcomes'] },
+  ],
+  trigonometry: [
+    { heading: 'SOH CAH TOA', rules: ['sin θ = opposite / hypotenuse', 'cos θ = adjacent / hypotenuse', 'tan θ = opposite / adjacent'] },
+    { heading: 'Key Rules', rules: ['Pythagoras\u2019 Theorem: a² + b² = c²', 'Sine Rule: a/sin A = b/sin B = c/sin C', 'Cosine Rule: c² = a² + b² − 2ab cos C', 'Angle sum of a triangle = 180°'] },
+  ],
+  algebra: [
+    { heading: 'Working with Expressions', rules: ['Like terms: combine terms with the same variable and power', 'Expanding: a(b + c) = ab + ac', 'Factorising: reverse of expanding — find common factors'] },
+    { heading: 'Equations & Substitution', rules: ['Solving equations: do the same operation to both sides to keep it balanced', 'Substitution: replace variables with given values, then calculate'] },
+    { heading: 'Index Laws', rules: ['aᵐ × aⁿ = aᵐ⁺ⁿ', 'aᵐ ÷ aⁿ = aᵐ⁻ⁿ', '(aᵐ)ⁿ = aᵐⁿ'] },
+  ],
+};
+
+function buildFormulaSheetHTML(module) {
+  const groups = FORMULA_SHEETS[module] || [];
+  const groupsHTML = groups.map((group) => `
+    <section class="conversion-formula-group">
+      <h3>${escapeHtml(group.heading)}</h3>
+      <ul>${group.rules.map((rule) => `<li>${escapeHtml(rule)}</li>`).join('')}</ul>
+    </section>`).join('');
+
+  return `
+    <div class="a4-page conversion-formula-page">
+      <div class="worksheet-header">
+        ${buildWorksheetHeaderBrandHTML(`${moduleLabel(module)} Formula Sheet`, module)}
+        <div class="worksheet-info-strip">
+          ${buildInfoStripItem('book', 'Module', moduleLabel(module))}
+          ${buildInfoStripItem('clipboard', 'Type', 'Formula & Glossary Sheet')}
+          ${buildInfoStripBlankItem('calendar', 'Date', 'date')}
+        </div>
+      </div>
+      <div class="conversion-formula-content">
+        <h2>${escapeHtml(moduleLabel(module))} - Key Formulas &amp; Terms</h2>
+        <div class="conversion-formula-grid">${groupsHTML}</div>
+      </div>
+      <div class="page-footer">
+        <div class="page-footer-left">${buildFooterLegalHTML()}</div>
+        <span class="page-footer-right">Page 1 of 1</span>
+      </div>
+    </div>`;
+}
+
+function renderFormulaLookupPreview() {
+  formulaLookupPreview.innerHTML = buildFormulaSheetHTML(formulaModuleSelect.value);
+}
+
+function openFormulaModal() {
+  renderFormulaLookupPreview();
+  formulaModalOverlay.style.display = 'flex';
+}
+
+function closeFormulaModal() {
+  formulaModalOverlay.style.display = 'none';
+}
+
+function printFormulaSheet() {
+  const printContainer = document.createElement('div');
+  printContainer.className = 'formula-print-only';
+  printContainer.innerHTML = buildFormulaSheetHTML(formulaModuleSelect.value);
+  document.body.appendChild(printContainer);
+  document.body.classList.add('formula-print-mode');
+  document.title = buildPrintableFileName();
+
+  const cleanup = () => {
+    document.body.classList.remove('formula-print-mode');
+    document.title = initialDocumentTitle;
+    printContainer.remove();
+    window.removeEventListener('afterprint', cleanup);
+  };
+  window.addEventListener('afterprint', cleanup);
+
+  window.print();
+}
+
+formulaLookupBtn.addEventListener('click', openFormulaModal);
+formulaModalCloseBtn.addEventListener('click', closeFormulaModal);
+formulaModalCancelBtn.addEventListener('click', closeFormulaModal);
+formulaModalOverlay.addEventListener('click', (event) => {
+  if (event.target === formulaModalOverlay) {
+    closeFormulaModal();
+  }
+});
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && formulaModalOverlay.style.display !== 'none') {
+    closeFormulaModal();
+  }
+});
+formulaModuleSelect.addEventListener('change', renderFormulaLookupPreview);
+formulaPrintBtn.addEventListener('click', printFormulaSheet);
+
 function formatDecimalResult(value) {
   return Number(value.toFixed(2)).toString();
 }
@@ -4083,6 +5636,44 @@ function formatPercentageChange(base, percent, direction) {
 }
 
 function getPageInstruction(topic) {
+  const primaryInstructions = {
+    'multiplication-strategies': 'Use a strategy to solve each multiplication question:',
+    'division-strategies': 'Use a strategy to solve each division question:',
+    'multi-step-word-problems': 'Read each problem carefully and solve it in steps:',
+    'fact-families': 'Write the related facts for each number family:',
+    'fraction-models': 'Write the fraction represented by each description:',
+    'measurement-conversions': 'Convert each measurement:',
+    'elapsed-time': 'Work out the finishing time for each activity:',
+    'shape-properties': 'Answer each question about shape properties:',
+    discounts: 'Calculate each sale price:',
+    'data-interpretation': 'Read the data and answer each question:',
+  };
+  if (primaryInstructions[topic]) {
+    return primaryInstructions[topic];
+  }
+
+  const advancedInstructions = {
+    quadratics: 'Solve each quadratic equation:',
+    calculus: 'Find each derivative:',
+    vectors: 'Add each pair of vectors:',
+    matrices: 'Add each pair of matrices:',
+    'complex-numbers': 'Simplify each complex-number expression:',
+    'financial-mathematics': 'Calculate the simple interest in each question:',
+    'advanced-probability': 'Find the probability of each event:',
+    pythagoras: 'Use Pythagoras’ theorem to find each hypotenuse:',
+  };
+  if (advancedInstructions[topic]) {
+    return advancedInstructions[topic];
+  }
+
+  if (topic === 'sudoku') {
+    return 'Complete the grid so each row, column and 3 × 3 box contains the numbers 1 to 9 once.';
+  }
+
+  if (topic === 'magic-squares') {
+    return 'Complete each square so every row, column and diagonal has the same total.';
+  }
+
   if (topic === 'odd-even') {
     return 'State whether each number is odd or even:';
   }
@@ -4097,6 +5688,18 @@ function getPageInstruction(topic) {
 
   if (topic === 'number-sentences') {
     return 'Find the missing number in each number sentence:';
+  }
+
+  if (topic === 'writing-numbers-sequence' || topic === 'writing-numbers-random') {
+    return 'Trace each number carefully:';
+  }
+
+  if (topic === 'identifying-numbers') {
+    return 'Write the numeral for each number name:';
+  }
+
+  if (topic === 'multiplication-groups') {
+    return 'Use the rows and columns to write each multiplication sentence:';
   }
 
   if (topic === 'equality') {
@@ -4153,6 +5756,10 @@ function getPageInstruction(topic) {
 
   if (topic === 'simple-probability') {
     return 'Find the probability of each event as a fraction:';
+  }
+
+  if (topic === 'word-problems') {
+    return 'Read each problem carefully and solve it:';
   }
 
   if (topic === 'making-change') {
