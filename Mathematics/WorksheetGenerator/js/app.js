@@ -40,6 +40,29 @@ const rangeRow         = document.getElementById('rangeRow');
 const titleInput       = document.getElementById('title');
 const solutionsCheckbox = document.getElementById('solutionsRequired');
 const coverPageCheckbox = document.getElementById('coverPageRequired');
+const examCheckbox = document.getElementById('examRequired');
+const examDisclaimerEditBtn = document.getElementById('examDisclaimerEditBtn');
+const examDisclaimerEditor = document.getElementById('examDisclaimerEditor');
+const examEditorBackdrop = document.getElementById('examEditorBackdrop');
+const examInfoBox = document.getElementById('examInfoBox');
+const examInstructionsBox = document.getElementById('examInstructionsBox');
+const DEFAULT_EXAM_DISCLAIMER = 'Exam conditions apply.';
+const examDisclaimerPreset = document.getElementById('examDisclaimerPreset');
+const examLoadPresetBtn = document.getElementById('examLoadPresetBtn');
+const examDeletePresetBtn = document.getElementById('examDeletePresetBtn');
+const examPresetName = document.getElementById('examPresetName');
+const examSavePresetBtn = document.getElementById('examSavePresetBtn');
+const examDisclaimerLivePreview = document.getElementById('examDisclaimerLivePreview');
+const EXAM_DISCLAIMER_PRESETS_KEY = 'worksheetGenerator.examDisclaimerPresets';
+const BUILT_IN_EXAM_DISCLAIMERS = {
+  Exam: { html: '<p>Exam conditions apply.</p><ul><li>Read every question carefully before beginning.</li><li>Show all working clearly.</li><li>Write your name on the cover page.</li><li>Check your answers before submitting.</li></ul>' },
+  'Exam - No Calculator': { html: '<p>Exam conditions apply. This is a no-calculator examination.</p><ul><li>Calculators, phones, and other electronic devices are not permitted.</li><li>Show all working clearly so each method can be checked.</li><li>Give exact answers where possible.</li><li>Check your answers before submitting.</li></ul>' },
+  'Exam - Detailed Information': { html: '<p><strong>Examination Information</strong></p><p><strong>Reading Time:</strong> 5 minutes<br><strong>Writing Time:</strong> 55 minutes<br><strong>Total Time:</strong> 60 minutes<br><strong>Total Marks:</strong> ______</p><p><strong>Instructions</strong></p><ul><li>Read all questions carefully during the reading time.</li><li>Do not write in the examination booklet during reading time.</li><li>Answer all questions.</li><li>Show all working where appropriate.</li><li>Write clearly in the spaces provided.</li><li>If you make a mistake, rule through it neatly.</li></ul><p><strong>Permitted Materials</strong></p><ul><li>Pens (blue or black)</li><li>Pencil</li><li>Eraser</li><li>Ruler</li></ul><p><strong>Prohibited Materials</strong></p><ul><li>Mobile phones</li><li>Smart watches</li><li>Notes or textbooks</li><li>Calculators</li></ul>' },
+  'Exam - Show Working': { html: '<p>Exam conditions apply.</p><ul><li>Show every important step in your working.</li><li>Write formulas before substituting values.</li><li>Include units in measurement answers.</li><li>Round answers only as instructed.</li></ul>' },
+  'Assessment - Check Answers': { html: '<p>Complete all questions independently.</p><ol><li>Read each question carefully.</li><li>Plan your method before calculating.</li><li>Check calculations and units.</li><li>Review every answer before submitting.</li></ol>' },
+  'Exam - Calculator Allowed': { html: '<p>Exam conditions apply. Calculators may be used where appropriate.</p><ul><li>Show the values and formula used.</li><li>Keep intermediate answers accurate.</li><li>Round only your final answer.</li><li>Check that your answer is reasonable.</li></ul>' },
+  'Exam - Student Checklist': { html: '<p>Before you submit your examination:</p><ol><li>Answer every question.</li><li>Show all working.</li><li>Check signs, calculations, and units.</li><li>Make sure your writing is clear.</li><li>Review any questions you skipped.</li></ol>' },
+};
 const formulaSheetCheckbox = document.getElementById('formulaSheetRequired');
 const coverPageTitleGroup = document.getElementById('coverPageTitleGroup');
 const coverPageTitleInput = document.getElementById('coverPageTitle');
@@ -475,6 +498,11 @@ moduleTopicSearchResults.addEventListener('change', applyModuleTopicSearchResult
 moduleTopicSearchToggle.addEventListener('click', toggleModuleTopicSearch);
 moduleTopicSearchBackdrop.addEventListener('click', closeModuleTopicSearch);
 document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && examDisclaimerEditor.style.display !== 'none') {
+    closeExamDisclaimerEditor();
+    return;
+  }
+
   if (event.key === 'Escape' && moduleTopicSearchPopup.style.display !== 'none') {
     closeModuleTopicSearch();
   }
@@ -525,9 +553,117 @@ denominatorSelect.addEventListener('change', () => {
   updateTitleInput();
 });
 
-coverPageCheckbox.addEventListener('change', () => {
-  coverPageTitleGroup.style.display = coverPageCheckbox.checked ? 'block' : 'none';
+function updateCoverPageTitleVisibility() {
+  if (examCheckbox.checked) {
+    coverPageCheckbox.checked = true;
+  }
+  coverPageTitleGroup.style.display = coverPageCheckbox.checked || examCheckbox.checked ? 'block' : 'none';
+  examDisclaimerEditBtn.disabled = !examCheckbox.checked;
+  if (!examCheckbox.checked) {
+    examDisclaimerEditor.style.display = 'none';
+  }
+}
+
+coverPageCheckbox.addEventListener('change', updateCoverPageTitleVisibility);
+examCheckbox.addEventListener('change', updateCoverPageTitleVisibility);
+examDisclaimerEditBtn.addEventListener('click', () => {
+  const isOpen = examDisclaimerEditor.style.display !== 'none';
+  examDisclaimerEditor.style.display = isOpen ? 'none' : 'block';
+  examEditorBackdrop.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) {
+    updateExamDisclaimerLivePreview();
+    examInfoBox.focus();
+  }
 });
+
+examEditorBackdrop.addEventListener('click', closeExamDisclaimerEditor);
+function closeExamDisclaimerEditor() {
+  examDisclaimerEditor.style.display = 'none';
+  examEditorBackdrop.style.display = 'none';
+}
+
+function updateExamEditorFields() {
+  updateExamDisclaimerLivePreview();
+}
+
+function updateExamDisclaimerLivePreview() {
+  examDisclaimerLivePreview.innerHTML = buildExamDisclaimerHTML();
+  if (lastGeneratedQuestions.length > 0 && examCheckbox.checked) {
+    renderWorksheetPages(lastGeneratedQuestions);
+  }
+}
+
+function getExamDisclaimerPresets() {
+  try {
+    return JSON.parse(localStorage.getItem(EXAM_DISCLAIMER_PRESETS_KEY) || '{}');
+  } catch (error) {
+    return {};
+  }
+}
+
+function renderExamDisclaimerPresets(selectedName = '') {
+  const presets = getExamDisclaimerPresets();
+  const allPresets = { ...BUILT_IN_EXAM_DISCLAIMERS, ...presets };
+  examDisclaimerPreset.innerHTML = '<option value="">Saved disclaimers</option>'
+    + Object.keys(allPresets).sort().map((name) => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
+  examDisclaimerPreset.value = selectedName;
+  const hasSelection = Boolean(examDisclaimerPreset.value);
+  examLoadPresetBtn.disabled = !hasSelection;
+  examDeletePresetBtn.disabled = !hasSelection;
+}
+
+function readExamDisclaimerPreset() {
+  return { info: examInfoBox.innerHTML, instructions: examInstructionsBox.innerHTML };
+}
+
+function applyExamDisclaimerPreset(preset) {
+  examInfoBox.innerHTML = preset.info || '<strong>Reading Time:</strong> 5 minutes<br><strong>Writing Time:</strong> 55 minutes<br><strong>Total Time:</strong> 60 minutes<br><strong>Total Marks:</strong> ______';
+  examInstructionsBox.innerHTML = preset.instructions || '<ul><li>Read all questions carefully during the reading time.</li><li>Do not write in the examination booklet during reading time.</li><li>Answer all questions.</li><li>Show all working where appropriate.</li><li>Write clearly in the spaces provided.</li><li>If you make a mistake, rule through it neatly.</li></ul><strong>Permitted Materials</strong><ul><li>Pens (blue or black)</li><li>Pencil</li><li>Eraser</li><li>Ruler</li></ul><strong>Prohibited Materials</strong><ul><li>Mobile phones</li><li>Smart watches</li><li>Notes or textbooks</li><li>Calculators</li></ul>';
+  updateExamEditorFields();
+}
+
+document.querySelectorAll('.exam-format-button').forEach((button) => {
+  button.addEventListener('mousedown', (event) => event.preventDefault());
+  button.addEventListener('click', () => {
+    const targetBox = document.getElementById(button.dataset.target);
+    if (targetBox) {
+      targetBox.focus();
+      document.execCommand(button.dataset.command, false);
+      updateExamDisclaimerLivePreview();
+    }
+  });
+});
+
+examInfoBox.addEventListener('input', updateExamDisclaimerLivePreview);
+examInstructionsBox.addEventListener('input', updateExamDisclaimerLivePreview);
+examDisclaimerPreset.addEventListener('change', () => {
+  const hasSelection = Boolean(examDisclaimerPreset.value);
+  examLoadPresetBtn.disabled = !hasSelection;
+  examDeletePresetBtn.disabled = !hasSelection;
+});
+examLoadPresetBtn.addEventListener('click', () => {
+  const preset = { ...BUILT_IN_EXAM_DISCLAIMERS, ...getExamDisclaimerPresets() }[examDisclaimerPreset.value];
+  if (preset) applyExamDisclaimerPreset(preset);
+});
+examDeletePresetBtn.addEventListener('click', () => {
+  const name = examDisclaimerPreset.value;
+  if (!name || BUILT_IN_EXAM_DISCLAIMERS[name]) return;
+  const presets = getExamDisclaimerPresets();
+  delete presets[name];
+  localStorage.setItem(EXAM_DISCLAIMER_PRESETS_KEY, JSON.stringify(presets));
+  renderExamDisclaimerPresets();
+});
+examSavePresetBtn.addEventListener('click', () => {
+  const name = examPresetName.value.trim();
+  if (!name || BUILT_IN_EXAM_DISCLAIMERS[name]) return;
+  const presets = getExamDisclaimerPresets();
+  presets[name] = readExamDisclaimerPreset();
+  localStorage.setItem(EXAM_DISCLAIMER_PRESETS_KEY, JSON.stringify(presets));
+  examPresetName.value = '';
+  renderExamDisclaimerPresets(name);
+});
+updateExamEditorFields();
+renderExamDisclaimerPresets();
 
 const DEFAULT_LOGO_SRC = 'assets/logo/edgeducate-logo.png';
 let customLogoDataUrl = null;
@@ -1129,8 +1265,8 @@ function renderWorksheetPages(questions) {
   const title       = titleSuffix;
   const includeSolutions = solutionsCheckbox.checked;
   const includeFormulaSheet = formulaSheetCheckbox.checked;
-  const coverPage = coverPageCheckbox.checked
-    ? { title: coverPageTitleInput.value.trim() || title }
+  const coverPage = coverPageCheckbox.checked || examCheckbox.checked
+    ? { title: coverPageTitleInput.value.trim() || title, exam: examCheckbox.checked }
     : null;
 
   lastRenderedTitle = title;
@@ -1305,7 +1441,7 @@ function paginateQuestions(questions, title, module, includeSolutions, topic, ti
   const worksheetPageCount = Math.ceil(questions.length / questionsPerPage);
 
   if (coverPage) {
-    pageModels.push({ type: 'cover', title: coverPage.title, module, topic, timesTable });
+    pageModels.push({ type: 'cover', title: coverPage.title, module, topic, timesTable, exam: coverPage.exam });
   }
 
   if (includeFormulaSheet || questions[0]?.topic === 'unit-conversions') {
@@ -1345,7 +1481,7 @@ function paginateQuestions(questions, title, module, includeSolutions, topic, ti
   const totalPages = pageModels.length;
   return pageModels.map((pageModel, index) => {
     if (pageModel.type === 'cover') {
-      return buildCoverPageHTML(pageModel.title, pageModel.module, pageModel.topic, pageModel.timesTable, index + 1, totalPages);
+      return buildCoverPageHTML(pageModel.title, pageModel.module, pageModel.topic, pageModel.timesTable, index + 1, totalPages, pageModel.exam);
     }
 
     if (pageModel.type === 'formula-sheet') {
@@ -1369,7 +1505,7 @@ function paginateQuestions(questions, title, module, includeSolutions, topic, ti
   });
 }
 
-function buildCoverPageHTML(title, module, topic, timesTable, pageNum, totalPages) {
+function buildCoverPageHTML(title, module, topic, timesTable, pageNum, totalPages, isExam = false) {
   const topicText = topicLabel(topic, timesTable).replace(/ Practice$/, '');
 
   return `
@@ -1381,10 +1517,7 @@ function buildCoverPageHTML(title, module, topic, timesTable, pageNum, totalPage
         <div class="cover-page-kicker">Mathematics Worksheet</div>
         <h1 class="cover-page-title">${escapeHtml(title)}</h1>
         <div class="cover-page-rule" aria-hidden="true"></div>
-        <div class="cover-page-meta">
-          ${buildInfoStripItem('book', 'Module', moduleLabel(module))}
-          ${buildInfoStripItem('clipboard', 'Topic', topicText)}
-        </div>
+        ${isExam ? buildExamCoverBoxesHTML() : ''}
         <div class="cover-page-fields">
           ${buildInfoStripBlankItem('user', 'Name', 'name')}
           ${buildInfoStripBlankItem('calendar', 'Date', 'date')}
@@ -1395,6 +1528,52 @@ function buildCoverPageHTML(title, module, topic, timesTable, pageNum, totalPage
         <span class="page-footer-right">Page ${pageNum} of ${totalPages}</span>
       </div>
     </div>`;
+}
+
+function buildExamCoverBoxesHTML() {
+  const infoHTML = sanitizeDisclaimerHTML(examInfoBox.innerHTML);
+  const instructionsHTML = sanitizeDisclaimerHTML(examInstructionsBox.innerHTML);
+  return `
+    <div class="exam-cover-boxes">
+      <div class="exam-cover-box exam-info-box">
+        <h3>Examination Information</h3>
+        ${infoHTML || '<strong>Reading Time:</strong> 5 minutes<br><strong>Writing Time:</strong> 55 minutes<br><strong>Total Time:</strong> 60 minutes<br><strong>Total Marks:</strong> ______'}
+      </div>
+      <div class="exam-cover-box exam-instructions-box">
+        <h3>Instructions</h3>
+        ${instructionsHTML || '<ul><li>Read all questions carefully during the reading time.</li><li>Do not write in the examination booklet during reading time.</li><li>Answer all questions.</li><li>Show all working where appropriate.</li><li>Write clearly in the spaces provided.</li><li>If you make a mistake, rule through it neatly.</li></ul><strong>Permitted Materials</strong><ul><li>Pens (blue or black)</li><li>Pencil</li><li>Eraser</li><li>Ruler</li></ul><strong>Prohibited Materials</strong><ul><li>Mobile phones</li><li>Smart watches</li><li>Notes or textbooks</li><li>Calculators</li></ul>'}
+      </div>
+    </div>`;
+}
+
+function buildExamDisclaimerHTML() {
+  const infoHTML = sanitizeDisclaimerHTML(examInfoBox.innerHTML);
+  const instructionsHTML = sanitizeDisclaimerHTML(examInstructionsBox.innerHTML);
+  return `
+    <div class="exam-cover-boxes">
+      <div class="exam-cover-box exam-info-box">
+        <h3>Examination Information</h3>
+        ${infoHTML || '<strong>Reading Time:</strong> 5 minutes<br><strong>Writing Time:</strong> 55 minutes<br><strong>Total Time:</strong> 60 minutes<br><strong>Total Marks:</strong> ______'}
+      </div>
+      <div class="exam-cover-box exam-instructions-box">
+        <h3>Instructions</h3>
+        ${instructionsHTML || '<ul><li>Read all questions carefully during the reading time.</li><li>Do not write in the examination booklet during reading time.</li><li>Answer all questions.</li><li>Show all working where appropriate.</li><li>Write clearly in the spaces provided.</li><li>If you make a mistake, rule through it neatly.</li></ul><strong>Permitted Materials</strong><ul><li>Pens (blue or black)</li><li>Pencil</li><li>Eraser</li><li>Ruler</li></ul><strong>Prohibited Materials</strong><ul><li>Mobile phones</li><li>Smart watches</li><li>Notes or textbooks</li><li>Calculators</li></ul>'}
+      </div>
+    </div>`;
+}
+
+function sanitizeDisclaimerHTML(html) {
+  const container = document.createElement('div');
+  container.innerHTML = html;
+  const allowedTags = new Set(['P', 'BR', 'UL', 'OL', 'LI', 'STRONG', 'B', 'EM', 'I']);
+  container.querySelectorAll('*').forEach((element) => {
+    if (!allowedTags.has(element.tagName)) {
+      element.replaceWith(...Array.from(element.childNodes));
+      return;
+    }
+    Array.from(element.attributes).forEach((attribute) => element.removeAttribute(attribute.name));
+  });
+  return container.innerHTML.trim();
 }
 
 function buildUnitConversionFormulaSheetHTML(title, module, pageNum, totalPages) {
@@ -3982,9 +4161,9 @@ function buildAlgebraQuestion(topic, min, max, selectedPatternMode = 'random') {
       const safeMax = Number.isFinite(max) ? Math.max(safeMin, max) : 12;
       const start = randomInt(safeMin, safeMax);
       const step = randomInt(2, 9);
-      const multiplier = patternType === 'multiply-4-add-2' || patternType === 'multiply-4-divide-2' ? 4 : randomInt(2, 3);
+      const multiplier = patternType === 'multiply-4-add-2' || patternType === 'multiply-4-divide-2' || patternType === 'multiply-divide' ? 4 : randomInt(2, 4);
       const adjustment = patternType === 'multiply-4-add-2' ? 2 : randomInt(1, 3);
-      const divisor = patternType === 'multiply-4-divide-2' ? 2 : pickRandomFromList([2, 3, 4]);
+      const divisor = 2;
       const alternateAdd = randomInt(2, 6);
       const alternateSubtract = randomInt(1, Math.min(4, alternateAdd - 1));
       const values = [start];

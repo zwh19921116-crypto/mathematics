@@ -154,8 +154,49 @@
         <input type="text" id="title" maxlength="60" />
       </div>
 
-      <div class="form-group">
+      <div class="form-group checkbox-pair">
         <label class="checkbox-label" for="coverPageRequired"><input type="checkbox" id="coverPageRequired" /> Cover Page Required</label>
+        <label class="checkbox-label" for="examRequired"><input type="checkbox" id="examRequired" /> Exam</label>
+        <button type="button" id="examDisclaimerEditBtn" class="exam-edit-button" aria-label="Edit exam disclaimer" title="Edit exam disclaimer" disabled>&#9998;</button>
+      </div>
+
+      <div class="exam-editor-backdrop" id="examEditorBackdrop" style="display:none"></div>
+      <div class="form-group exam-disclaimer-editor" id="examDisclaimerEditor" style="display:none">
+        <div class="exam-editor-title">Exam Cover Boxes</div>
+        
+        <div class="exam-editor-two-boxes">
+          <div class="exam-editor-box">
+            <h4>Examination Information</h4>
+            <div class="exam-editor-toolbar" role="toolbar" aria-label="Exam info formatting">
+              <button type="button" class="exam-format-button" data-command="bold" data-target="examInfoBox" title="Bold">B</button>
+              <button type="button" class="exam-format-button" data-command="italic" data-target="examInfoBox" title="Italic"><i>I</i></button>
+            </div>
+            <div class="exam-rich-editor exam-info-editor" id="examInfoBox" contenteditable="true" role="textbox" aria-label="Examination information editor"><strong>Reading Time:</strong> 5 minutes<br><strong>Writing Time:</strong> 55 minutes<br><strong>Total Time:</strong> 60 minutes<br><strong>Total Marks:</strong> ______</div>
+          </div>
+          
+          <div class="exam-editor-box">
+            <h4>Instructions</h4>
+            <div class="exam-editor-toolbar" role="toolbar" aria-label="Instructions formatting">
+              <button type="button" class="exam-format-button" data-command="bold" data-target="examInstructionsBox" title="Bold">B</button>
+              <button type="button" class="exam-format-button" data-command="italic" data-target="examInstructionsBox" title="Italic"><i>I</i></button>
+              <button type="button" class="exam-format-button" data-command="insertUnorderedList" data-target="examInstructionsBox" title="Bullet list">&#8226;</button>
+              <button type="button" class="exam-format-button" data-command="insertOrderedList" data-target="examInstructionsBox" title="Numbered list">1.</button>
+            </div>
+            <div class="exam-rich-editor exam-instructions-editor" id="examInstructionsBox" contenteditable="true" role="textbox" aria-label="Instructions editor"><ul><li>Read all questions carefully during the reading time.</li><li>Do not write in the examination booklet during reading time.</li><li>Answer all questions.</li><li>Show all working where appropriate.</li><li>Write clearly in the spaces provided.</li><li>If you make a mistake, rule through it neatly.</li></ul><strong>Permitted Materials</strong><ul><li>Pens (blue or black)</li><li>Pencil</li><li>Eraser</li><li>Ruler</li></ul><strong>Prohibited Materials</strong><ul><li>Mobile phones</li><li>Smart watches</li><li>Notes or textbooks</li><li>Calculators</li></ul></div>
+          </div>
+        </div>
+        
+        <div class="exam-preset-row">
+          <select id="examDisclaimerPreset" aria-label="Saved exam disclaimers"><option value="">Saved disclaimers</option></select>
+          <button type="button" id="examLoadPresetBtn" class="btn-secondary" disabled>Load</button>
+          <button type="button" id="examDeletePresetBtn" class="btn-secondary" disabled>Delete</button>
+        </div>
+        <div class="exam-preset-row">
+          <input type="text" id="examPresetName" maxlength="60" placeholder="Save preset as..." />
+          <button type="button" id="examSavePresetBtn" class="btn-secondary">Save</button>
+        </div>
+        <div class="exam-disclaimer-live-preview-label">Live Preview</div>
+        <div class="exam-disclaimer-live-preview" id="examDisclaimerLivePreview"></div>
       </div>
 
       <div class="form-group" id="coverPageTitleGroup" style="display:none">
