@@ -287,8 +287,8 @@ const MODULE_TOPICS = {
     { value: 'quadratics', label: 'Quadratics' },
     { value: 'calculus', label: 'Calculus' },
     { value: 'vectors', label: 'Vectors' },
-    { value: 'matrices', label: 'Matrices' },
     { value: 'sequences', label: 'Sequences' },
+    { value: 'recurrence-relations', label: 'Recurrence Relations' },
   ],
   number: [
     { value: 'whole-numbers', label: 'Whole Numbers' },
@@ -321,11 +321,33 @@ const MODULE_TOPICS = {
     { value: 'dividing-in-a-ratio', label: 'Dividing in a Ratio' },
     { value: 'proportion', label: 'Proportion' },
   ],
+  networks: [
+    { value: 'network-graphs', label: 'Network Graphs' },
+    { value: 'shortest-paths', label: 'Shortest Paths' },
+    { value: 'minimum-spanning-trees', label: 'Minimum Spanning Trees' },
+    { value: 'critical-paths', label: 'Critical Path Analysis' },
+    { value: 'network-flow', label: 'Network Flow and Optimisation' },
+  ],
+  matrices: [
+    { value: 'matrix-addition', label: 'Matrix Addition' },
+    { value: 'matrix-subtraction', label: 'Matrix Subtraction' },
+    { value: 'matrix-multiplication', label: 'Matrix Multiplication' },
+    { value: 'matrix-inverse', label: 'Matrix Inverse' },
+  ],
 };
 
 const MODULES_BY_YEAR_LEVEL = {
   primary: new Set(['algebra', 'arithmetic', 'decimals', 'fractions', 'geometry', 'measurement', 'money', 'number', 'percentages', 'ratio', 'statistics', 'probability']),
   secondary: new Set(['algebra', 'arithmetic', 'decimals', 'fractions', 'geometry', 'measurement', 'money', 'number', 'percentages', 'ratio', 'statistics', 'probability', 'trigonometry']),
+  'general-mathematics': new Set(['algebra', 'money', 'statistics', 'matrices', 'networks']),
+};
+
+const GENERAL_MATHEMATICS_TOPIC_LIMITS = {
+  algebra: new Set(['sequences', 'recurrence-relations']),
+  matrices: new Set(['matrix-addition', 'matrix-subtraction', 'matrix-multiplication', 'matrix-inverse']),
+  money: new Set(['financial-mathematics']),
+  statistics: new Set(['collecting-data', 'tables', 'graphs', 'mean', 'median', 'mode', 'range', 'interquartile-range', 'box-plots', 'cumulative-frequency', 'histograms', 'scatter-plots', 'regression', 'data-analysis']),
+  networks: new Set(['network-graphs', 'shortest-paths', 'minimum-spanning-trees', 'critical-paths', 'network-flow']),
 };
 
 const PRIMARY_TOPIC_LIMITS = {
@@ -390,6 +412,9 @@ const ADVANCED_WORKSHEET_TOPICS = new Set([
   'box-plots',
   'cumulative-frequency',
 ]);
+
+const NETWORK_TOPICS = new Set(['network-graphs', 'shortest-paths', 'minimum-spanning-trees', 'critical-paths', 'network-flow']);
+const MATRIX_TOPICS = new Set(['matrix-addition', 'matrix-subtraction', 'matrix-multiplication', 'matrix-inverse']);
 
 const SECONDARY_EXCLUDED_TOPICS = new Set([
   'number-bonds', 'mental-maths', 'analogue-clocks', 'coin-note-recognition', 'visual-measurement', 'chance-experiments',
@@ -466,6 +491,7 @@ const ALGEBRA_TOPICS = new Set([
   'vectors',
   'matrices',
   'sequences',
+  'recurrence-relations',
 ]);
 
 const MEASUREMENT_TOPICS = new Set([
@@ -801,6 +827,9 @@ function populateTopicsFor(moduleEl, topicEl) {
     if (yearLevelSelect.value === 'secondary') {
       topics = topics.filter((topic) => !SECONDARY_EXCLUDED_TOPICS.has(topic.value));
     }
+    if (yearLevelSelect.value === 'general-mathematics') {
+      topics = topics.filter((topic) => GENERAL_MATHEMATICS_TOPIC_LIMITS[moduleEl.value]?.has(topic.value));
+    }
   }
   topics = topics.slice().sort((firstTopic, secondTopic) => firstTopic.label.localeCompare(secondTopic.label));
   topicEl.innerHTML = topics
@@ -831,6 +860,7 @@ function getAvailableModuleTopicSearchResults() {
   [
     { value: 'primary', label: 'Primary' },
     { value: 'secondary', label: 'Secondary' },
+    { value: 'general-mathematics', label: 'General Mathematics - Units 1 & 2' },
   ].forEach((yearLevel) => {
     results.push({ yearLevel: yearLevel.value, module: '', topic: '', label: `Year Level > ${yearLevel.label}`, searchText: yearLevel.label });
     const availableModules = MODULES_BY_YEAR_LEVEL[yearLevel.value] || MODULES_BY_YEAR_LEVEL.primary;
@@ -844,9 +874,12 @@ function getAvailableModuleTopicSearchResults() {
         results.push({ yearLevel: yearLevel.value, module: moduleValue, topic: '', label: `${yearName} > ${moduleName}`, searchText: `${yearName} ${moduleName}` });
 
         const allowedTopics = PRIMARY_TOPIC_LIMITS[yearLevel.value === 'primary' ? moduleValue : ''];
+        const generalTopics = GENERAL_MATHEMATICS_TOPIC_LIMITS[moduleValue];
         const topics = allowedTopics
           ? (MODULE_TOPICS[moduleValue] || []).filter((topic) => allowedTopics.has(topic.value))
-          : (MODULE_TOPICS[moduleValue] || []);
+          : generalTopics
+            ? (MODULE_TOPICS[moduleValue] || []).filter((topic) => generalTopics.has(topic.value))
+            : (MODULE_TOPICS[moduleValue] || []);
         topics.forEach((topic) => {
           results.push({
             yearLevel: yearLevel.value,
@@ -1373,6 +1406,8 @@ function moduleLabel(module) {
     money: 'Money',
     ratio: 'Ratio & Proportion',
     probability: 'Probability',
+    matrices: 'Matrices',
+    networks: 'Networks',
   };
   return map[module] || 'Mathematics';
 }
@@ -1398,6 +1433,16 @@ function topicLabel(topic, timesTable) {
     'algebraic-fractions': 'Algebraic Fractions Practice',
     'box-plots': 'Box Plots Practice',
     'cumulative-frequency': 'Cumulative Frequency Practice',
+    'network-graphs': 'Network Graphs Practice',
+    'shortest-paths': 'Shortest Paths Practice',
+    'minimum-spanning-trees': 'Minimum Spanning Trees Practice',
+    'critical-paths': 'Critical Path Analysis Practice',
+    'network-flow': 'Network Flow and Optimisation Practice',
+    'matrix-addition': 'Matrix Addition Practice',
+    'matrix-subtraction': 'Matrix Subtraction Practice',
+    'matrix-multiplication': 'Matrix Multiplication Practice',
+    'matrix-inverse': 'Matrix Inverse Practice',
+    'recurrence-relations': 'Recurrence Relations Practice',
     'stem-and-leaf': 'Stem-and-Leaf Plots Practice',
     histograms: 'Histograms Practice',
     'dot-plots': 'Dot Plots Practice',
@@ -2264,6 +2309,18 @@ function renderBodmasQuestion(num, question) {
 }
 
 function renderNumberQuestion(num, question) {
+  if (question.matrix) {
+    return `
+    <div class="question question-number-topic question-matrix">
+      <div class="question-number">${num}.</div>
+      <div class="number-topic-body matrix-body">
+        <div class="number-topic-prompt">${escapeHtml(question.prompt)}</div>
+        <div class="matrix-expression">${renderMatrixHTML(question.matrix.first)}<span class="matrix-operator">${question.matrix.operator || '+'}</span>${question.matrix.second ? renderMatrixHTML(question.matrix.second) : ''}</div>
+        <div class="number-topic-answer-line"></div>
+      </div>
+    </div>`;
+  }
+
   return `
     <div class="question question-number-topic">
       <div class="question-number">${num}.</div>
@@ -2272,6 +2329,10 @@ function renderNumberQuestion(num, question) {
         <div class="number-topic-answer-line"></div>
       </div>
     </div>`;
+}
+
+function renderMatrixHTML(matrix) {
+  return `<table class="matrix-table" aria-label="Matrix">${matrix.map((row) => `<tr>${row.map((value) => `<td>${escapeHtml(String(value))}</td>`).join('')}</tr>`).join('')}</table>`;
 }
 
 function renderFractionQuestion(num, question) {
@@ -2696,6 +2757,10 @@ function renderSolutionHTML(question) {
     return `${renderNumberPromptHTML(question)} = ${renderScientificNotationHTML(String(question.answer))}`;
   }
 
+  if (question.matrix) {
+    return `<div class="matrix-solution"><div>${escapeHtml(question.prompt)}</div><div class="matrix-expression">${renderMatrixHTML(question.matrix.first)}<span class="matrix-operator">${question.matrix.operator || '+'}</span>${question.matrix.second ? renderMatrixHTML(question.matrix.second) : ''}<span class="matrix-operator">=</span>${renderMatrixHTML(question.matrix.result)}</div></div>`;
+  }
+
   if (question.solutionSteps?.length) {
     return `<div class="secondary-solution-steps"><div>${renderNumberPromptHTML(question)} = ${escapeHtml(String(question.answer ?? ''))}</div>${question.solutionSteps.map((step) => `<div>${escapeHtml(step)}</div>`).join('')}</div>`;
   }
@@ -2718,6 +2783,20 @@ function buildQuestions(topic, min, max, count, timesTable, denominatorMode, mag
   if (ADVANCED_WORKSHEET_TOPICS.has(topic)) {
     for (let i = 0; i < count; i++) {
       pushUniqueQuestion(questions, seenSignatures, () => buildAdvancedWorksheetQuestion(topic, pythagorasMode));
+    }
+    return questions;
+  }
+
+  if (NETWORK_TOPICS.has(topic)) {
+    for (let i = 0; i < count; i++) {
+      pushUniqueQuestion(questions, seenSignatures, () => buildNetworkQuestion(topic));
+    }
+    return questions;
+  }
+
+  if (MATRIX_TOPICS.has(topic)) {
+    for (let i = 0; i < count; i++) {
+      pushUniqueQuestion(questions, seenSignatures, () => buildMatrixQuestion(topic));
     }
     return questions;
   }
@@ -4624,6 +4703,12 @@ function buildAlgebraQuestion(topic, min, max, selectedPatternMode = 'random') {
         answer: terms[3] + step,
       };
     }
+    case 'recurrence-relations': {
+      const first = randomInt(2, 12);
+      const difference = randomInt(2, 8);
+      const terms = [first, first + difference, first + difference * 2, first + difference * 3];
+      return { kind: 'algebra', topic, prompt: `For a₁ = ${first}, aₙ = aₙ₋₁ + ${difference}, find a₅.`, answer: terms[3] + difference };
+    }
     default:
       return {
         kind: 'algebra',
@@ -4864,6 +4949,41 @@ function buildNumberQuestion(topic, min, max, questionIndex = 0) {
   }
 }
 
+function buildMatrixQuestion(topic) {
+  const first = [[randomInt(1, 9), randomInt(1, 9)], [randomInt(1, 9), randomInt(1, 9)]];
+  const second = [[randomInt(1, 9), randomInt(1, 9)], [randomInt(1, 9), randomInt(1, 9)]];
+
+  if (topic === 'matrix-inverse') {
+    const matrix = [[2, 1], [1, 1]];
+    return { kind: 'number', topic, prompt: 'Find the inverse of the matrix.', matrix: { first: matrix, operator: '−1', result: [[1, -1], [-1, 2]], answerFormat: 'fraction' }, answer: '[[1, -1], [-1, 2]]' };
+  }
+
+  const operator = topic === 'matrix-addition' ? '+' : topic === 'matrix-subtraction' ? '−' : '×';
+  const result = operator === '+'
+    ? first.map((row, rowIndex) => row.map((value, columnIndex) => value + second[rowIndex][columnIndex]))
+    : operator === '−'
+      ? first.map((row, rowIndex) => row.map((value, columnIndex) => value - second[rowIndex][columnIndex]))
+      : [[first[0][0] * second[0][0] + first[0][1] * second[1][0], first[0][0] * second[0][1] + first[0][1] * second[1][1]], [first[1][0] * second[0][0] + first[1][1] * second[1][0], first[1][0] * second[0][1] + first[1][1] * second[1][1]]];
+  return { kind: 'number', topic, prompt: `Perform matrix ${operator === '+' ? 'addition' : operator === '−' ? 'subtraction' : 'multiplication'}.`, matrix: { first, second, operator, result }, answer: JSON.stringify(result) };
+}
+
+function buildNetworkQuestion(topic) {
+  const edges = [["A-B", 4], ["A-C", 7], ["B-C", 3], ["B-D", 6], ["C-D", 5]];
+  if (topic === 'network-graphs') {
+    return { kind: 'number', topic, prompt: `A network has edges ${edges.map(([edge, weight]) => `${edge} (${weight})`).join(', ')}. How many edges are shown?`, answer: edges.length };
+  }
+  if (topic === 'shortest-paths') {
+    return { kind: 'number', topic, prompt: 'A route from A to D has lengths A–B = 4, B–D = 6, A–C = 7, C–D = 5. Find the shortest route length.', answer: 10 };
+  }
+  if (topic === 'minimum-spanning-trees') {
+    return { kind: 'number', topic, prompt: 'A network has connection costs 3, 4, 5, 6 and 7. Find the total cost of the minimum spanning tree using the three smallest connections.', answer: 12 };
+  }
+  if (topic === 'critical-paths') {
+    return { kind: 'number', topic, prompt: 'A project has three critical activities lasting 4, 7 and 5 days in sequence. Find the project duration.', answer: '16 days' };
+  }
+  return { kind: 'number', topic, prompt: 'A network can carry 12, 8 and 5 units through three independent routes. Find the maximum total flow.', answer: '25 units' };
+}
+
 function buildAdvancedWorksheetQuestion(topic, pythagorasMode = 'hypotenuse') {
   if (topic === 'multi-step-linear-equations') {
     const coefficient = randomInt(2, 8);
@@ -4931,7 +5051,7 @@ function buildAdvancedWorksheetQuestion(topic, pythagorasMode = 'hypotenuse') {
     const first = [[randomInt(1, 9), randomInt(1, 9)], [randomInt(1, 9), randomInt(1, 9)]];
     const second = [[randomInt(1, 9), randomInt(1, 9)], [randomInt(1, 9), randomInt(1, 9)]];
     const result = first.map((row, rowIndex) => row.map((value, columnIndex) => value + second[rowIndex][columnIndex]));
-    return { kind: 'number', topic, prompt: `Add [[${first[0].join(', ')}], [${first[1].join(', ')}]] + [[${second[0].join(', ')}], [${second[1].join(', ')}]].`, answer: `[[${result[0].join(', ')}], [${result[1].join(', ')}]]` };
+    return { kind: 'number', topic, prompt: 'Add the matrices.', matrix: { first, second, result }, answer: `[[${result[0].join(', ')}], [${result[1].join(', ')}]]` };
   }
 
   if (topic === 'complex-numbers') {
@@ -6216,6 +6336,10 @@ const FORMULA_SHEETS = {
     { heading: 'Ratios', rules: ['Writing ratios: a : b', 'Equivalent ratios: multiply or divide both sides by the same number', 'Dividing in a ratio: total parts = a + b, each part = total ÷ parts'] },
     { heading: 'Proportion', rules: ['a/b = c/d, cross multiply: a × d = b × c'] },
   ],
+  networks: [
+    { heading: 'Networks', rules: ['Shortest path: choose the route with the smallest total weight', 'Minimum spanning tree: connect all vertices with minimum total weight and no cycles'] },
+    { heading: 'Flow and Scheduling', rules: ['Maximum flow is limited by edge capacities', 'Critical path duration is the longest dependent path'] },
+  ],
   statistics: [
     { heading: 'Averages', rules: ['Mean = sum of values ÷ number of values', 'Median = middle value when ordered (average the two middle values if even count)', 'Mode = most frequently occurring value', 'Range = highest value − lowest value'] },
     { heading: 'Probability', rules: ['Probability = favourable outcomes ÷ total outcomes'] },
@@ -6235,9 +6359,17 @@ const FORMULA_SHEETS = {
     { heading: 'Graphs & Equations', rules: ['Straight line: y = mx + c', 'Gradient = rise ÷ run', 'Solve equations by performing inverse operations on both sides', 'For inequalities, reverse the sign when multiplying or dividing by a negative'] },
     { heading: 'Algebraic Fractions', rules: ['Simplify by dividing the numerator and denominator by their common factor'] },
   ],
+  matrices: [
+    { heading: 'Matrix Operations', rules: ['Add or subtract corresponding entries', 'Matrices must have compatible dimensions for multiplication', 'Multiply rows by columns'] },
+    { heading: 'Inverse of a 2×2 Matrix', rules: ['For [[a,b],[c,d]], determinant = ad − bc', 'A⁻¹ = 1/(ad−bc) [[d,−b], [−c,a]]'] },
+  ],
 };
 
 const TOPIC_FORMULA_GROUPS = {
+  'matrix-addition': [{ heading: 'Matrix Addition', rules: ['Add corresponding entries', 'Matrices must have the same dimensions'] }],
+  'matrix-subtraction': [{ heading: 'Matrix Subtraction', rules: ['Subtract corresponding entries', 'Matrices must have the same dimensions'] }],
+  'matrix-multiplication': [{ heading: 'Matrix Multiplication', rules: ['Multiply rows by columns', 'Each result entry is a row-column dot product'] }],
+  'matrix-inverse': [{ heading: 'Inverse of a 2×2 Matrix', rules: ['For [[a,b],[c,d]], determinant = ad − bc', 'A⁻¹ = 1/(ad−bc) [[d,−b], [−c,a]]'] }],
   'add-fractions': [{ heading: 'Adding Fractions', rules: ['Same denominator: a/c + b/c = (a+b)/c', 'Different denominators: find a common denominator first', 'Simplify the final fraction'] }],
   'subtract-fractions': [{ heading: 'Subtracting Fractions', rules: ['Same denominator: a/c − b/c = (a−b)/c', 'Different denominators: find a common denominator first', 'Simplify the final fraction'] }],
   'multiply-fractions': [{ heading: 'Multiplying Fractions', rules: ['a/b × c/d = (a×c)/(b×d)', 'Simplify before or after multiplying'] }],
@@ -6259,6 +6391,12 @@ const TOPIC_FORMULA_GROUPS = {
   'frequency-distributions': [{ heading: 'Frequency Distributions', rules: ['Frequency is the number of observations in a group', 'The sum of frequencies is the total frequency'] }],
   'draw-charts': [{ heading: 'Drawing Statistical Charts', rules: ['Label both axes', 'Choose an appropriate scale', 'Plot or draw each value accurately'] }],
   distributions: [{ heading: 'Distributions', rules: ['A symmetric distribution has similar tails', 'A skewed distribution has a longer tail on one side'] }],
+  'recurrence-relations': [{ heading: 'Recurrence Relations', rules: ['Define the first term, a₁', 'Define each term from the previous term, aₙ = f(aₙ₋₁)'] }],
+  'network-graphs': [{ heading: 'Network Graphs', rules: ['Vertices represent objects and edges represent connections', 'Edge weights represent distance, time or cost'] }],
+  'shortest-paths': [{ heading: 'Shortest Paths', rules: ['Add edge weights along each route', 'Choose the route with the smallest total weight'] }],
+  'minimum-spanning-trees': [{ heading: 'Minimum Spanning Trees', rules: ['Connect every vertex without cycles', 'Choose edges with the smallest possible total weight'] }],
+  'critical-paths': [{ heading: 'Critical Path Analysis', rules: ['Critical path duration is the sum of activity durations on the longest dependent path'] }],
+  'network-flow': [{ heading: 'Network Flow', rules: ['Maximum flow is limited by capacity', 'Total flow is the sum of flow through independent routes'] }],
 };
 
 function getTopicFormulaGroups(module, topic, unitConversionGroups) {
