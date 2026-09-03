@@ -12,7 +12,10 @@ const previewToolbar   = document.getElementById('previewToolbar');
 const pagination       = document.getElementById('pagination');
 const prevBtn          = document.getElementById('prevBtn');
 const nextBtn          = document.getElementById('nextBtn');
+const solutionsJumpBtn = document.getElementById('solutionsJumpBtn');
 const pageIndicator    = document.getElementById('pageIndicator');
+const pageNumberInput  = document.getElementById('pageNumberInput');
+const pageTotal        = document.getElementById('pageTotal');
 const zoomOutBtn       = document.getElementById('zoomOutBtn');
 const zoomResetBtn     = document.getElementById('zoomResetBtn');
 const zoomInBtn        = document.getElementById('zoomInBtn');
@@ -29,10 +32,15 @@ const denominatorSelect = document.getElementById('denominatorMode');
 const timesTableGroup  = document.getElementById('timesTableGroup');
 const magicSquareSizeGroup = document.getElementById('magicSquareSizeGroup');
 const magicSquareSizeSelect = document.getElementById('magicSquareSize');
+const pythagorasModeGroup = document.getElementById('pythagorasModeGroup');
+const pythagorasModeSelect = document.getElementById('pythagorasMode');
+const patternModeGroup = document.getElementById('patternModeGroup');
+const patternModeSelect = document.getElementById('patternMode');
 const rangeRow         = document.getElementById('rangeRow');
 const titleInput       = document.getElementById('title');
 const solutionsCheckbox = document.getElementById('solutionsRequired');
 const coverPageCheckbox = document.getElementById('coverPageRequired');
+const formulaSheetCheckbox = document.getElementById('formulaSheetRequired');
 const coverPageTitleGroup = document.getElementById('coverPageTitleGroup');
 const coverPageTitleInput = document.getElementById('coverPageTitle');
 const whiteLabelCheckbox = document.getElementById('whiteLabelCheckbox');
@@ -264,7 +272,7 @@ const PRIMARY_TOPIC_LIMITS = {
   money: new Set(['making-change', 'adding-money', 'money-word-problems', 'saving-money', 'budgeting', 'best-buy', 'discounts']),
   number: new Set(['whole-numbers', 'writing-numbers-sequence', 'writing-numbers-random', 'identifying-numbers', 'place-value', 'odd-even', 'comparing-numbers', 'ordering-numbers', 'missing-numbers', 'number-sentences', 'equality', 'factors', 'multiples', 'magic-squares', 'sudoku']),
   statistics: new Set(['collecting-data', 'tables', 'picture-graphs', 'bar-graphs', 'chance-language', 'simple-probability', 'data-interpretation']),
-  fractions: new Set(['recognising-fractions', 'comparing-fractions', 'equivalent-fractions', 'fraction-models']),
+  fractions: new Set(['recognising-fractions', 'comparing-fractions', 'equivalent-fractions', 'fraction-models', 'add-fractions', 'subtract-fractions', 'multiply-fractions', 'divide-fractions']),
   measurement: new Set(['length', 'area', 'perimeter', 'volume', 'capacity', 'mass', 'time', 'calendars', 'temperature', 'unit-conversions', 'measurement-conversions', 'elapsed-time']),
 };
 
@@ -506,6 +514,9 @@ topicSelect.addEventListener('change', () => {
   updateTitleInput();
 });
 
+pythagorasModeSelect.addEventListener('change', updateTitleInput);
+patternModeSelect.addEventListener('change', updateTitleInput);
+
 titleInput.addEventListener('input', () => {
   titleTouched = titleInput.value.trim() !== defaultTitleSuffix();
 });
@@ -721,6 +732,8 @@ function updateTopicControlsFor(topicEl, timesTableGroupEl, rangeRowEl, denomina
 
 function updateTopicControls() {
   updateTopicControlsFor(topicSelect, timesTableGroup, rangeRow, denominatorGroup, denominatorSelect);
+  pythagorasModeGroup.style.display = topicSelect.value === 'pythagoras' ? 'block' : 'none';
+  patternModeGroup.style.display = topicSelect.value === 'patterns' ? 'block' : 'none';
 }
 
 function updateTitleInput(force = false) {
@@ -772,6 +785,13 @@ printBtn.addEventListener('click', () => {
 });
 prevBtn.addEventListener('click', () => showPage(currentPage - 1));
 nextBtn.addEventListener('click', () => showPage(currentPage + 1));
+pageNumberInput.addEventListener('change', goToTypedPage);
+pageNumberInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    goToTypedPage();
+  }
+});
+solutionsJumpBtn.addEventListener('click', jumpToSolutions);
 fullscreenBtn.addEventListener('click', toggleFullscreenMode);
 zoomOutBtn.addEventListener('click', () => changePreviewZoom(-PREVIEW_ZOOM_STEP));
 zoomResetBtn.addEventListener('click', resetPreviewZoom);
@@ -1087,7 +1107,7 @@ function generateWorksheet() {
     return;
   }
 
-  const questions = buildQuestions(topic, minNum, maxNum, numQ, timesTable, denominatorMode, parseInt(magicSquareSizeSelect.value, 10));
+  const questions = buildQuestions(topic, minNum, maxNum, numQ, timesTable, denominatorMode, parseInt(magicSquareSizeSelect.value, 10), pythagorasModeSelect.value, patternModeSelect.value);
   lastGeneratedQuestions = questions;
   renderWorksheetPages(questions);
 }
@@ -1108,12 +1128,13 @@ function renderWorksheetPages(questions) {
   const titleSuffix = titleInput.value.trim() || defaultTitleSuffix();
   const title       = titleSuffix;
   const includeSolutions = solutionsCheckbox.checked;
+  const includeFormulaSheet = formulaSheetCheckbox.checked;
   const coverPage = coverPageCheckbox.checked
     ? { title: coverPageTitleInput.value.trim() || title }
     : null;
 
   lastRenderedTitle = title;
-  allPages = paginateQuestions(questions, title, module, includeSolutions, topic, timesTable, coverPage);
+  allPages = paginateQuestions(questions, title, module, includeSolutions, topic, timesTable, coverPage, includeFormulaSheet);
   currentPage = 0;
   showPage(0);
   printBtn.disabled = false;
@@ -1278,7 +1299,7 @@ function topicLabel(topic, timesTable) {
   return map[topic] || 'Math Practice';
 }
 
-function paginateQuestions(questions, title, module, includeSolutions, topic, timesTable, coverPage) {
+function paginateQuestions(questions, title, module, includeSolutions, topic, timesTable, coverPage, includeFormulaSheet = false) {
   const pageModels = [];
   const questionsPerPage = getQuestionsPerPage(questions);
   const worksheetPageCount = Math.ceil(questions.length / questionsPerPage);
@@ -1287,7 +1308,7 @@ function paginateQuestions(questions, title, module, includeSolutions, topic, ti
     pageModels.push({ type: 'cover', title: coverPage.title, module, topic, timesTable });
   }
 
-  if (questions[0]?.topic === 'unit-conversions') {
+  if (includeFormulaSheet || questions[0]?.topic === 'unit-conversions') {
     pageModels.push({ type: 'formula-sheet', title, module });
   }
 
@@ -1357,7 +1378,9 @@ function buildCoverPageHTML(title, module, topic, timesTable, pageNum, totalPage
         ${buildWorksheetHeaderBrandHTML('', module)}
       </div>
       <div class="cover-page-content">
+        <div class="cover-page-kicker">Mathematics Worksheet</div>
         <h1 class="cover-page-title">${escapeHtml(title)}</h1>
+        <div class="cover-page-rule" aria-hidden="true"></div>
         <div class="cover-page-meta">
           ${buildInfoStripItem('book', 'Module', moduleLabel(module))}
           ${buildInfoStripItem('clipboard', 'Topic', topicText)}
@@ -1487,7 +1510,8 @@ function usesLargeVisualLayout(question) {
   if (question.kind === 'geometry') {
     return question.topic === '2d-shapes'
       || question.topic === '3d-shapes'
-      || question.topic === 'circle-geometry';
+      || question.topic === 'circle-geometry'
+      || question.topic === 'pythagoras';
   }
 
   if (question.kind === 'measurement') {
@@ -1510,11 +1534,32 @@ function showPage(index) {
   preview.innerHTML = allPages[index];
 
   const total = allPages.length;
-  pageIndicator.textContent = `Page ${index + 1} of ${total}`;
+  pageNumberInput.value = index + 1;
+  pageNumberInput.max = total;
+  pageTotal.textContent = total;
   prevBtn.disabled = index === 0;
   nextBtn.disabled = index === total - 1;
   pagination.style.display = total > 1 ? 'flex' : 'none';
+  const solutionsPageIndex = allPages.findIndex((page) => page.includes('solutions-page'));
+  solutionsJumpBtn.style.display = solutionsPageIndex >= 0 ? 'inline-flex' : 'none';
+  solutionsJumpBtn.disabled = currentPage === solutionsPageIndex;
   syncPreviewToolbar();
+}
+
+function goToTypedPage() {
+  const requestedPage = Number.parseInt(pageNumberInput.value, 10);
+  if (!Number.isFinite(requestedPage)) {
+    pageNumberInput.value = currentPage + 1;
+    return;
+  }
+  showPage(Math.max(0, Math.min(allPages.length - 1, requestedPage - 1)));
+}
+
+function jumpToSolutions() {
+  const solutionsPageIndex = allPages.findIndex((page) => page.includes('solutions-page'));
+  if (solutionsPageIndex >= 0) {
+    showPage(solutionsPageIndex);
+  }
 }
 
 function preparePreviewForPrint() {
@@ -1935,7 +1980,7 @@ function renderMeasurementQuestion(num, question) {
         <div class="question-number">${num}.</div>
         <div class="number-topic-body">
           <div class="measurement-inline-row">
-            <div class="number-topic-prompt measurement-inline-prompt">${renderMeasurementPromptHTML(question)}</div>
+            <div class="number-topic-prompt measurement-inline-prompt">${renderMeasurementPromptHTML(question, true)}</div>
             <div class="number-topic-answer-line measurement-inline-answer-line"></div>
           </div>
         </div>
@@ -1946,7 +1991,7 @@ function renderMeasurementQuestion(num, question) {
     <div class="question question-number-topic">
       <div class="question-number">${num}.</div>
       <div class="number-topic-body">
-        <div class="number-topic-prompt">${renderMeasurementPromptHTML(question)}</div>
+        <div class="number-topic-prompt">${renderMeasurementPromptHTML(question, true)}</div>
         <div class="number-topic-answer-line"></div>
       </div>
     </div>`;
@@ -1973,14 +2018,14 @@ function renderTrigonometryQuestion(num, question) {
     <div class="question question-number-topic question-trigonometry-topic">
       <div class="question-number">${num}.</div>
       <div class="number-topic-body trigonometry-topic-body">
-        <div class="number-topic-prompt trigonometry-topic-prompt">${renderTrigonometryPromptHTML(question)}</div>
+        <div class="number-topic-prompt trigonometry-topic-prompt">${renderTrigonometryPromptHTML(question, true)}</div>
         <div class="number-topic-answer-line trigonometry-topic-answer-line"></div>
       </div>
     </div>`;
 }
 
-function renderTrigonometryPromptHTML(question) {
-  const label = escapeHtml(String(question.prompt ?? ''));
+function renderTrigonometryPromptHTML(question, concise = false) {
+  const label = escapeHtml(concise ? getConciseVisualPrompt(question) : String(question.prompt ?? ''));
   const shapeSvg = renderTrigonometryShapeSVG(question);
   if (!shapeSvg) {
     return label;
@@ -2128,8 +2173,8 @@ function renderTrigonometryShapeSVG(question) {
   return '';
 }
 
-function renderMeasurementPromptHTML(question) {
-  const label = escapeHtml(String(question.prompt ?? ''));
+function renderMeasurementPromptHTML(question, concise = false) {
+  const label = escapeHtml(concise ? getConciseVisualPrompt(question) : String(question.prompt ?? ''));
   const shapeSvg = renderMeasurementShapeSVG(question);
   const areaPerimeterShapeClass = (question.topic === 'area' || question.topic === 'perimeter') ? ' measurement-area-perimeter-shape' : '';
   const volumeShapeClass = question.topic === 'volume' ? ' measurement-volume-shape' : '';
@@ -2219,6 +2264,18 @@ function renderSolutionHTML(question) {
     }
 
     if (question.kind === 'geometry') {
+      if (question.topic === 'pythagoras' && question.legs) {
+        const completedQuestion = {
+          ...question,
+          legs: {
+            legA: question.legs.legA === '?' ? question.answer : question.legs.legA,
+            legB: question.legs.legB === '?' ? question.answer : question.legs.legB,
+            hypotenuse: question.legs.hypotenuse === '?' ? question.answer : question.legs.hypotenuse,
+          },
+        };
+        return `${renderGeometryPromptHTML(completedQuestion)} = ${escapeHtml(String(question.answer))}`;
+      }
+
       return `${escapeHtml(String(question.prompt ?? ''))} = ${escapeHtml(String(question.answer))}`;
     }
 
@@ -2266,7 +2323,7 @@ function renderSolutionHTML(question) {
   return `${renderNumberPromptHTML(question)} = ${escapeHtml(String(question.answer))}`;
 }
 
-function buildQuestions(topic, min, max, count, timesTable, denominatorMode, magicSquareSize = 3) {
+function buildQuestions(topic, min, max, count, timesTable, denominatorMode, magicSquareSize = 3, pythagorasMode = 'hypotenuse', patternMode = 'random') {
   const mixedOps = ['addition', 'subtraction', 'multiplication', 'division'];
   const questions = [];
   const seenSignatures = new Set();
@@ -2280,7 +2337,7 @@ function buildQuestions(topic, min, max, count, timesTable, denominatorMode, mag
 
   if (ADVANCED_WORKSHEET_TOPICS.has(topic)) {
     for (let i = 0; i < count; i++) {
-      pushUniqueQuestion(questions, seenSignatures, () => buildAdvancedWorksheetQuestion(topic));
+      pushUniqueQuestion(questions, seenSignatures, () => buildAdvancedWorksheetQuestion(topic, pythagorasMode));
     }
     return questions;
   }
@@ -2291,7 +2348,7 @@ function buildQuestions(topic, min, max, count, timesTable, denominatorMode, mag
 
   if (ALGEBRA_TOPICS.has(topic)) {
     for (let i = 0; i < count; i++) {
-      pushUniqueQuestion(questions, seenSignatures, () => buildAlgebraQuestion(topic));
+      pushUniqueQuestion(questions, seenSignatures, () => buildAlgebraQuestion(topic, min, max, patternMode));
     }
     return questions;
   }
@@ -3775,7 +3832,7 @@ function buildTrigonometryQuestion(topic, min, max) {
         topic,
         shape: 'sine-rule-triangle',
         dimensions: { sideA, angleA, angleB },
-        prompt: `In △ABC, a=${sideA} cm, A=${angleA}°, B=${angleB}°. Find b`,
+        prompt: `a=${sideA} cm, A=${angleA}°, B=${angleB}°. Find b`,
         answer: `${formatDecimalResult(sideB)} cm`,
       };
     }
@@ -3915,14 +3972,21 @@ function get3dShapeFacts() {
   ];
 }
 
-function buildAlgebraQuestion(topic) {
+function buildAlgebraQuestion(topic, min, max, selectedPatternMode = 'random') {
   switch (topic) {
     case 'patterns': {
-      const patternType = pickRandomFromList(['add', 'multiply-add']);
-      const start = patternType === 'add' ? randomInt(1, 12) : randomInt(1, 8);
+      const patternType = selectedPatternMode === 'random'
+        ? pickRandomFromList(['add', 'multiply-add', 'multiply-divide', 'alternate-add-subtract'])
+        : selectedPatternMode;
+      const safeMin = Number.isFinite(min) ? Math.max(0, min) : 1;
+      const safeMax = Number.isFinite(max) ? Math.max(safeMin, max) : 12;
+      const start = randomInt(safeMin, safeMax);
       const step = randomInt(2, 9);
-      const multiplier = randomInt(2, 3);
-      const adjustment = randomInt(1, 3);
+      const multiplier = patternType === 'multiply-4-add-2' || patternType === 'multiply-4-divide-2' ? 4 : randomInt(2, 3);
+      const adjustment = patternType === 'multiply-4-add-2' ? 2 : randomInt(1, 3);
+      const divisor = patternType === 'multiply-4-divide-2' ? 2 : pickRandomFromList([2, 3, 4]);
+      const alternateAdd = randomInt(2, 6);
+      const alternateSubtract = randomInt(1, Math.min(4, alternateAdd - 1));
       const values = [start];
 
       for (let index = 0; index < 3; index++) {
@@ -3930,13 +3994,25 @@ function buildAlgebraQuestion(topic) {
         values.push(
           patternType === 'add'
             ? previousValue + step
-            : (previousValue * multiplier) + adjustment
+            : patternType === 'multiply-add' || patternType === 'multiply-4-add-2'
+              ? (previousValue * multiplier) + adjustment
+              : patternType === 'multiply-divide' || patternType === 'multiply-4-divide-2'
+                ? index % 2 === 0
+                  ? previousValue * multiplier
+                  : previousValue / divisor
+                : index % 2 === 0
+                  ? previousValue + alternateAdd
+                  : previousValue - alternateSubtract
         );
       }
 
       const answer = patternType === 'add'
         ? values[3] + step
-        : (values[3] * multiplier) + adjustment;
+        : patternType === 'multiply-add' || patternType === 'multiply-4-add-2'
+          ? (values[3] * multiplier) + adjustment
+          : patternType === 'multiply-divide' || patternType === 'multiply-4-divide-2'
+            ? values[3] * multiplier
+            : values[3] + alternateAdd;
 
       return {
         kind: 'algebra',
@@ -4330,7 +4406,7 @@ function buildNumberQuestion(topic, min, max, questionIndex = 0) {
   }
 }
 
-function buildAdvancedWorksheetQuestion(topic) {
+function buildAdvancedWorksheetQuestion(topic, pythagorasMode = 'hypotenuse') {
   if (topic === 'quadratics') {
     const first = randomInt(1, 9);
     const second = randomInt(1, 9);
@@ -4379,10 +4455,15 @@ function buildAdvancedWorksheetQuestion(topic) {
     return { kind: 'number', topic, prompt: `A bag has ${total} counters and ${favourable} are blue. What is the probability of choosing a blue counter?`, answer: fractionToText({ numerator: favourable, denominator: total }) };
   }
 
-  const legA = randomInt(3, 12);
-  const legB = randomInt(3, 12);
-  const hypotenuse = Math.sqrt((legA * legA) + (legB * legB));
-  return { kind: 'number', topic, prompt: `A right triangle has legs ${legA} and ${legB}. Find the hypotenuse to 2 decimal places.`, answer: hypotenuse.toFixed(2) };
+  const triples = [[3, 4, 5], [6, 8, 10], [5, 12, 13], [8, 15, 17]];
+  const [legA, legB, hypotenuse] = pickRandomFromList(triples);
+  if (pythagorasMode === 'missing-leg') {
+    const unknownLeg = randomInt(0, 1);
+    const knownLeg = unknownLeg === 0 ? legB : legA;
+    const missingLeg = unknownLeg === 0 ? legA : legB;
+    return { kind: 'geometry', topic, prompt: `A right triangle has a hypotenuse of ${hypotenuse} and a leg of ${knownLeg}. Find the missing leg.`, legs: { legA: unknownLeg === 0 ? '?' : legA, legB: unknownLeg === 1 ? '?' : legB, hypotenuse }, answer: formatDecimalResult(missingLeg) };
+  }
+  return { kind: 'geometry', topic, prompt: `A right triangle has legs ${legA} and ${legB}. Find the hypotenuse.`, legs: { legA, legB, hypotenuse: '?' }, answer: formatDecimalResult(hypotenuse) };
 }
 
 function buildPrimaryAdditionalQuestion(topic, min, max) {
@@ -4818,10 +4899,11 @@ function renderAlgebraQuestion(num, question) {
 
 function renderGeometryQuestion(num, question) {
   const largeShapeClass = (question.topic === '2d-shapes' || question.topic === '3d-shapes') ? ' geometry-topic-large-shape' : '';
+  const threeDShapeClass = question.topic === '3d-shapes' ? ' geometry-topic-3d-shape' : '';
   return `
     <div class="question question-geometry-topic">
       <div class="question-number">${num}.</div>
-      <div class="geometry-topic-body${largeShapeClass}">
+      <div class="geometry-topic-body${largeShapeClass}${threeDShapeClass}">
         <div class="geometry-topic-prompt">${renderGeometryPromptHTML(question)}</div>
         <div class="geometry-topic-answer-line"></div>
       </div>
@@ -4839,7 +4921,15 @@ function renderAlgebraPromptHTML(question) {
 function renderGeometryPromptHTML(question) {
   const rawPrompt = String(question.prompt ?? '');
   const shapeName = rawPrompt.includes(':') ? rawPrompt.split(':')[0].trim() : rawPrompt;
-  const label = escapeHtml(rawPrompt);
+  const label = escapeHtml(getConciseVisualPrompt(question));
+
+  if (question.topic === 'pythagoras' && question.legs) {
+    return `
+      <span class="geometry-shape-stack pythagoras-shape-stack">
+        <span class="geometry-shape-question">${label}</span>
+        <span class="geometry-shape-icon pythagoras-shape-icon" aria-hidden="true">${renderPythagorasSVG(question)}</span>
+      </span>`;
+  }
 
   if (question.topic === 'circle-geometry') {
     const diagram = renderCircleGeometrySVG(rawPrompt);
@@ -4868,6 +4958,15 @@ function renderGeometryPromptHTML(question) {
       <span class="geometry-shape-question">${label}</span>
       <span class="geometry-shape-icon" aria-hidden="true">${shapeSvg}</span>
     </span>`;
+}
+
+function getConciseVisualPrompt(question) {
+  const prompt = String(question.prompt ?? '');
+  return prompt
+    .replace(/\. Find the (area|perimeter|volume|surface area)\.?$/i, '')
+    .replace(/\. Find the hypotenuse to 2 decimal places\.?$/i, '')
+    .replace(/\. Find the missing leg to 2 decimal places\.?$/i, '')
+    .replace(/\. Find (opposite|adjacent|hypotenuse)\.?$/i, '');
 }
 
 function renderGeometryShapeSVG(shapeName, topic) {
@@ -5555,7 +5654,6 @@ function buildFormulaSheetHTML(module) {
         <div class="worksheet-info-strip">
           ${buildInfoStripItem('book', 'Module', moduleLabel(module))}
           ${buildInfoStripItem('clipboard', 'Type', 'Formula & Glossary Sheet')}
-          ${buildInfoStripBlankItem('calendar', 'Date', 'date')}
         </div>
       </div>
       <div class="conversion-formula-content">
@@ -5660,7 +5758,7 @@ function getPageInstruction(topic) {
     'complex-numbers': 'Simplify each complex-number expression:',
     'financial-mathematics': 'Calculate the simple interest in each question:',
     'advanced-probability': 'Find the probability of each event:',
-    pythagoras: 'Use Pythagoras’ theorem to find each hypotenuse:',
+    pythagoras: 'Use Pythagoras’ theorem to find each missing side:',
   };
   if (advancedInstructions[topic]) {
     return advancedInstructions[topic];
@@ -5967,6 +6065,11 @@ function getPageInstruction(topic) {
   }
 
   return '';
+}
+
+function renderPythagorasSVG(question) {
+  const { legA, legB, hypotenuse } = question.legs;
+  return `<svg viewBox="0 0 180 140" aria-hidden="true"><polygon points="35,112 35,32 145,112" fill="rgba(43,108,176,0.1)" stroke="currentColor" stroke-width="2.8"/><polyline points="35,98 49,98 49,112" fill="none" stroke="currentColor" stroke-width="2"/><text x="25" y="74" text-anchor="middle" font-size="16" font-weight="700" fill="currentColor">${legA}</text><text x="90" y="130" text-anchor="middle" font-size="16" font-weight="700" fill="currentColor">${legB}</text><text x="103" y="62" text-anchor="middle" font-size="17" font-weight="700" fill="currentColor">${hypotenuse}</text></svg>`;
 }
 
 function buildUniquePlaceValueDigits(length, targetIndex, targetDigit) {

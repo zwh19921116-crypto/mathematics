@@ -86,6 +86,27 @@
         </select>
       </div>
 
+      <div class="form-group" id="pythagorasModeGroup" style="display:none">
+        <label for="pythagorasMode">Find</label>
+        <select id="pythagorasMode">
+          <option value="hypotenuse">Hypotenuse (c)</option>
+          <option value="missing-leg">Missing leg (a or b)</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="patternModeGroup" style="display:none">
+        <label for="patternMode">Pattern Type</label>
+        <select id="patternMode">
+          <option value="random">Random</option>
+          <option value="add">Addition</option>
+          <option value="multiply-add">Multiply then Add</option>
+          <option value="multiply-divide">Multiply then Divide</option>
+          <option value="multiply-4-add-2">Multiply by 4 then Add 2</option>
+          <option value="multiply-4-divide-2">Multiply by 4 then Divide by 2</option>
+          <option value="alternate-add-subtract">Add then Subtract</option>
+        </select>
+      </div>
+
       <div class="form-group" id="timesTableGroup" style="display:none">
         <label for="timesTable">Times Table</label>
         <select id="timesTable">
@@ -134,11 +155,7 @@
       </div>
 
       <div class="form-group">
-        <label for="solutionsRequired"><input type="checkbox" id="solutionsRequired" /> Solutions Required</label>
-      </div>
-
-      <div class="form-group">
-        <label for="coverPageRequired"><input type="checkbox" id="coverPageRequired" /> Cover Page Required</label>
+        <label class="checkbox-label" for="coverPageRequired"><input type="checkbox" id="coverPageRequired" /> Cover Page Required</label>
       </div>
 
       <div class="form-group" id="coverPageTitleGroup" style="display:none">
@@ -147,7 +164,15 @@
       </div>
 
       <div class="form-group">
-        <label for="whiteLabelCheckbox"><input type="checkbox" id="whiteLabelCheckbox" /> White Label (Custom Logo)</label>
+        <label class="checkbox-label" for="formulaSheetRequired"><input type="checkbox" id="formulaSheetRequired" /> Formula Sheet Required</label>
+      </div>
+
+      <div class="form-group">
+        <label class="checkbox-label" for="solutionsRequired"><input type="checkbox" id="solutionsRequired" /> Solutions Required</label>
+      </div>
+
+      <div class="form-group">
+        <label class="checkbox-label" for="whiteLabelCheckbox"><input type="checkbox" id="whiteLabelCheckbox" /> White Label (Custom Logo)</label>
       </div>
 
       <div class="form-group" id="whiteLabelUploadGroup" style="display:none">
@@ -168,10 +193,13 @@
 
     <div class="preview-wrapper">
       <div class="preview-toolbar" id="previewToolbar" style="display:none">
-        <div class="pagination" id="pagination" style="display:none">
-          <button id="prevBtn" class="btn-page" disabled>&#8592; Prev</button>
-          <span id="pageIndicator">Page 1 of 1</span>
-          <button id="nextBtn" class="btn-page">Next &#8594;</button>
+        <div class="pagination-actions">
+          <div class="pagination" id="pagination" style="display:none">
+            <button id="prevBtn" class="btn-page" disabled>&#8592; Prev</button>
+            <span class="page-indicator">Page <input id="pageNumberInput" type="number" min="1" value="1" aria-label="Current page" /> of <span id="pageTotal">1</span></span>
+            <button id="nextBtn" class="btn-page">Next &#8594;</button>
+          </div>
+          <button id="solutionsJumpBtn" class="solutions-jump-btn" type="button" style="display:none">Solutions</button>
         </div>
 
         <div class="zoom-controls" id="zoomControls" aria-label="Preview zoom controls">
