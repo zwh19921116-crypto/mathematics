@@ -1557,6 +1557,31 @@ body.is-fullscreen .preview.is-dragging {
   font-weight: 700;
 }
 
+.question-multi-term {
+  max-width: 9rem;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.question-multi-term-question {
+  align-items: flex-start;
+}
+
+.question-multi-term .question-bottom {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.question-multi-term .question-bottom:nth-last-child(2) {
+  border-bottom: 2px solid #2b6cb0;
+  padding-bottom: 0.35rem;
+}
+
+.question-multi-term .answer-line {
+  margin-top: 0.35rem;
+  min-height: 1.3rem;
+}
+
 .answer-line {
   display: block;
   border-bottom: 2px solid #2b6cb0;
@@ -1840,6 +1865,29 @@ body.is-fullscreen .preview.is-dragging {
   align-items: flex-start;
 }
 
+.question-chart-topic .statistics-topic-body,
+.question-table-topic .statistics-topic-body {
+  max-width: 40rem;
+}
+
+.question-chart-topic .statistics-topic-body {
+  align-items: center;
+}
+
+.question-chart-topic .statistics-topic-prompt,
+.question-table-topic .statistics-topic-prompt {
+  width: 100%;
+}
+
+.question-chart-topic .statistics-topic-question,
+.question-chart-topic .statistics-topic-data {
+  max-width: 20rem;
+}
+
+.question-chart-topic .secondary-chart-wrap {
+  max-width: 40rem;
+}
+
 .statistics-topic-prompt {
   font-size: 0.98rem;
   line-height: 1.35;
@@ -2056,6 +2104,144 @@ body.is-fullscreen .preview.is-dragging {
 .fraction-denominator {
   font-size: 0.82em;
   font-variant-numeric: tabular-nums;
+}
+.primary-visual-question {
+  align-items: center;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  text-align: center;
+  width: 100%;
+}
+
+.primary-visual {
+  color: #2b6cb0;
+  display: block;
+  height: 4.5rem;
+  max-width: 10rem;
+  width: 100%;
+}
+
+.primary-visual text {
+  fill: currentColor;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.primary-ruler {
+  height: 3.7rem;
+}
+
+.primary-counters {
+  height: 3.2rem;
+}
+
+.secondary-graph {
+  aspect-ratio: 1.8;
+  height: auto;
+  max-width: 40rem;
+}
+
+.secondary-box-plot {
+  aspect-ratio: 2;
+  height: auto;
+  max-width: 40rem;
+}
+
+.secondary-chart-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 0.4rem auto;
+  width: 100%;
+}
+
+.chart-and-data {
+  align-items: center;
+  display: flex;
+  gap: 0.8rem;
+  justify-content: center;
+  width: 100%;
+}
+
+.secondary-chart-data-table {
+  border-collapse: collapse;
+  color: #1f3556;
+  font-size: 0.72rem;
+  min-width: 6rem;
+}
+
+.secondary-chart-data-table th,
+.secondary-chart-data-table td {
+  border: 1px solid rgba(43, 108, 176, 0.3);
+  padding: 0.2rem 0.35rem;
+  text-align: center;
+}
+
+.secondary-chart-data-table th {
+  background: rgba(43, 108, 176, 0.1);
+  font-weight: 800;
+}
+
+.secondary-chart {
+  color: #2b6cb0;
+  display: block;
+  height: auto;
+  max-width: 40rem;
+  width: 100%;
+}
+
+.secondary-chart text {
+  fill: currentColor;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.graph-single-column {
+  grid-template-columns: 1fr;
+}
+
+.cartesian-plot-stack {
+  align-items: center;
+  width: 100%;
+}
+
+.cartesian-plot-icon {
+  height: min(58vh, 18rem);
+  width: min(100%, 25rem);
+}
+
+.cartesian-plot-svg {
+  height: 100%;
+  width: 100%;
+}
+
+.primary-visual-solution {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  width: 100%;
+}
+
+.primary-solution-answer {
+  color: #1f4ea2;
+  font-size: 1rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.secondary-solution-steps {
+  color: #2d3748;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  margin-top: 0.35rem;
+  text-align: left;
+}
+
+.secondary-solution-steps > div + div {
+  border-left: 2px solid #d9e2ec;
+  margin-top: 0.15rem;
+  padding-left: 0.45rem;
 }
 
 .fraction-line {

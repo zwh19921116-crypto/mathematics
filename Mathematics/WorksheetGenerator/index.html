@@ -40,7 +40,6 @@
         <select id="yearLevel">
           <option value="primary">Primary</option>
           <option value="secondary">Secondary</option>
-          <option value="vce">VCE</option>
         </select>
       </div>
 
@@ -57,7 +56,8 @@
           <option value="number">Number</option>
           <option value="percentages">Percentages</option>
           <option value="ratio">Ratio &amp; Proportion</option>
-          <option value="statistics">Statistics &amp; Probability</option>
+          <option value="statistics">Statistics</option>
+          <option value="probability">Probability</option>
           <option value="trigonometry">Trigonometry</option>
         </select>
       </div>
@@ -104,6 +104,42 @@
           <option value="multiply-4-add-2">Multiply by 4 then Add 2</option>
           <option value="multiply-4-divide-2">Multiply by 4 then Divide by 2</option>
           <option value="alternate-add-subtract">Add then Subtract</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="termCountGroup" style="display:none">
+        <label for="termCount">Number of Terms</label>
+        <select id="termCount">
+          <option value="2">2 numbers</option>
+          <option value="3">3 numbers</option>
+          <option value="4">4 numbers</option>
+          <option value="5">5 numbers</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="mixedQuestionsPerPageGroup" style="display:none">
+        <label for="mixedQuestionsPerPage">Questions per Page</label>
+        <select id="mixedQuestionsPerPage">
+          <option value="6">6 questions</option>
+          <option value="4">4 questions</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="roundingPlaceGroup" style="display:none">
+        <label for="roundingPlace">Round to</label>
+        <select id="roundingPlace">
+          <option value="mixed">Mixed</option>
+          <option value="10">Nearest 10</option>
+          <option value="100">Nearest 100</option>
+          <option value="1000">Nearest 1,000</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="graphQuestionsPerPageGroup" style="display:none">
+        <label for="graphQuestionsPerPage">Graph Questions per Page</label>
+        <select id="graphQuestionsPerPage">
+          <option value="2">2 questions</option>
+          <option value="4">4 questions</option>
         </select>
       </div>
 
@@ -337,7 +373,8 @@
               <option value="number">Number</option>
               <option value="percentages">Percentages</option>
               <option value="ratio">Ratio &amp; Proportion</option>
-              <option value="statistics">Statistics &amp; Probability</option>
+              <option value="statistics">Statistics</option>
+              <option value="probability">Probability</option>
               <option value="trigonometry">Trigonometry</option>
             </select>
           </div>
@@ -361,7 +398,8 @@
               <option value="number">Number</option>
               <option value="percentages">Percentages</option>
               <option value="ratio">Ratio &amp; Proportion</option>
-              <option value="statistics">Statistics &amp; Probability</option>
+              <option value="statistics">Statistics</option>
+              <option value="probability">Probability</option>
               <option value="trigonometry">Trigonometry</option>
             </select>
           </div>
@@ -376,6 +414,42 @@
             <select id="bulkDenominatorMode">
               <option value="same">Same</option>
               <option value="mixed">Mixed</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="bulkTermCountGroup" style="display:none">
+            <label for="bulkTermCount">Number of Terms</label>
+            <select id="bulkTermCount">
+              <option value="2">2 numbers</option>
+              <option value="3">3 numbers</option>
+              <option value="4">4 numbers</option>
+              <option value="5">5 numbers</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="bulkRoundingPlaceGroup" style="display:none">
+            <label for="bulkRoundingPlace">Round to</label>
+            <select id="bulkRoundingPlace">
+              <option value="mixed">Mixed</option>
+              <option value="10">Nearest 10</option>
+              <option value="100">Nearest 100</option>
+              <option value="1000">Nearest 1,000</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="bulkMixedQuestionsPerPageGroup" style="display:none">
+            <label for="bulkMixedQuestionsPerPage">Questions per Page</label>
+            <select id="bulkMixedQuestionsPerPage">
+              <option value="6">6 questions</option>
+              <option value="4">4 questions</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="bulkGraphQuestionsPerPageGroup" style="display:none">
+            <label for="bulkGraphQuestionsPerPage">Graph Questions per Page</label>
+            <select id="bulkGraphQuestionsPerPage">
+              <option value="2">2 questions</option>
+              <option value="4">4 questions</option>
             </select>
           </div>
 
@@ -467,7 +541,8 @@
             <option value="number">Number</option>
             <option value="percentages">Percentages</option>
             <option value="ratio">Ratio &amp; Proportion</option>
-            <option value="statistics">Statistics &amp; Probability</option>
+            <option value="statistics">Statistics</option>
+            <option value="probability">Probability</option>
             <option value="trigonometry">Trigonometry</option>
           </select>
         </div>

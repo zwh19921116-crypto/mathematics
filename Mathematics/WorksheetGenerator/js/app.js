@@ -36,6 +36,14 @@ const pythagorasModeGroup = document.getElementById('pythagorasModeGroup');
 const pythagorasModeSelect = document.getElementById('pythagorasMode');
 const patternModeGroup = document.getElementById('patternModeGroup');
 const patternModeSelect = document.getElementById('patternMode');
+const termCountGroup = document.getElementById('termCountGroup');
+const termCountSelect = document.getElementById('termCount');
+const mixedQuestionsPerPageGroup = document.getElementById('mixedQuestionsPerPageGroup');
+const mixedQuestionsPerPageSelect = document.getElementById('mixedQuestionsPerPage');
+const roundingPlaceGroup = document.getElementById('roundingPlaceGroup');
+const roundingPlaceSelect = document.getElementById('roundingPlace');
+const graphQuestionsPerPageGroup = document.getElementById('graphQuestionsPerPageGroup');
+const graphQuestionsPerPageSelect = document.getElementById('graphQuestionsPerPage');
 const rangeRow         = document.getElementById('rangeRow');
 const titleInput       = document.getElementById('title');
 const solutionsCheckbox = document.getElementById('solutionsRequired');
@@ -88,6 +96,14 @@ const bulkModuleSelect  = document.getElementById('bulkModule');
 const bulkTopicSelect   = document.getElementById('bulkTopic');
 const bulkDenominatorGroup = document.getElementById('bulkDenominatorGroup');
 const bulkDenominatorSelect = document.getElementById('bulkDenominatorMode');
+const bulkTermCountGroup = document.getElementById('bulkTermCountGroup');
+const bulkTermCountSelect = document.getElementById('bulkTermCount');
+const bulkRoundingPlaceGroup = document.getElementById('bulkRoundingPlaceGroup');
+const bulkRoundingPlaceSelect = document.getElementById('bulkRoundingPlace');
+const bulkMixedQuestionsPerPageGroup = document.getElementById('bulkMixedQuestionsPerPageGroup');
+const bulkMixedQuestionsPerPageSelect = document.getElementById('bulkMixedQuestionsPerPage');
+const bulkGraphQuestionsPerPageGroup = document.getElementById('bulkGraphQuestionsPerPageGroup');
+const bulkGraphQuestionsPerPageSelect = document.getElementById('bulkGraphQuestionsPerPage');
 const bulkTimesTableGroup = document.getElementById('bulkTimesTableGroup');
 const bulkTimesTableSelect = document.getElementById('bulkTimesTable');
 const bulkMagicSquareSizeGroup = document.getElementById('bulkMagicSquareSizeGroup');
@@ -136,6 +152,8 @@ const MODULE_TOPICS = {
     { value: 'word-problems', label: 'Word Problems' },
     { value: 'multi-step-word-problems', label: 'Multi-step Word Problems' },
     { value: 'fact-families', label: 'Fact Families' },
+    { value: 'number-bonds', label: 'Number Bonds' },
+    { value: 'mental-maths', label: 'Mental Maths Strategies' },
     { value: 'times-tables', label: 'Times Tables' },
     { value: 'bodmas', label: 'B.O.D.M.A.S' },
     { value: 'mixed', label: 'Mixed Operations' },
@@ -145,6 +163,7 @@ const MODULE_TOPICS = {
     { value: 'comparing-fractions', label: 'Comparing & Ordering Fractions' },
     { value: 'equivalent-fractions', label: 'Equivalent Fractions' },
     { value: 'fraction-models', label: 'Visual Fraction Models' },
+    { value: 'fraction-of-quantity', label: 'Fractions of Quantities' },
     { value: 'simplifying-fractions', label: 'Simplifying Fractions' },
     { value: 'mixed-fractions', label: 'Mixed Fractions' },
     { value: 'improper-fractions', label: 'Improper Fractions' },
@@ -171,6 +190,7 @@ const MODULE_TOPICS = {
     { value: 'symmetry', label: 'Symmetry' },
     { value: 'position-direction', label: 'Position and Direction' },
     { value: 'coordinates', label: 'Maps and Coordinates' },
+    { value: 'plot-cartesian-plane', label: 'Plot on the Cartesian Plane' },
     { value: 'transformations', label: 'Transformations' },
     { value: 'congruence', label: 'Congruence' },
     { value: 'similarity', label: 'Similarity' },
@@ -181,6 +201,7 @@ const MODULE_TOPICS = {
     { value: 'shape-properties', label: '2D & 3D Shape Properties' },
   ],
   measurement: [
+    { value: 'visual-measurement', label: 'Visual Measurement' },
     { value: 'length', label: 'Length' },
     { value: 'area', label: 'Area' },
     { value: 'perimeter', label: 'Perimeter' },
@@ -189,6 +210,7 @@ const MODULE_TOPICS = {
     { value: 'capacity', label: 'Capacity' },
     { value: 'mass', label: 'Mass' },
     { value: 'time', label: 'Time' },
+    { value: 'analogue-clocks', label: 'Analogue Clocks' },
     { value: 'calendars', label: 'Calendars' },
     { value: 'temperature', label: 'Temperature' },
     { value: 'unit-conversions', label: 'Unit Conversions' },
@@ -197,6 +219,7 @@ const MODULE_TOPICS = {
   ],
   money: [
     { value: 'making-change', label: 'Making Change' },
+    { value: 'coin-note-recognition', label: 'Coins and Notes' },
     { value: 'adding-money', label: 'Adding Money' },
     { value: 'money-word-problems', label: 'Money Word Problems' },
     { value: 'financial-mathematics', label: 'Financial Mathematics' },
@@ -216,13 +239,25 @@ const MODULE_TOPICS = {
     { value: 'mode', label: 'Mode' },
     { value: 'range', label: 'Range' },
     { value: 'interquartile-range', label: 'Interquartile Range' },
+    { value: 'box-plots', label: 'Box Plots' },
+    { value: 'cumulative-frequency', label: 'Cumulative Frequency' },
+    { value: 'stem-and-leaf', label: 'Stem-and-Leaf Plots' },
+    { value: 'histograms', label: 'Histograms' },
+    { value: 'dot-plots', label: 'Dot Plots' },
+    { value: 'scatter-plots', label: 'Scatter Plots' },
+    { value: 'frequency-distributions', label: 'Frequency Distributions' },
+    { value: 'draw-charts', label: 'Draw Statistical Charts' },
+    { value: 'distributions', label: 'Data Distributions' },
     { value: 'standard-deviation', label: 'Standard Deviation' },
     { value: 'data-analysis', label: 'Data Analysis' },
     { value: 'regression', label: 'Regression' },
+    { value: 'data-interpretation', label: 'Data Interpretation' },
+  ],
+  probability: [
     { value: 'chance-language', label: 'Chance (Likely/Unlikely/Certain)' },
+    { value: 'chance-experiments', label: 'Chance Experiments' },
     { value: 'simple-probability', label: 'Simple Probability' },
     { value: 'advanced-probability', label: 'Advanced Probability' },
-    { value: 'data-interpretation', label: 'Data Interpretation' },
   ],
   trigonometry: [
     { value: 'right-angle-trigonometry', label: 'Right Angle Trigonometry' },
@@ -241,6 +276,10 @@ const MODULE_TOPICS = {
     { value: 'linear-equations', label: 'Linear Equations' },
     { value: 'simultaneous-equations', label: 'Simultaneous Equations' },
     { value: 'inequalities', label: 'Inequalities' },
+    { value: 'multi-step-linear-equations', label: 'Multi-step Linear Equations' },
+    { value: 'linear-graphs', label: 'Linear Graphs' },
+    { value: 'gradient', label: 'Gradient' },
+    { value: 'algebraic-fractions', label: 'Algebraic Fractions' },
     { value: 'polynomials', label: 'Polynomials' },
     { value: 'functions', label: 'Functions' },
     { value: 'exponential-functions', label: 'Exponential Functions' },
@@ -253,6 +292,7 @@ const MODULE_TOPICS = {
   ],
   number: [
     { value: 'whole-numbers', label: 'Whole Numbers' },
+    { value: 'rounding-estimation', label: 'Rounding and Estimation' },
     { value: 'writing-numbers-sequence', label: 'Writing Number (Sequence)' },
     { value: 'writing-numbers-random', label: 'Writing Number (Random)' },
     { value: 'identifying-numbers', label: 'Identifying Numbers' },
@@ -284,19 +324,20 @@ const MODULE_TOPICS = {
 };
 
 const MODULES_BY_YEAR_LEVEL = {
-  primary: new Set(['algebra', 'arithmetic', 'decimals', 'fractions', 'geometry', 'measurement', 'money', 'number', 'percentages', 'ratio', 'statistics']),
-  secondary: new Set(['algebra', 'arithmetic', 'decimals', 'fractions', 'geometry', 'measurement', 'money', 'number', 'percentages', 'ratio', 'statistics', 'trigonometry']),
-  vce: new Set(['algebra', 'arithmetic', 'decimals', 'fractions', 'geometry', 'measurement', 'money', 'number', 'percentages', 'ratio', 'statistics', 'trigonometry']),
+  primary: new Set(['algebra', 'arithmetic', 'decimals', 'fractions', 'geometry', 'measurement', 'money', 'number', 'percentages', 'ratio', 'statistics', 'probability']),
+  secondary: new Set(['algebra', 'arithmetic', 'decimals', 'fractions', 'geometry', 'measurement', 'money', 'number', 'percentages', 'ratio', 'statistics', 'probability', 'trigonometry']),
 };
 
 const PRIMARY_TOPIC_LIMITS = {
+  arithmetic: new Set(['addition', 'subtraction', 'multiplication', 'multiplication-groups', 'multiplication-strategies', 'division', 'division-strategies', 'word-problems', 'multi-step-word-problems', 'fact-families', 'number-bonds', 'mental-maths', 'times-tables', 'bodmas', 'mixed']),
   algebra: new Set(['patterns', 'variables', 'sequences']),
-  geometry: new Set(['2d-shapes', '3d-shapes', 'angles', 'symmetry', 'position-direction', 'coordinates', 'transformations', 'shape-properties']),
-  money: new Set(['making-change', 'adding-money', 'money-word-problems', 'saving-money', 'budgeting', 'best-buy', 'discounts']),
-  number: new Set(['whole-numbers', 'writing-numbers-sequence', 'writing-numbers-random', 'identifying-numbers', 'place-value', 'odd-even', 'comparing-numbers', 'ordering-numbers', 'missing-numbers', 'number-sentences', 'equality', 'factors', 'multiples', 'magic-squares', 'sudoku']),
-  statistics: new Set(['collecting-data', 'tables', 'picture-graphs', 'bar-graphs', 'chance-language', 'simple-probability', 'data-interpretation']),
-  fractions: new Set(['recognising-fractions', 'comparing-fractions', 'equivalent-fractions', 'fraction-models', 'add-fractions', 'subtract-fractions', 'multiply-fractions', 'divide-fractions']),
-  measurement: new Set(['length', 'area', 'perimeter', 'volume', 'capacity', 'mass', 'time', 'calendars', 'temperature', 'unit-conversions', 'measurement-conversions', 'elapsed-time']),
+  geometry: new Set(['2d-shapes', '3d-shapes', 'angles', 'symmetry', 'position-direction', 'coordinates', 'plot-cartesian-plane', 'transformations', 'shape-properties']),
+  money: new Set(['making-change', 'coin-note-recognition', 'adding-money', 'money-word-problems', 'saving-money', 'budgeting', 'best-buy', 'discounts']),
+  number: new Set(['whole-numbers', 'rounding-estimation', 'writing-numbers-sequence', 'writing-numbers-random', 'identifying-numbers', 'place-value', 'odd-even', 'comparing-numbers', 'ordering-numbers', 'missing-numbers', 'number-sentences', 'equality', 'factors', 'multiples', 'magic-squares', 'sudoku']),
+  statistics: new Set(['collecting-data', 'tables', 'picture-graphs', 'bar-graphs', 'graphs', 'mean', 'median', 'mode', 'range', 'interquartile-range', 'box-plots', 'cumulative-frequency', 'stem-and-leaf', 'histograms', 'dot-plots', 'scatter-plots', 'frequency-distributions', 'draw-charts', 'distributions', 'standard-deviation', 'data-analysis', 'regression', 'data-interpretation']),
+  probability: new Set(['chance-language', 'chance-experiments', 'simple-probability', 'advanced-probability']),
+  fractions: new Set(['recognising-fractions', 'comparing-fractions', 'equivalent-fractions', 'fraction-models', 'fraction-of-quantity', 'add-fractions', 'subtract-fractions', 'multiply-fractions', 'divide-fractions']),
+  measurement: new Set(['visual-measurement', 'length', 'area', 'perimeter', 'volume', 'capacity', 'mass', 'time', 'analogue-clocks', 'calendars', 'temperature', 'unit-conversions', 'measurement-conversions', 'elapsed-time']),
 };
 
 const NUMBER_TOPICS = new Set([
@@ -328,7 +369,9 @@ const MULTIPLICATION_GROUPING_TOPICS = new Set(['multiplication-groups']);
 const WORD_PROBLEM_TOPICS = new Set(['word-problems']);
 const PRIMARY_ADDITIONAL_TOPICS = new Set([
   'multiplication-strategies', 'division-strategies', 'multi-step-word-problems', 'fact-families',
-  'fraction-models', 'measurement-conversions', 'elapsed-time', 'shape-properties', 'discounts',
+  'number-bonds', 'mental-maths', 'fraction-models', 'fraction-of-quantity', 'measurement-conversions', 'elapsed-time',
+  'visual-measurement', 'analogue-clocks', 'coin-note-recognition', 'chance-experiments', 'rounding-estimation',
+  'shape-properties', 'discounts',
   'data-interpretation',
 ]);
 const ADVANCED_WORKSHEET_TOPICS = new Set([
@@ -340,6 +383,18 @@ const ADVANCED_WORKSHEET_TOPICS = new Set([
   'financial-mathematics',
   'advanced-probability',
   'pythagoras',
+  'multi-step-linear-equations',
+  'linear-graphs',
+  'gradient',
+  'algebraic-fractions',
+  'box-plots',
+  'cumulative-frequency',
+]);
+
+const SECONDARY_EXCLUDED_TOPICS = new Set([
+  'number-bonds', 'mental-maths', 'analogue-clocks', 'coin-note-recognition', 'visual-measurement', 'chance-experiments',
+  'multiplication-groups', 'multiplication-strategies', 'division-strategies', 'fact-families', 'times-tables',
+  'writing-numbers-sequence', 'writing-numbers-random', 'identifying-numbers', 'odd-even',
 ]);
 
 const FRACTION_TOPICS = new Set([
@@ -382,6 +437,7 @@ const GEOMETRY_TOPICS = new Set([
   'symmetry',
   'position-direction',
   'coordinates',
+  'plot-cartesian-plane',
   'transformations',
   'congruence',
   'similarity',
@@ -466,6 +522,13 @@ const STATISTICS_TOPICS = new Set([
   'chance-language',
   'simple-probability',
   'advanced-probability',
+  'stem-and-leaf',
+  'histograms',
+  'dot-plots',
+  'scatter-plots',
+  'frequency-distributions',
+  'draw-charts',
+  'distributions',
 ]);
 
 let allPages    = [];
@@ -544,6 +607,7 @@ topicSelect.addEventListener('change', () => {
 
 pythagorasModeSelect.addEventListener('change', updateTitleInput);
 patternModeSelect.addEventListener('change', updateTitleInput);
+termCountSelect.addEventListener('change', updateTitleInput);
 
 titleInput.addEventListener('input', () => {
   titleTouched = titleInput.value.trim() !== defaultTitleSuffix();
@@ -734,7 +798,11 @@ function populateTopicsFor(moduleEl, topicEl) {
     if (allowedTopics) {
       topics = topics.filter((topic) => allowedTopics.has(topic.value));
     }
+    if (yearLevelSelect.value === 'secondary') {
+      topics = topics.filter((topic) => !SECONDARY_EXCLUDED_TOPICS.has(topic.value));
+    }
   }
+  topics = topics.slice().sort((firstTopic, secondTopic) => firstTopic.label.localeCompare(secondTopic.label));
   topicEl.innerHTML = topics
     .map((topic) => `<option value="${topic.value}">${topic.label}</option>`)
     .join('');
@@ -763,7 +831,6 @@ function getAvailableModuleTopicSearchResults() {
   [
     { value: 'primary', label: 'Primary' },
     { value: 'secondary', label: 'Secondary' },
-    { value: 'vce', label: 'VCE' },
   ].forEach((yearLevel) => {
     results.push({ yearLevel: yearLevel.value, module: '', topic: '', label: `Year Level > ${yearLevel.label}`, searchText: yearLevel.label });
     const availableModules = MODULES_BY_YEAR_LEVEL[yearLevel.value] || MODULES_BY_YEAR_LEVEL.primary;
@@ -870,6 +937,10 @@ function updateTopicControls() {
   updateTopicControlsFor(topicSelect, timesTableGroup, rangeRow, denominatorGroup, denominatorSelect);
   pythagorasModeGroup.style.display = topicSelect.value === 'pythagoras' ? 'block' : 'none';
   patternModeGroup.style.display = topicSelect.value === 'patterns' ? 'block' : 'none';
+  termCountGroup.style.display = ['addition', 'subtraction', 'mixed'].includes(topicSelect.value) ? 'block' : 'none';
+  mixedQuestionsPerPageGroup.style.display = topicSelect.value === 'mixed' ? 'block' : 'none';
+  roundingPlaceGroup.style.display = topicSelect.value === 'rounding-estimation' ? 'block' : 'none';
+  graphQuestionsPerPageGroup.style.display = ['linear-graphs', 'gradient', 'box-plots', 'cumulative-frequency', 'stem-and-leaf', 'histograms', 'dot-plots', 'scatter-plots', 'frequency-distributions', 'draw-charts', 'distributions'].includes(topicSelect.value) ? 'block' : 'none';
 }
 
 function updateTitleInput(force = false) {
@@ -900,6 +971,7 @@ updateTitleInput(true);
 
 populateTopicsFor(bulkModuleSelect, bulkTopicSelect);
 updateTopicControlsFor(bulkTopicSelect, bulkTimesTableGroup, bulkRangeRow, bulkDenominatorGroup, bulkDenominatorSelect);
+updateBulkPrimaryControlVisibility();
 
 bulkModuleSelect.addEventListener('change', () => {
   populateTopicsFor(bulkModuleSelect, bulkTopicSelect);
@@ -907,7 +979,16 @@ bulkModuleSelect.addEventListener('change', () => {
 });
 bulkTopicSelect.addEventListener('change', () => {
   updateTopicControlsFor(bulkTopicSelect, bulkTimesTableGroup, bulkRangeRow, bulkDenominatorGroup, bulkDenominatorSelect);
+  updateBulkPrimaryControlVisibility();
 });
+
+function updateBulkPrimaryControlVisibility() {
+  const topic = bulkTopicSelect.value;
+  bulkTermCountGroup.style.display = ['addition', 'subtraction', 'mixed'].includes(topic) ? 'block' : 'none';
+  bulkRoundingPlaceGroup.style.display = topic === 'rounding-estimation' ? 'block' : 'none';
+  bulkMixedQuestionsPerPageGroup.style.display = topic === 'mixed' ? 'block' : 'none';
+  bulkGraphQuestionsPerPageGroup.style.display = ['plot-cartesian-plane', 'linear-graphs', 'gradient', 'box-plots', 'cumulative-frequency', 'stem-and-leaf', 'histograms', 'dot-plots', 'scatter-plots', 'frequency-distributions', 'draw-charts', 'distributions'].includes(topic) ? 'block' : 'none';
+}
 
 generateBtn.addEventListener('click', generateWorksheet);
 refreshBtn.addEventListener('click', refreshWorksheet);
@@ -1243,7 +1324,7 @@ function generateWorksheet() {
     return;
   }
 
-  const questions = buildQuestions(topic, minNum, maxNum, numQ, timesTable, denominatorMode, parseInt(magicSquareSizeSelect.value, 10), pythagorasModeSelect.value, patternModeSelect.value);
+  const questions = buildQuestions(topic, minNum, maxNum, numQ, timesTable, denominatorMode, parseInt(magicSquareSizeSelect.value, 10), pythagorasModeSelect.value, patternModeSelect.value, parseInt(termCountSelect.value, 10), roundingPlaceSelect.value);
   lastGeneratedQuestions = questions;
   renderWorksheetPages(questions);
 }
@@ -1270,7 +1351,7 @@ function renderWorksheetPages(questions) {
     : null;
 
   lastRenderedTitle = title;
-  allPages = paginateQuestions(questions, title, module, includeSolutions, topic, timesTable, coverPage, includeFormulaSheet);
+  allPages = paginateQuestions(questions, title, module, includeSolutions, topic, timesTable, coverPage, includeFormulaSheet, parseInt(mixedQuestionsPerPageSelect.value, 10), parseInt(graphQuestionsPerPageSelect.value, 10));
   currentPage = 0;
   showPage(0);
   printBtn.disabled = false;
@@ -1285,12 +1366,13 @@ function moduleLabel(module) {
     percentages: 'Percentages',
     geometry: 'Geometry',
     measurement: 'Measurement',
-    statistics: 'Statistics & Probability',
+    statistics: 'Statistics',
     trigonometry: 'Trigonometry',
     algebra: 'Algebra',
     number: 'Number',
     money: 'Money',
     ratio: 'Ratio & Proportion',
+    probability: 'Probability',
   };
   return map[module] || 'Mathematics';
 }
@@ -1301,7 +1383,28 @@ function topicLabel(topic, timesTable) {
     'division-strategies': 'Division Strategies Practice',
     'multi-step-word-problems': 'Multi-step Word Problems Practice',
     'fact-families': 'Fact Families Practice',
+    'number-bonds': 'Number Bonds Practice',
+    'mental-maths': 'Mental Maths Strategies Practice',
+    'rounding-estimation': 'Rounding and Estimation Practice',
     'fraction-models': 'Visual Fraction Models Practice',
+    'fraction-of-quantity': 'Fractions of Quantities Practice',
+    'analogue-clocks': 'Analogue Clocks Practice',
+    'coin-note-recognition': 'Coins and Notes Practice',
+    'visual-measurement': 'Visual Measurement Practice',
+    'chance-experiments': 'Chance Experiments Practice',
+    'multi-step-linear-equations': 'Multi-step Linear Equations Practice',
+    'linear-graphs': 'Linear Graphs Practice',
+    gradient: 'Gradient Practice',
+    'algebraic-fractions': 'Algebraic Fractions Practice',
+    'box-plots': 'Box Plots Practice',
+    'cumulative-frequency': 'Cumulative Frequency Practice',
+    'stem-and-leaf': 'Stem-and-Leaf Plots Practice',
+    histograms: 'Histograms Practice',
+    'dot-plots': 'Dot Plots Practice',
+    'scatter-plots': 'Scatter Plots Practice',
+    'frequency-distributions': 'Frequency Distributions Practice',
+    'draw-charts': 'Drawing Statistical Charts Practice',
+    distributions: 'Data Distributions Practice',
     'measurement-conversions': 'Measurement Conversions Practice',
     'elapsed-time': 'Elapsed Time Practice',
     'shape-properties': '2D & 3D Shape Properties Practice',
@@ -1389,6 +1492,7 @@ function topicLabel(topic, timesTable) {
     symmetry: 'Symmetry Practice',
     'position-direction': 'Position and Direction Practice',
     coordinates: 'Maps and Coordinates Practice',
+    'plot-cartesian-plane': 'Plot on the Cartesian Plane Practice',
     transformations: 'Transformations Practice',
     congruence: 'Congruence Practice',
     similarity: 'Similarity Practice',
@@ -1435,9 +1539,9 @@ function topicLabel(topic, timesTable) {
   return map[topic] || 'Math Practice';
 }
 
-function paginateQuestions(questions, title, module, includeSolutions, topic, timesTable, coverPage, includeFormulaSheet = false) {
+function paginateQuestions(questions, title, module, includeSolutions, topic, timesTable, coverPage, includeFormulaSheet = false, mixedQuestionsPerPage = 6, graphQuestionsPerPage = 2) {
   const pageModels = [];
-  const questionsPerPage = getQuestionsPerPage(questions);
+  const questionsPerPage = getQuestionsPerPage(questions, topic, mixedQuestionsPerPage, graphQuestionsPerPage);
   const worksheetPageCount = Math.ceil(questions.length / questionsPerPage);
 
   if (coverPage) {
@@ -1445,7 +1549,7 @@ function paginateQuestions(questions, title, module, includeSolutions, topic, ti
   }
 
   if (includeFormulaSheet || questions[0]?.topic === 'unit-conversions') {
-    pageModels.push({ type: 'formula-sheet', title, module });
+    pageModels.push({ type: 'formula-sheet', title, module, topic });
   }
 
   for (let p = 0; p < worksheetPageCount; p++) {
@@ -1463,7 +1567,8 @@ function paginateQuestions(questions, title, module, includeSolutions, topic, ti
   }
 
   if (includeSolutions) {
-    const solutionsPerPage = topic === 'sudoku' ? 1 : 20;
+    const chartTopics = new Set(['plot-cartesian-plane', 'linear-graphs', 'gradient', 'box-plots', 'cumulative-frequency', 'stem-and-leaf', 'histograms', 'dot-plots', 'scatter-plots', 'frequency-distributions', 'draw-charts', 'distributions']);
+    const solutionsPerPage = topic === 'sudoku' ? 1 : chartTopics.has(topic) ? 2 : 20;
     const solutionPageCount = Math.ceil(questions.length / solutionsPerPage);
     for (let p = 0; p < solutionPageCount; p++) {
       const slice = questions.slice(p * solutionsPerPage, (p + 1) * solutionsPerPage);
@@ -1485,7 +1590,7 @@ function paginateQuestions(questions, title, module, includeSolutions, topic, ti
     }
 
     if (pageModel.type === 'formula-sheet') {
-      return buildUnitConversionFormulaSheetHTML(pageModel.title, pageModel.module, index + 1, totalPages);
+      return buildUnitConversionFormulaSheetHTML(pageModel.title, pageModel.module, pageModel.topic, index + 1, totalPages);
     }
 
     if (pageModel.type === 'solutions') {
@@ -1576,7 +1681,7 @@ function sanitizeDisclaimerHTML(html) {
   return container.innerHTML.trim();
 }
 
-function buildUnitConversionFormulaSheetHTML(title, module, pageNum, totalPages) {
+function buildUnitConversionFormulaSheetHTML(title, module, topic, pageNum, totalPages) {
   const conversionGroups = [
     {
       heading: 'Length',
@@ -1596,7 +1701,9 @@ function buildUnitConversionFormulaSheetHTML(title, module, pageNum, totalPages)
     },
   ];
 
-  const groupsHTML = conversionGroups.map((group) => `
+  const formulaGroups = getTopicFormulaGroups(module, topic, conversionGroups);
+
+  const groupsHTML = formulaGroups.map((group) => `
     <section class="conversion-formula-group">
       <h3>${group.heading}</h3>
       <ul>${group.rules.map((rule) => `<li>${rule}</li>`).join('')}</ul>
@@ -1608,12 +1715,12 @@ function buildUnitConversionFormulaSheetHTML(title, module, pageNum, totalPages)
         ${buildWorksheetHeaderBrandHTML(title, module)}
         <div class="worksheet-info-strip">
           ${buildInfoStripItem('book', 'Module', moduleLabel(module))}
-          ${buildInfoStripItem('clipboard', 'Topic', 'Unit Conversions')}
+          ${buildInfoStripItem('clipboard', 'Topic', topicLabel(topic).replace(/ Practice$/, ''))}
           ${buildInfoStripBlankItem('calendar', 'Date', 'date')}
         </div>
       </div>
       <div class="conversion-formula-content">
-        <h2>Unit Conversion Formula Sheet</h2>
+        <h2>${escapeHtml(moduleLabel(module))} Formula Sheet</h2>
         <div class="conversion-formula-grid">${groupsHTML}</div>
       </div>
       <div class="page-footer">
@@ -1623,7 +1730,7 @@ function buildUnitConversionFormulaSheetHTML(title, module, pageNum, totalPages)
     </div>`;
 }
 
-function getQuestionsPerPage(questions) {
+function getQuestionsPerPage(questions, topic = '', mixedQuestionsPerPage = 6, graphQuestionsPerPage = 2) {
   const multiplicationOnly = questions.length > 0 && questions.every((question) => question.operation === 'multiplication');
   const bodmasOnly = questions.length > 0 && questions.every((question) => question.operation === 'bodmas');
   const numberOnly = questions.length > 0 && questions.every((question) => question.kind === 'number');
@@ -1636,6 +1743,22 @@ function getQuestionsPerPage(questions) {
 
   if (sudokuOnly) {
     return 1;
+  }
+
+  if (topic === 'mixed') {
+    return [4, 6].includes(mixedQuestionsPerPage) ? mixedQuestionsPerPage : 6;
+  }
+
+  if (topic === 'plot-cartesian-plane') {
+    return 1;
+  }
+
+  if (['plot-cartesian-plane', 'linear-graphs', 'gradient', 'box-plots', 'cumulative-frequency', 'stem-and-leaf', 'histograms', 'dot-plots', 'scatter-plots', 'frequency-distributions', 'draw-charts', 'distributions'].includes(topic)) {
+    return [2, 4].includes(graphQuestionsPerPage) ? graphQuestionsPerPage : 2;
+  }
+
+  if (questions.some((question) => Array.isArray(question.numbers) && question.numbers.length > 2)) {
+    return 6;
   }
 
   if (numberWritingOnly) {
@@ -1672,6 +1795,10 @@ function getQuestionsPerPage(questions) {
 function usesLargeVisualLayout(question) {
   if (!question || typeof question !== 'object') {
     return false;
+  }
+
+  if (question.visual || question.chart) {
+    return true;
   }
 
   if (question.kind === 'trigonometry') {
@@ -1821,7 +1948,9 @@ function buildPageHTML(questions, startIdx, title, module, pageNum, totalPages, 
     : questions.every((question) => question.kind === 'number-writing')
       ? 'questions-grid number-writing-questions-grid'
     : 'questions-grid';
-  html += `<div class="${questionsGridClass}">`;
+  const graphTopics = new Set(['plot-cartesian-plane', 'linear-graphs', 'gradient', 'box-plots', 'cumulative-frequency', 'stem-and-leaf', 'histograms', 'dot-plots', 'scatter-plots', 'frequency-distributions', 'draw-charts', 'distributions']);
+  const graphLayoutClass = graphTopics.has(topic) && questions.length <= 2 ? ' graph-single-column' : '';
+  html += `<div class="${questionsGridClass}${graphLayoutClass}">`;
   questions.forEach((q, idx) => {
     const num    = startIdx + idx + 1;
     html += renderVerticalQuestion(num, q, opSymbol[q.operation]);
@@ -1873,6 +2002,11 @@ function buildSolutionsPageHTML(questions, startIdx, title, module, pageNum, tot
 }
 
 function formatSolution(question) {
+  if (question.numbers?.length > 2) {
+    const symbol = question.operation === 'addition' ? '+' : '−';
+    return `${question.numbers.join(` ${symbol} `)} = ${question.answer}`;
+  }
+
   if (question.kind === 'number') {
     return `${question.prompt} = ${question.answer}`;
   }
@@ -2075,6 +2209,22 @@ function renderVerticalQuestion(num, question, symbol) {
     return renderLongDivisionQuestion(num, question);
   }
 
+  if (question.numbers?.length > 2) {
+    const termRows = question.numbers.map((value, index) => `
+        <div class="question-${index === 0 ? 'top' : 'bottom'}">
+          ${index === 0 ? '' : `<span class="question-operator">${symbol}</span>`}
+          <span class="question-value">${value}</span>
+        </div>`).join('');
+    return `
+    <div class="question question-vertical question-multi-term-question">
+      <div class="question-number">${num}.</div>
+      <div class="question-stack question-multi-term">
+        ${termRows}
+        <div class="answer-line"></div>
+      </div>
+    </div>`;
+  }
+
   return `
     <div class="question question-vertical">
       <div class="question-number">${num}.</div>
@@ -2180,8 +2330,9 @@ function renderStatisticsQuestion(num, question) {
   const tableHTML = question.topic === 'tables' ? renderStatisticsFrequencyTableHTML(question) : '';
   const regressionHTML = question.topic === 'regression' ? renderStatisticsRegressionHTML(question) : '';
   const promptHTML = question.topic === 'regression' ? '' : `<div class="number-topic-prompt statistics-topic-prompt">${renderStatisticsPromptHTML(question)}</div>`;
+  const layoutClass = question.chart || question.topic === 'regression' ? ' question-chart-topic' : question.topic === 'tables' ? ' question-table-topic' : '';
   return `
-    <div class="question question-number-topic question-statistics-topic">
+    <div class="question question-number-topic question-statistics-topic${layoutClass}">
       <div class="question-number">${num}.</div>
       <div class="number-topic-body statistics-topic-body">
         ${promptHTML}
@@ -2222,8 +2373,43 @@ function renderStatisticsPromptHTML(question) {
     return `<div class="statistics-topic-question statistics-regression-question">${escapeHtml(String(question.prompt ?? ''))}</div>`;
   }
   const dataHTML = question.data ? `<div class="statistics-topic-data">${escapeHtml(String(question.data))}</div>` : '';
+  const chartHTML = question.chart ? `<div class="secondary-chart-wrap">${renderSecondaryChartSVG(question.chart)}</div>` : '';
+  const chartTableHTML = question.chart?.table ? renderChartDataTableHTML(question.chart) : '';
   const promptHTML = `<div class="statistics-topic-question">${escapeHtml(String(question.prompt ?? ''))}</div>`;
-  return `${dataHTML}${promptHTML}`;
+  return `${dataHTML}<div class="chart-and-data">${chartHTML}${chartTableHTML}</div>${promptHTML}`;
+}
+
+function renderChartDataTableHTML(chart) {
+  const headers = chart.type === 'scatter' ? ['x', 'y'] : ['Group', 'Frequency'];
+  const rows = chart.table.map((row) => `<tr>${row.map((value) => `<td>${escapeHtml(String(value))}</td>`).join('')}</tr>`).join('');
+  return `<table class="secondary-chart-data-table"><thead><tr>${headers.map((header) => `<th>${header}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function renderSecondaryChartSVG(chart) {
+  const axes = '<line x1="24" y1="86" x2="164" y2="86"/><line x1="24" y1="16" x2="24" y2="86"/>';
+  const chartGrid = `<g stroke="#d9e2ec" stroke-width="0.55">${Array.from({ length: 11 }, (_, index) => `<line x1="${24 + index * 14}" y1="16" x2="${24 + index * 14}" y2="86"/><line x1="24" y1="${86 - index * 7}" x2="164" y2="${86 - index * 7}"/>`).join('')}</g>`;
+  const axisNumbers = `<g fill="currentColor" stroke="none" font-size="7">${Array.from({ length: 11 }, (_, index) => `<text x="${24 + index * 14}" y="96" text-anchor="middle">${index}</text><text x="17" y="${88 - index * 7}" text-anchor="end">${index}</text>`).join('')}</g>`;
+  const axisLabels = `<g fill="currentColor" stroke="none" font-size="6"><text x="94" y="112" text-anchor="middle">${escapeHtml(chart.xLabel || 'Value')}</text><text x="6" y="51" text-anchor="middle" transform="rotate(-90 6 51)">${escapeHtml(chart.yLabel || 'Frequency')}</text></g>`;
+  if (chart.type === 'stem-and-leaf') {
+    const stems = [...new Set(chart.values.map((value) => Math.floor(value / 10)))];
+    return `<svg class="secondary-chart secondary-stem-leaf" viewBox="0 0 190 100" role="img" aria-label="Stem and leaf plot"><text x="70" y="16">Stem</text><text x="110" y="16">Leaf</text>${stems.map((stem, index) => `<text x="76" y="${32 + index * 14}">${stem}</text><text x="110" y="${32 + index * 14}">${chart.showData ? chart.values.filter(value => Math.floor(value / 10) === stem).map(value => value % 10).join('  ') : '______'}</text>`).join('')}<text x="70" y="94">Key: 3 | 4 = 34</text></svg>`;
+  }
+  if (!chart.showData) {
+    return `<svg class="secondary-chart" viewBox="0 0 190 115" role="img" aria-label="Blank chart to complete">${chartGrid}<g stroke="currentColor" fill="none">${axes}</g>${axisNumbers}${axisLabels}</svg>`;
+  }
+  if (chart.type === 'dot-plot') {
+    const dots = chart.values.map((value, index) => `<circle cx="${32 + value * 14}" cy="${76 - (chart.values.slice(0, index).filter(item => item === value).length * 10)}" r="4" fill="#c62828"/>`).join('');
+    return `<svg class="secondary-chart" viewBox="0 0 190 100" role="img" aria-label="Dot plot"><line x1="24" y1="78" x2="174" y2="78" stroke="currentColor"/>${[1,2,3,4,5,6,7,8,9].map(value => `<text x="${32 + value * 14}" y="94">${value}</text>`).join('')}${dots}</svg>`;
+  }
+  if (chart.type === 'scatter') {
+    return `<svg class="secondary-chart" viewBox="0 0 190 115" role="img" aria-label="Scatter plot">${chartGrid}<g stroke="currentColor" fill="none">${axes}</g>${axisNumbers}${axisLabels}${chart.points.map(point => `<circle cx="${24 + point.x * 14}" cy="${86 - point.y * 7}" r="3" fill="#c62828"/>`).join('')}</svg>`;
+  }
+  if (chart.type === 'distribution') {
+    const heights = chart.shape === 'approximately symmetric' ? [2, 5, 9, 13, 9, 5, 2] : chart.shape === 'positively skewed' ? [12, 9, 6, 4, 3, 2, 1] : [1, 2, 3, 4, 6, 9, 12];
+    return `<svg class="secondary-chart" viewBox="0 0 190 100" role="img" aria-label="Distribution shape">${chartGrid}<g stroke="currentColor" fill="none">${axes}</g>${axisNumbers}${heights.map((height, index) => `<rect x="${35 + index * 18}" y="${82 - height * 4}" width="14" height="${height * 4}" fill="#d9eaf7" stroke="#2b6cb0"/>`).join('')}</svg>`;
+  }
+  const bars = chart.bins || chart.frequencies || [];
+  return `<svg class="secondary-chart" viewBox="0 0 190 115" role="img" aria-label="Frequency chart">${chartGrid}<g stroke="currentColor" fill="none">${axes}</g>${axisNumbers}${axisLabels}${bars.map((value, index) => `<rect x="${35 + index * 30}" y="${82 - value * 6}" width="20" height="${value * 6}" fill="#d9eaf7" stroke="#2b6cb0"/>`).join('')}</svg>`;
 }
 
 function renderStatisticsRegressionHTML(question) {
@@ -2421,6 +2607,11 @@ function renderMeasurementShapeSVG(question) {
 }
 
 function renderSolutionHTML(question) {
+  if (question.visual) {
+    const stepsHTML = question.solutionSteps?.length ? `<div class="secondary-solution-steps">${question.solutionSteps.map((step) => `<div>${escapeHtml(step)}</div>`).join('')}</div>` : '';
+    return `<div class="primary-visual-solution">${renderNumberPromptHTML(question)}<div class="primary-solution-answer">Answer: ${escapeHtml(String(question.answer ?? ''))}</div>${stepsHTML}</div>`;
+  }
+
   if (question.kind !== 'number') {
     if (question.kind === 'sudoku') {
       return `${renderSudokuLegendHTML()}${renderSudokuGridHTML(question.solution, true, question.puzzle)}`;
@@ -2443,6 +2634,9 @@ function renderSolutionHTML(question) {
     }
 
     if (question.kind === 'geometry') {
+      if (question.topic === 'plot-cartesian-plane') {
+        return renderGeometryPromptHTML({ ...question, showPoints: true });
+      }
       if (question.topic === 'pythagoras' && question.legs) {
         const completedQuestion = {
           ...question,
@@ -2481,6 +2675,9 @@ function renderSolutionHTML(question) {
       if (question.topic === 'regression') {
         return `${renderStatisticsRegressionHTML(question)} = ${escapeHtml(String(question.answer ?? ''))}`;
       }
+      if (question.chart) {
+        return renderStatisticsPromptHTML({ ...question, chart: { ...question.chart, showData: true } });
+      }
       return `${renderStatisticsPromptHTML(question)} = ${escapeHtml(String(question.answer ?? ''))}`;
     }
 
@@ -2499,17 +2696,21 @@ function renderSolutionHTML(question) {
     return `${renderNumberPromptHTML(question)} = ${renderScientificNotationHTML(String(question.answer))}`;
   }
 
+  if (question.solutionSteps?.length) {
+    return `<div class="secondary-solution-steps"><div>${renderNumberPromptHTML(question)} = ${escapeHtml(String(question.answer ?? ''))}</div>${question.solutionSteps.map((step) => `<div>${escapeHtml(step)}</div>`).join('')}</div>`;
+  }
+
   return `${renderNumberPromptHTML(question)} = ${escapeHtml(String(question.answer))}`;
 }
 
-function buildQuestions(topic, min, max, count, timesTable, denominatorMode, magicSquareSize = 3, pythagorasMode = 'hypotenuse', patternMode = 'random') {
+function buildQuestions(topic, min, max, count, timesTable, denominatorMode, magicSquareSize = 3, pythagorasMode = 'hypotenuse', patternMode = 'random', termCount = 2, roundingPlace = 'mixed') {
   const mixedOps = ['addition', 'subtraction', 'multiplication', 'division'];
   const questions = [];
   const seenSignatures = new Set();
 
   if (PRIMARY_ADDITIONAL_TOPICS.has(topic)) {
     for (let i = 0; i < count; i++) {
-      pushUniqueQuestion(questions, seenSignatures, () => buildPrimaryAdditionalQuestion(topic, min, max));
+      pushUniqueQuestion(questions, seenSignatures, () => buildPrimaryAdditionalQuestion(topic, min, max, roundingPlace));
     }
     return questions;
   }
@@ -2635,6 +2836,9 @@ function buildQuestions(topic, min, max, count, timesTable, denominatorMode, mag
       let operation, a, b;
       if (topic === 'mixed') {
         operation = mixedOps[randomInt(0, 3)];
+        if (['addition', 'subtraction'].includes(operation) && termCount > 2) {
+          return buildMultiTermArithmeticQuestion(operation, min, max, termCount);
+        }
         a = randomInt(min, max);
         b = randomInt(min, max);
         if (operation === 'subtraction' && a < b) [a, b] = [b, a];
@@ -2643,6 +2847,9 @@ function buildQuestions(topic, min, max, count, timesTable, denominatorMode, mag
         }
       } else {
         operation = topic;
+        if (['addition', 'subtraction'].includes(operation) && termCount > 2) {
+          return buildMultiTermArithmeticQuestion(operation, min, max, termCount);
+        }
         a = randomInt(min, max);
         b = randomInt(min, max);
         if (operation === 'subtraction' && a < b) [a, b] = [b, a];
@@ -2655,6 +2862,18 @@ function buildQuestions(topic, min, max, count, timesTable, denominatorMode, mag
     });
   }
   return questions;
+}
+
+function buildMultiTermArithmeticQuestion(operation, min, max, termCount) {
+  const safeTermCount = Math.min(5, Math.max(3, termCount));
+  const numbers = Array.from({ length: safeTermCount }, () => randomInt(min, max));
+  if (operation === 'subtraction') {
+    numbers[0] = numbers.slice(1).reduce((total, number) => total + number, 0) + randomInt(min, max);
+  }
+  const answer = operation === 'addition'
+    ? numbers.reduce((total, number) => total + number, 0)
+    : numbers.slice(1).reduce((total, number) => total - number, numbers[0]);
+  return { numbers, a: numbers[0], b: numbers[1], operation, answer };
 }
 
 function buildMagicSquareQuestion(size) {
@@ -2792,6 +3011,9 @@ function renderSudokuLegendHTML() {
 
 function getQuestionSignature(question) {
   if (question && typeof question === 'object') {
+    if (Array.isArray(question.numbers)) {
+      return `${question.operation}:${question.numbers.join(':')}`;
+    }
     if ('operation' in question && 'a' in question && 'b' in question) {
       return `${question.operation}:${question.a}:${question.b}`;
     }
@@ -3234,6 +3456,21 @@ function buildGeometryQuestion(topic) {
         answer: `(${x}, ${y})`,
       };
     }
+    case 'plot-cartesian-plane': {
+      const points = Array.from({ length: 3 }, (_, index) => ({
+        label: String.fromCharCode(65 + index),
+        x: randomInt(-4, 4),
+        y: randomInt(-4, 4),
+      }));
+      return {
+        kind: 'geometry',
+        topic,
+        diagram: 'cartesian-plane',
+        points,
+        prompt: `Plot points ${points.map((point) => `${point.label}(${point.x}, ${point.y})`).join(', ')} on the Cartesian plane.`,
+        answer: points.map((point) => `${point.label}(${point.x}, ${point.y})`).join(', '),
+      };
+    }
     case '2d-shapes': {
       const shape = pickRandomFromList(get2dShapeFacts());
       const promptType = pickRandomFromList(['sides', 'vertices', 'symmetry']);
@@ -3405,6 +3642,42 @@ function buildGeometryQuestion(topic) {
   }
 }
 
+function buildSecondaryChartQuestion(topic) {
+  const values = Array.from({ length: 8 }, () => randomInt(1, 9));
+
+  if (topic === 'stem-and-leaf') {
+    const data = values.map((value) => value * 10 + randomInt(0, 9)).sort((a, b) => a - b);
+    return { kind: 'statistics', topic, data: `Data: ${data.join(', ')}`, prompt: 'Construct a stem-and-leaf plot for the data.', chart: { type: 'stem-and-leaf', values: data } };
+  }
+
+  if (topic === 'histograms') {
+    const bins = [randomInt(1, 8), randomInt(1, 8), randomInt(1, 8), randomInt(1, 8)];
+    return { kind: 'statistics', topic, data: `Intervals: 0–9, 10–19, 20–29, 30–39`, prompt: 'Draw a histogram using the frequency table.', chart: { type: 'histogram', bins, xLabel: 'Class interval', yLabel: 'Frequency', table: [['0–9', bins[0]], ['10–19', bins[1]], ['20–29', bins[2]], ['30–39', bins[3]]] } };
+  }
+
+  if (topic === 'dot-plots') {
+    return { kind: 'statistics', topic, data: `Data: ${values.join(', ')}`, prompt: 'Construct a dot plot for the data.', chart: { type: 'dot-plot', values } };
+  }
+
+  if (topic === 'scatter-plots') {
+    const points = values.map((x, index) => ({ x, y: Math.max(1, Math.min(10, x + randomInt(-2, 2))) }));
+    return { kind: 'statistics', topic, data: 'Paired data: study hours and test score', prompt: 'Plot the paired data on a scatter plot.', chart: { type: 'scatter', points, xLabel: 'Study hours', yLabel: 'Test score', table: points.map(point => [point.x, point.y]) } };
+  }
+
+  if (topic === 'frequency-distributions') {
+    const frequencies = [randomInt(2, 8), randomInt(2, 8), randomInt(2, 8), randomInt(2, 8)];
+    return { kind: 'statistics', topic, data: 'Groups: 1–5, 6–10, 11–15, 16–20', prompt: 'Display the frequency distribution as a column graph.', chart: { type: 'frequency', frequencies, xLabel: 'Group', yLabel: 'Frequency', table: [['1–5', frequencies[0]], ['6–10', frequencies[1]], ['11–15', frequencies[2]], ['16–20', frequencies[3]]] } };
+  }
+
+  if (topic === 'distributions') {
+    const shape = pickRandomFromList(['approximately symmetric', 'positively skewed', 'negatively skewed']);
+    return { kind: 'statistics', topic, data: `The distribution is ${shape}.`, prompt: 'Sketch a distribution with this shape.', chart: { type: 'distribution', shape } };
+  }
+
+  const chartBins = values.slice(0, 4);
+  return { kind: 'statistics', topic, data: `Frequencies: ${chartBins.join(', ')}`, prompt: 'Draw a suitable graph for the data.', chart: { type: 'histogram', bins: chartBins, xLabel: 'Category', yLabel: 'Frequency', table: chartBins.map((value, index) => [`${index + 1}`, value]) } };
+}
+
 function buildStatisticsQuestion(topic, min, max) {
     const parsedMin = Number.isFinite(min) ? min : 1;
     const parsedMax = Number.isFinite(max) ? max : 12;
@@ -3437,6 +3710,10 @@ function buildStatisticsQuestion(topic, min, max) {
     const iqr = upperQuartile - lowerQuartile;
     const meanSquared = values.reduce((total, value) => total + ((value - mean) ** 2), 0) / values.length;
     const standardDeviation = Math.sqrt(meanSquared);
+
+    if (['stem-and-leaf', 'histograms', 'dot-plots', 'scatter-plots', 'frequency-distributions', 'draw-charts', 'distributions'].includes(topic)) {
+      return buildSecondaryChartQuestion(topic);
+    }
 
     switch (topic) {
       case 'collecting-data': {
@@ -4284,10 +4561,12 @@ function buildAlgebraQuestion(topic, min, max, selectedPatternMode = 'random') {
       const comparison = pickRandomFromList(['>', '<']);
       const rightSide = solution + offset;
       return {
-        kind: 'algebra',
+        kind: 'number',
         topic,
         prompt: `${variable} + ${offset} ${comparison} ${rightSide}`,
+        visual: { type: 'inequality', solution, comparison },
         answer: `${variable} ${comparison} ${solution}`,
+        solutionSteps: [`Subtract ${offset} from both sides`, `${variable} ${comparison} ${solution}`],
       };
     }
     case 'polynomials': {
@@ -4586,6 +4865,49 @@ function buildNumberQuestion(topic, min, max, questionIndex = 0) {
 }
 
 function buildAdvancedWorksheetQuestion(topic, pythagorasMode = 'hypotenuse') {
+  if (topic === 'multi-step-linear-equations') {
+    const coefficient = randomInt(2, 8);
+    const solution = randomInt(2, 12);
+    const constant = randomInt(1, 12);
+    const result = coefficient * solution + constant;
+    return { kind: 'number', topic, prompt: `Solve ${coefficient}x + ${constant} = ${result}.`, answer: `x = ${solution}`, solutionSteps: [`Subtract ${constant}: ${coefficient}x = ${result - constant}`, `Divide by ${coefficient}: x = ${solution}`] };
+  }
+
+  if (topic === 'linear-graphs') {
+    const gradient = randomInt(1, 5);
+    const intercept = randomInt(-5, 5);
+    const x = randomInt(1, 6);
+    return { kind: 'number', topic, prompt: `For y = ${gradient}x ${intercept < 0 ? '−' : '+'} ${Math.abs(intercept)}, find y when x = ${x}.`, visual: { type: 'line-graph', gradient, intercept, x }, answer: gradient * x + intercept };
+  }
+
+  if (topic === 'gradient') {
+    const gradient = randomInt(-4, 6) || 1;
+    const x1 = randomInt(-4, 4);
+    const y1 = randomInt(-4, 4);
+    const run = randomInt(1, 5);
+    const rise = gradient * run;
+    return { kind: 'number', topic, prompt: `Find the gradient between (${x1}, ${y1}) and (${x1 + run}, ${y1 + rise}).`, visual: { type: 'gradient', x1, y1, x2: x1 + run, y2: y1 + rise }, answer: gradient, solutionSteps: [`Rise = ${rise}`, `Run = ${run}`, `Gradient = rise ÷ run = ${gradient}`] };
+  }
+
+  if (topic === 'algebraic-fractions') {
+    const numerator = randomInt(2, 12);
+    const denominator = pickRandomFromList([2, 3, 4, 5]);
+    const divisor = gcd(numerator, denominator);
+    return { kind: 'number', topic, prompt: `Simplify ${numerator}x/${denominator}.`, answer: `${numerator / divisor}x/${denominator / divisor}`, solutionSteps: [`Divide numerator and denominator by ${divisor}`, `Simplified form: ${numerator / divisor}x/${denominator / divisor}`] };
+  }
+
+  if (topic === 'box-plots') {
+    const values = Array.from({ length: 5 }, () => randomInt(1, 30)).sort((a, b) => a - b);
+    return { kind: 'number', topic, prompt: `A box plot has five-number summary ${values.join(', ')}. What is the interquartile range?`, visual: { type: 'box-plot', values }, answer: values[3] - values[1] };
+  }
+
+  if (topic === 'cumulative-frequency') {
+    const frequencies = Array.from({ length: 4 }, () => randomInt(2, 10));
+    const index = randomInt(0, frequencies.length - 1);
+    const cumulative = frequencies.slice(0, index + 1).reduce((total, value) => total + value, 0);
+    return { kind: 'number', topic, prompt: `The frequencies for groups 1–4 are ${frequencies.join(', ')}. Find the cumulative frequency at group ${index + 1}.`, visual: { type: 'cumulative-frequency', frequencies, index }, answer: cumulative };
+  }
+
   if (topic === 'quadratics') {
     const first = randomInt(1, 9);
     const second = randomInt(1, 9);
@@ -4621,11 +4943,14 @@ function buildAdvancedWorksheetQuestion(topic, pythagorasMode = 'hypotenuse') {
   }
 
   if (topic === 'financial-mathematics') {
-    const principal = randomInt(2, 20) * 100;
-    const rate = pickRandomFromList([5, 10, 15]);
+    const scenarios = [
+      { item: 'savings account', amount: randomInt(2, 20) * 100, rate: pickRandomFromList([3, 5, 8]) },
+      { item: 'small business loan', amount: randomInt(4, 25) * 100, rate: pickRandomFromList([4, 6, 10]) },
+    ];
+    const scenario = pickRandomFromList(scenarios);
     const years = randomInt(1, 4);
-    const interest = principal * (rate / 100) * years;
-    return { kind: 'number', topic, prompt: `Find the simple interest on $${principal} at ${rate}% per year for ${years} year${years === 1 ? '' : 's'}.`, answer: `$${interest.toFixed(2)}` };
+    const interest = scenario.amount * (scenario.rate / 100) * years;
+    return { kind: 'number', topic, prompt: `A ${scenario.item} starts with $${scenario.amount}. It earns simple interest at ${scenario.rate}% per year for ${years} year${years === 1 ? '' : 's'}. How much interest is earned?`, answer: `$${interest.toFixed(2)}` };
   }
 
   if (topic === 'advanced-probability') {
@@ -4645,9 +4970,55 @@ function buildAdvancedWorksheetQuestion(topic, pythagorasMode = 'hypotenuse') {
   return { kind: 'geometry', topic, prompt: `A right triangle has legs ${legA} and ${legB}. Find the hypotenuse.`, legs: { legA, legB, hypotenuse: '?' }, answer: formatDecimalResult(hypotenuse) };
 }
 
-function buildPrimaryAdditionalQuestion(topic, min, max) {
+function buildPrimaryAdditionalQuestion(topic, min, max, roundingPlace = 'mixed') {
   const safeMin = Number.isFinite(min) ? Math.max(1, min) : 1;
   const safeMax = Number.isFinite(max) ? Math.max(safeMin + 1, max) : 20;
+
+  if (topic === 'rounding-estimation') {
+    const place = roundingPlace === 'mixed' ? pickRandomFromList([10, 100, 1000]) : Number(roundingPlace);
+    const value = randomInt(Math.max(place, safeMin), Math.max(place, safeMax) * 10);
+    return { kind: 'number', topic, prompt: `Round ${value} to the nearest ${place}.`, answer: Math.round(value / place) * place };
+  }
+  if (topic === 'number-bonds') {
+    const target = pickRandomFromList([10, 20, 50, 100]);
+    const part = randomInt(1, target - 1);
+    return { kind: 'number', topic, prompt: `Complete the number bond: ${part} + ___ = ${target}.`, answer: target - part };
+  }
+  if (topic === 'mental-maths') {
+    const base = randomInt(2, 20) * 5;
+    const adjustment = randomInt(1, 9);
+    const add = Math.random() < 0.5;
+    return { kind: 'number', topic, prompt: `Use a mental strategy to solve ${base} ${add ? '+' : '−'} ${adjustment}.`, answer: add ? base + adjustment : base - adjustment };
+  }
+  if (topic === 'fraction-of-quantity') {
+    const denominator = pickRandomFromList([2, 4, 5, 10]);
+    const numerator = randomInt(1, denominator - 1);
+    const groups = randomInt(2, 12);
+    const quantity = denominator * groups;
+    return { kind: 'number', topic, prompt: `Find ${numerator}/${denominator} of ${quantity}.`, visual: { type: 'fraction-quantity', numerator, denominator, quantity }, answer: numerator * groups };
+  }
+  if (topic === 'analogue-clocks') {
+    const hour = randomInt(1, 12);
+    const minute = pickRandomFromList([0, 15, 30, 45]);
+    return { kind: 'number', topic, prompt: 'Write the time shown in words.', visual: { type: 'clock', hour, minute }, answer: formatClockTime(hour, minute) };
+  }
+  if (topic === 'coin-note-recognition') {
+    const value = pickRandomFromList([1, 2, 5, 10, 20, 50, 100, 200]);
+    const type = value <= 2 ? 'coin' : 'note';
+    return { kind: 'number', topic, prompt: `What is the value of this Australian ${type}?`, visual: { type: 'currency', value }, answer: `$${value}` };
+  }
+  if (topic === 'visual-measurement') {
+    const length = randomInt(2, 20);
+    const unit = pickRandomFromList(['cm', 'm']);
+    return { kind: 'number', topic, prompt: 'Write the measurement shown with its unit.', visual: { type: 'ruler', length, unit }, answer: `${length} ${unit}` };
+  }
+  if (topic === 'chance-experiments') {
+    const red = randomInt(1, 5);
+    const blue = randomInt(1, 5);
+    const total = red + blue;
+    const divisor = gcd(red, total);
+    return { kind: 'number', topic, prompt: 'What is the probability of choosing a red counter?', visual: { type: 'counters', red, blue }, answer: fractionToText({ numerator: red / divisor, denominator: total / divisor }) };
+  }
 
   if (topic === 'multiplication-strategies') {
     const first = randomInt(2, 10);
@@ -4660,10 +5031,16 @@ function buildPrimaryAdditionalQuestion(topic, min, max) {
     return { kind: 'number', topic, prompt: `Use a division strategy to solve ${divisor * quotient} ÷ ${divisor}.`, answer: quotient };
   }
   if (topic === 'multi-step-word-problems') {
+    const contexts = [
+      { name: 'Luca', item: 'cards', firstVerb: 'receives', secondVerb: 'trades away' },
+      { name: 'Mia', item: 'dollars', firstVerb: 'earns', secondVerb: 'spends' },
+      { name: 'Noah', item: 'points', firstVerb: 'scores', secondVerb: 'loses' },
+    ];
+    const context = pickRandomFromList(contexts);
     const start = randomInt(safeMin + 5, safeMax + 15);
     const first = randomInt(2, Math.max(2, Math.floor(start / 3)));
     const second = randomInt(2, Math.max(2, Math.floor(start / 3)));
-    return { kind: 'number', topic, prompt: `Luca has ${start} cards, gets ${first} more, then gives away ${second}. How many cards are left?`, answer: start + first - second };
+    return { kind: 'number', topic, prompt: `${context.name} has ${start} ${context.item}, ${context.firstVerb} ${first} more, then ${context.secondVerb} ${second}. How many ${context.item} are left?`, answer: start + first - second };
   }
   if (topic === 'fact-families') {
     const first = randomInt(2, 9);
@@ -4700,6 +5077,13 @@ function buildPrimaryAdditionalQuestion(topic, min, max) {
   const labels = ['Monday', 'Tuesday', 'Wednesday'];
   const highestIndex = data.indexOf(Math.max(...data));
   return { kind: 'number', topic, prompt: `Books read: ${labels[0]} ${data[0]}, ${labels[1]} ${data[1]}, ${labels[2]} ${data[2]}. Which day had the most?`, answer: labels[highestIndex] };
+}
+
+function formatClockTime(hour, minute) {
+  if (minute === 0) return `${hour} o'clock`;
+  if (minute === 15) return `quarter past ${hour}`;
+  if (minute === 30) return `half past ${hour}`;
+  return `quarter to ${hour === 12 ? 1 : hour + 1}`;
 }
 
 function buildMultiplicationGroupingQuestion(topic) {
@@ -5102,6 +5486,10 @@ function renderGeometryPromptHTML(question) {
   const shapeName = rawPrompt.includes(':') ? rawPrompt.split(':')[0].trim() : rawPrompt;
   const label = escapeHtml(getConciseVisualPrompt(question));
 
+  if (question.topic === 'plot-cartesian-plane') {
+    return `<span class="geometry-shape-stack cartesian-plot-stack"><span class="geometry-shape-question">${label}</span><span class="geometry-shape-icon cartesian-plot-icon">${renderCartesianPlaneSVG(question)}</span></span>`;
+  }
+
   if (question.topic === 'pythagoras' && question.legs) {
     return `
       <span class="geometry-shape-stack pythagoras-shape-stack">
@@ -5137,6 +5525,20 @@ function renderGeometryPromptHTML(question) {
       <span class="geometry-shape-question">${label}</span>
       <span class="geometry-shape-icon" aria-hidden="true">${shapeSvg}</span>
     </span>`;
+}
+
+function renderCartesianPlaneSVG(question) {
+  const gridLines = Array.from({ length: 11 }, (_, index) => {
+    const position = 20 + index * 14;
+    return `<line x1="${position}" y1="5" x2="${position}" y2="145"/><line x1="20" y1="${position - 5}" x2="160" y2="${position - 5}"/>`;
+  }).join('');
+  const points = question.showPoints ? (question.points || []).map((point) => {
+    const x = 90 + point.x * 14;
+    const y = 75 - point.y * 14;
+    return `<circle cx="${x}" cy="${y}" r="3.5" fill="#c62828"/><text x="${x + 5}" y="${y - 5}">${point.label}</text>`;
+  }).join('') : '';
+  const labels = Array.from({ length: 9 }, (_, index) => index - 4).map((value) => `<text x="${90 + value * 14}" y="86" text-anchor="middle">${value}</text><text x="84" y="${79 - value * 14}" text-anchor="end">${value}</text>`).join('');
+  return `<svg viewBox="0 0 180 155" class="cartesian-plot-svg" role="img" aria-label="Cartesian plane"><g stroke="#cbd5e0" stroke-width="0.7">${gridLines}</g><line x1="20" y1="75" x2="160" y2="75" stroke="#1f4ea2" stroke-width="1.5"/><line x1="90" y1="5" x2="90" y2="145" stroke="#1f4ea2" stroke-width="1.5"/><g fill="#1f4ea2" font-size="7">${labels}</g><text x="163" y="79" fill="#1f4ea2">x</text><text x="94" y="10" fill="#1f4ea2">y</text>${points}</svg>`;
 }
 
 function getConciseVisualPrompt(question) {
@@ -5320,10 +5722,14 @@ function buildWorksheetPagesForConfig(config) {
     config.numQuestions,
     config.timesTable,
     config.denominatorMode,
-    config.magicSquareSize
+    config.magicSquareSize,
+    'hypotenuse',
+    'random',
+    config.termCount,
+    config.roundingPlace
   );
   const title = config.title || buildDefaultTitle(config.module, config.topic, config.timesTable);
-  return paginateQuestions(questions, title, config.module, config.includeSolutions, config.topic, config.timesTable);
+  return paginateQuestions(questions, title, config.module, config.includeSolutions, config.topic, config.timesTable, null, false, config.mixedQuestionsPerPage, config.graphQuestionsPerPage);
 }
 
 function buildBulkItemLabel(config) {
@@ -5389,6 +5795,10 @@ function readBulkItemConfigFromForm() {
   const magicSquareSize = parseInt(bulkMagicSquareSizeSelect.value, 10);
   const includeSolutions = bulkSolutionsCheckbox.checked;
   const title = bulkTitleInput.value.trim();
+  const termCount = parseInt(bulkTermCountSelect.value, 10);
+  const roundingPlace = bulkRoundingPlaceSelect.value;
+  const mixedQuestionsPerPage = parseInt(bulkMixedQuestionsPerPageSelect.value, 10);
+  const graphQuestionsPerPage = parseInt(bulkGraphQuestionsPerPageSelect.value, 10);
 
   if (topic !== 'times-tables' && minNum > maxNum) {
     alert('Min Number cannot be greater than Max Number.');
@@ -5400,7 +5810,7 @@ function readBulkItemConfigFromForm() {
     return null;
   }
 
-  return { module, topic, minNum, maxNum, numQuestions, timesTable, denominatorMode, magicSquareSize, includeSolutions, title };
+  return { module, topic, minNum, maxNum, numQuestions, timesTable, denominatorMode, magicSquareSize, termCount, roundingPlace, mixedQuestionsPerPage, graphQuestionsPerPage, includeSolutions, title };
 }
 
 function addBulkItem() {
@@ -5768,12 +6178,14 @@ const FORMULA_SHEETS = {
   arithmetic: [
     { heading: 'Order of Operations (BODMAS)', rules: ['Brackets first', 'Orders (powers & roots) next', 'Division and Multiplication, left to right', 'Addition and Subtraction, left to right'] },
     { heading: 'Basic Properties', rules: ['a + b = b + a (commutative addition)', 'a × b = b × a (commutative multiplication)', 'a × (b + c) = (a × b) + (a × c) (distributive law)'] },
+    { heading: 'Mental Strategies', rules: ['Number bond: part + part = whole', 'Compensation: adjust a number, then correct the answer'] },
   ],
   fractions: [
     { heading: 'Equivalent Fractions', rules: ['Multiply or divide the numerator and denominator by the same number'] },
     { heading: 'Add / Subtract', rules: ['Same denominator: a/c + b/c = (a+b)/c', 'Different denominators: find a common denominator first'] },
     { heading: 'Multiply / Divide', rules: ['Multiply: a/b × c/d = (a×c)/(b×d)', 'Divide: a/b ÷ c/d = a/b × d/c (flip and multiply)'] },
     { heading: 'Simplifying & Converting', rules: ['Simplify: divide numerator and denominator by their GCD', 'Mixed to improper: (whole × denominator) + numerator, over the denominator'] },
+    { heading: 'Fractions of Quantities', rules: ['Fraction of a quantity = numerator × (quantity ÷ denominator)'] },
   ],
   decimals: [
     { heading: 'Place Value', rules: ['Tenths, hundredths, thousandths (each column is ÷10 of the last)'] },
@@ -5792,12 +6204,13 @@ const FORMULA_SHEETS = {
     { heading: 'Area', rules: ['Rectangle = l × w', 'Square = s²', 'Triangle = ½ × b × h', 'Circle = πr²', 'Parallelogram = b × h', 'Trapezium = ½(a + b) × h'] },
     { heading: 'Volume & Surface Area', rules: ['Cube volume = s³, surface area = 6s²', 'Rectangular prism volume = l × w × h', 'Cylinder volume = πr²h'] },
     { heading: 'Unit Conversions', rules: ['km ↔ m: ×1,000 / ÷1,000', 'm ↔ cm: ×100 / ÷100', 'kg ↔ g: ×1,000 / ÷1,000', 'L ↔ mL: ×1,000 / ÷1,000', 'hours ↔ minutes: ×60 / ÷60'] },
+    { heading: 'Time', rules: ['Elapsed time = finish time − start time', 'Quarter past = :15, half past = :30, quarter to = :45'] },
   ],
   money: [
     { heading: 'Working with Money', rules: ['Adding money: line up the decimal points, add cents then dollars', 'Making change: amount paid − cost = change'] },
   ],
   number: [
-    { heading: 'Key Terms', rules: ['Factors: numbers that divide exactly into another number', 'Multiples: results of multiplying a number by whole numbers', 'Prime numbers: only divisible by 1 and itself (2, 3, 5, 7, 11, 13...)', 'Composite numbers: have more than two factors', 'Square numbers: n × n', 'Square root: √(n × n) = n'] },
+    { heading: 'Key Terms', rules: ['Factors: numbers that divide exactly into another number', 'Multiples: results of multiplying a number by whole numbers', 'Prime numbers: only divisible by 1 and itself (2, 3, 5, 7, 11, 13...)', 'Composite numbers: have more than two factors', 'Square numbers: n × n', 'Square root: √(n × n) = n', 'Rounding: look at the digit to the right of the target place'] },
   ],
   ratio: [
     { heading: 'Ratios', rules: ['Writing ratios: a : b', 'Equivalent ratios: multiply or divide both sides by the same number', 'Dividing in a ratio: total parts = a + b, each part = total ÷ parts'] },
@@ -5806,6 +6219,10 @@ const FORMULA_SHEETS = {
   statistics: [
     { heading: 'Averages', rules: ['Mean = sum of values ÷ number of values', 'Median = middle value when ordered (average the two middle values if even count)', 'Mode = most frequently occurring value', 'Range = highest value − lowest value'] },
     { heading: 'Probability', rules: ['Probability = favourable outcomes ÷ total outcomes'] },
+    { heading: 'Box Plots & Cumulative Frequency', rules: ['IQR = upper quartile − lower quartile', 'Cumulative frequency = running total of frequencies'] },
+  ],
+  probability: [
+    { heading: 'Probability', rules: ['Probability = favourable outcomes ÷ total outcomes', 'Probability is between 0 and 1 inclusive', 'Impossible = 0, certain = 1'] },
   ],
   trigonometry: [
     { heading: 'SOH CAH TOA', rules: ['sin θ = opposite / hypotenuse', 'cos θ = adjacent / hypotenuse', 'tan θ = opposite / adjacent'] },
@@ -5815,8 +6232,39 @@ const FORMULA_SHEETS = {
     { heading: 'Working with Expressions', rules: ['Like terms: combine terms with the same variable and power', 'Expanding: a(b + c) = ab + ac', 'Factorising: reverse of expanding — find common factors'] },
     { heading: 'Equations & Substitution', rules: ['Solving equations: do the same operation to both sides to keep it balanced', 'Substitution: replace variables with given values, then calculate'] },
     { heading: 'Index Laws', rules: ['aᵐ × aⁿ = aᵐ⁺ⁿ', 'aᵐ ÷ aⁿ = aᵐ⁻ⁿ', '(aᵐ)ⁿ = aᵐⁿ'] },
+    { heading: 'Graphs & Equations', rules: ['Straight line: y = mx + c', 'Gradient = rise ÷ run', 'Solve equations by performing inverse operations on both sides', 'For inequalities, reverse the sign when multiplying or dividing by a negative'] },
+    { heading: 'Algebraic Fractions', rules: ['Simplify by dividing the numerator and denominator by their common factor'] },
   ],
 };
+
+const TOPIC_FORMULA_GROUPS = {
+  'add-fractions': [{ heading: 'Adding Fractions', rules: ['Same denominator: a/c + b/c = (a+b)/c', 'Different denominators: find a common denominator first', 'Simplify the final fraction'] }],
+  'subtract-fractions': [{ heading: 'Subtracting Fractions', rules: ['Same denominator: a/c − b/c = (a−b)/c', 'Different denominators: find a common denominator first', 'Simplify the final fraction'] }],
+  'multiply-fractions': [{ heading: 'Multiplying Fractions', rules: ['a/b × c/d = (a×c)/(b×d)', 'Simplify before or after multiplying'] }],
+  'divide-fractions': [{ heading: 'Dividing Fractions', rules: ['a/b ÷ c/d = a/b × d/c', 'Flip the second fraction, then multiply'] }],
+  area: [{ heading: 'Area', rules: ['Rectangle = length × width', 'Triangle = ½ × base × height', 'Parallelogram = base × perpendicular height'] }],
+  perimeter: [{ heading: 'Perimeter', rules: ['Rectangle = 2(length + width)', 'Square = 4 × side', 'Polygon perimeter = sum of all side lengths'] }],
+  'linear-graphs': [{ heading: 'Linear Graphs', rules: ['Straight line: y = mx + c', 'm is the gradient and c is the y-intercept'] }],
+  gradient: [{ heading: 'Gradient', rules: ['Gradient = rise ÷ run', 'Gradient = (y₂ − y₁) ÷ (x₂ − x₁)'] }],
+  inequalities: [{ heading: 'Inequalities', rules: ['Perform the same operation on both sides', 'Reverse the inequality sign when multiplying or dividing by a negative'] }],
+  'multi-step-linear-equations': [{ heading: 'Multi-step Equations', rules: ['Undo addition or subtraction first', 'Undo multiplication or division second', 'Perform the same operation on both sides'] }],
+  'algebraic-fractions': [{ heading: 'Algebraic Fractions', rules: ['Divide the numerator and denominator by their common factor'] }],
+  'box-plots': [{ heading: 'Box Plots', rules: ['IQR = upper quartile − lower quartile', 'The five-number summary is minimum, Q1, median, Q3, maximum'] }],
+  'cumulative-frequency': [{ heading: 'Cumulative Frequency', rules: ['Add each frequency to the running total', 'The final cumulative frequency equals the total frequency'] }],
+  'plot-cartesian-plane': [{ heading: 'Cartesian Plane', rules: ['Coordinates are written (x, y)', 'Move along the x-axis first, then move along the y-axis'] }],
+  'stem-and-leaf': [{ heading: 'Stem-and-Leaf Plots', rules: ['The stem shows leading digits', 'The leaf shows the final digit', 'Include a key, for example 3 | 4 = 34'] }],
+  histograms: [{ heading: 'Histograms', rules: ['Use touching bars for continuous grouped data', 'Bar height represents frequency'] }],
+  'dot-plots': [{ heading: 'Dot Plots', rules: ['Place one dot above a value for each occurrence', 'Stack dots when values repeat'] }],
+  'scatter-plots': [{ heading: 'Scatter Plots', rules: ['Plot paired values as (x, y)', 'Describe the association as positive, negative or none'] }],
+  'frequency-distributions': [{ heading: 'Frequency Distributions', rules: ['Frequency is the number of observations in a group', 'The sum of frequencies is the total frequency'] }],
+  'draw-charts': [{ heading: 'Drawing Statistical Charts', rules: ['Label both axes', 'Choose an appropriate scale', 'Plot or draw each value accurately'] }],
+  distributions: [{ heading: 'Distributions', rules: ['A symmetric distribution has similar tails', 'A skewed distribution has a longer tail on one side'] }],
+};
+
+function getTopicFormulaGroups(module, topic, unitConversionGroups) {
+  if (topic === 'unit-conversions') return unitConversionGroups;
+  return TOPIC_FORMULA_GROUPS[topic] || FORMULA_SHEETS[module] || [];
+}
 
 function buildFormulaSheetHTML(module) {
   const groups = FORMULA_SHEETS[module] || [];
@@ -6352,7 +6800,79 @@ function numberToWords(value) {
   return String(value);
 }
 
+function renderPrimaryVisualHTML(visual) {
+  if (!visual) return '';
+
+  if (visual.type === 'clock') {
+    const minuteAngle = visual.minute * 6;
+    const hourAngle = (visual.hour % 12) * 30 + visual.minute * 0.5;
+    const hand = (angle, length, width) => {
+      const radians = (angle - 90) * Math.PI / 180;
+      return `<line x1="50" y1="50" x2="${50 + Math.cos(radians) * length}" y2="${50 + Math.sin(radians) * length}" stroke="currentColor" stroke-width="${width}" stroke-linecap="round"/>`;
+    };
+    return `<svg class="primary-visual primary-clock" viewBox="0 0 100 100" role="img" aria-label="Analogue clock"><circle cx="50" cy="50" r="42" fill="white" stroke="currentColor" stroke-width="2"/><text x="50" y="17" text-anchor="middle">12</text><text x="84" y="54" text-anchor="middle">3</text><text x="50" y="91" text-anchor="middle">6</text><text x="16" y="54" text-anchor="middle">9</text>${hand(hourAngle, 23, 3)}${hand(minuteAngle, 32, 2)}<circle cx="50" cy="50" r="3" fill="currentColor"/></svg>`;
+  }
+
+  if (visual.type === 'currency') {
+    const isCoin = visual.value <= 2;
+    return isCoin
+      ? `<svg class="primary-visual primary-currency" viewBox="0 0 120 70" role="img" aria-label="Australian coin"><circle cx="60" cy="35" r="28" fill="#d7a743" stroke="currentColor" stroke-width="2"/><text x="60" y="42" text-anchor="middle">$${visual.value}</text></svg>`
+      : `<svg class="primary-visual primary-currency" viewBox="0 0 120 70" role="img" aria-label="Australian banknote"><rect x="10" y="12" width="100" height="46" rx="3" fill="#d9eef2" stroke="currentColor" stroke-width="2"/><text x="60" y="42" text-anchor="middle">$${visual.value}</text></svg>`;
+  }
+
+  if (visual.type === 'ruler') {
+    const ticks = Array.from({ length: 11 }, (_, index) => `<line x1="${10 + index * 10}" y1="35" x2="${10 + index * 10}" y2="${index % 5 === 0 ? 12 : 22}" stroke="currentColor" stroke-width="1"/><text x="${10 + index * 10}" y="49" text-anchor="middle">${index}</text>`).join('');
+    return `<svg class="primary-visual primary-ruler" viewBox="0 0 120 55" role="img" aria-label="Ruler showing a measurement"><rect x="5" y="10" width="110" height="28" fill="#fff5c7" stroke="currentColor" stroke-width="1.5"/>${ticks}<text x="60" y="54" text-anchor="middle">${visual.length} ${escapeHtml(visual.unit)}</text></svg>`;
+  }
+
+  if (visual.type === 'counters') {
+    const counters = [...Array(visual.red).fill('red'), ...Array(visual.blue).fill('blue')];
+    return `<svg class="primary-visual primary-counters" viewBox="0 0 180 55" role="img" aria-label="Counters in a bag"><rect x="4" y="4" width="172" height="47" rx="20" fill="#f7fafc" stroke="currentColor" stroke-width="1.5"/>${counters.map((colour, index) => `<circle cx="${18 + (index % 8) * 21}" cy="${18 + Math.floor(index / 8) * 20}" r="7" fill="${colour}" stroke="currentColor" stroke-width="0.8"/>`).join('')}</svg>`;
+  }
+
+  if (visual.type === 'fraction-quantity') {
+    const groups = visual.quantity / visual.denominator;
+    const cells = Array.from({ length: visual.quantity }, (_, index) => `<rect x="${8 + (index % 10) * 16}" y="${8 + Math.floor(index / 10) * 18}" width="12" height="12" rx="2" fill="${index < visual.numerator * groups ? '#2b6cb0' : '#edf2f7'}" stroke="currentColor" stroke-width="0.7"/>`).join('');
+    return `<svg class="primary-visual primary-fraction-model" viewBox="0 0 170 52" role="img" aria-label="Fraction of a quantity model">${cells}</svg>`;
+  }
+
+  if (visual.type === 'line-graph') {
+    const y = visual.gradient * visual.x + visual.intercept;
+    return `<svg class="primary-visual secondary-graph" viewBox="0 0 180 100" role="img" aria-label="Linear graph"><line x1="20" y1="82" x2="165" y2="82" stroke="currentColor"/><line x1="20" y1="15" x2="20" y2="82" stroke="currentColor"/><line x1="25" y1="76" x2="150" y2="20" stroke="#c62828" stroke-width="2"/><circle cx="${25 + visual.x * 12}" cy="${82 - y * 5}" r="3" fill="#c62828"/><text x="91" y="96" text-anchor="middle">x = ${visual.x}, y = ${y}</text></svg>`;
+  }
+
+  if (visual.type === 'gradient') {
+    return `<svg class="primary-visual secondary-graph" viewBox="0 0 180 100" role="img" aria-label="Gradient rise and run diagram"><line x1="25" y1="78" x2="155" y2="22" stroke="currentColor" stroke-width="2"/><path d="M70 58 L105 58 L105 43" fill="none" stroke="#c62828" stroke-width="2"/><text x="87" y="70" text-anchor="middle">run</text><text x="113" y="51">rise</text></svg>`;
+  }
+
+  if (visual.type === 'inequality') {
+    const x = 30 + visual.solution * 12;
+    const open = visual.comparison === '<' || visual.comparison === '>';
+    const leftArrow = visual.comparison === '<' ? `${x - 48},50 ${x - 58},44 ${x - 48},38` : `${x + 48},50 ${x + 58},44 ${x + 48},38`;
+    return `<svg class="primary-visual secondary-number-line" viewBox="0 0 180 75" role="img" aria-label="Inequality number line"><line x1="15" y1="44" x2="165" y2="44" stroke="currentColor" stroke-width="1.5"/><path d="M${leftArrow}" fill="none" stroke="#c62828" stroke-width="2"/><circle cx="${x}" cy="44" r="6" fill="white" stroke="#c62828" stroke-width="2"${open ? '' : ' fill="#c62828"'}/><text x="${x}" y="68" text-anchor="middle">${visual.solution}</text></svg>`;
+  }
+
+  if (visual.type === 'box-plot') {
+    const [minimum, lowerQuartile, median, upperQuartile, maximum] = visual.values;
+    const scale = value => 15 + value * 4;
+    return `<svg class="primary-visual secondary-box-plot" viewBox="0 0 160 70" role="img" aria-label="Box plot"><line x1="10" y1="42" x2="150" y2="42" stroke="currentColor"/><line x1="${scale(minimum)}" y1="42" x2="${scale(maximum)}" y2="42" stroke="currentColor" stroke-width="2"/><line x1="${scale(minimum)}" y1="34" x2="${scale(minimum)}" y2="50" stroke="currentColor"/><line x1="${scale(maximum)}" y1="34" x2="${scale(maximum)}" y2="50" stroke="currentColor"/><rect x="${scale(lowerQuartile)}" y="28" width="${scale(upperQuartile) - scale(lowerQuartile)}" height="28" fill="#d9eaf7" stroke="currentColor"/><line x1="${scale(median)}" y1="28" x2="${scale(median)}" y2="56" stroke="#c62828" stroke-width="2"/></svg>`;
+  }
+
+  if (visual.type === 'cumulative-frequency') {
+    let total = 0;
+    const points = visual.frequencies.map((frequency, index) => { total += frequency; return `${25 + index * 38},${78 - total * 3}`; }).join(' ');
+    return `<svg class="primary-visual secondary-graph" viewBox="0 0 180 100" role="img" aria-label="Cumulative frequency graph"><line x1="20" y1="82" x2="165" y2="82" stroke="currentColor"/><line x1="20" y1="15" x2="20" y2="82" stroke="currentColor"/><polyline points="${points}" fill="none" stroke="#c62828" stroke-width="2"/><text x="92" y="96" text-anchor="middle">Groups</text><text x="7" y="20" text-anchor="middle" transform="rotate(-90 7 20)">Frequency</text></svg>`;
+  }
+
+  return '';
+}
+
 function renderNumberPromptHTML(question) {
+  const visualHTML = renderPrimaryVisualHTML(question.visual);
+  if (visualHTML) {
+    return `<span class="primary-visual-question">${visualHTML}<span>${escapeHtml(question.prompt)}</span></span>`;
+  }
+
   switch (question.topic) {
     case 'indices': {
       const match = question.prompt.match(/^Evaluate (\d+)\^(\d+)\.$/);
