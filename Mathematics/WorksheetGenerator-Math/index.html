@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Math Worksheet Generator</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header>
+    <div class="header-brand">
+      <img class="header-logo" id="headerLogoImg" src="assets/logo/edgeducate-logo.png" alt="Edgeducate logo" />
+      <div class="header-text">
+        <h1>Math Worksheet Generator</h1>
+        <p class="subtitle">Create custom math worksheets instantly</p>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="controls">
+      <div class="controls-logo-wrap" aria-hidden="true">
+        <img class="controls-logo" id="controlsLogoImg" src="assets/logo/edgeducate-logo.png" alt="" />
+      </div>
+      <div class="settings-heading">
+        <h2>Worksheet Settings</h2>
+        <button type="button" id="moduleTopicSearchToggle" class="search-icon-button" aria-label="Search modules and topics" aria-expanded="false">&#128269;</button>
+      </div>
+
+      <div class="search-modal-backdrop" id="moduleTopicSearchBackdrop" style="display:none"></div>
+      <div class="search-filter-section search-filter-popup" id="moduleTopicSearchPopup" role="search" aria-labelledby="searchPopupTitle" style="display:none">
+        <div class="search-popup-title" id="searchPopupTitle">Search</div>
+        <label for="moduleTopicSearch">Find a Module or Topic</label>
+        <input type="search" id="moduleTopicSearch" placeholder="Search modules and topics" autocomplete="off" />
+        <select id="moduleTopicSearchResults" class="module-topic-search-results" size="5" aria-label="Search results" style="display:none"></select>
+      </div>
+
+      <div class="form-group">
+        <label for="yearLevel">Year Level</label>
+        <select id="yearLevel">
+          <option value="primary">Primary</option>
+          <option value="secondary">Secondary</option>
+          <option value="general-mathematics-12">VCE General Mathematics - Units 1 &amp; 2</option>
+          <option value="general-mathematics-34">VCE General Mathematics - Units 3 &amp; 4</option>
+          <option value="mathematical-methods-12">VCE Mathematical Methods - Units 1 &amp; 2</option>
+          <option value="mathematical-methods-34">VCE Mathematical Methods - Units 3 &amp; 4</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="module">Module</label>
+        <select id="module">
+          <option value="algebra">Algebra</option>
+          <option value="functions">Functions</option>
+          <option value="calculus">Calculus</option>
+          <option value="matrices">Matrices</option>
+          <option value="arithmetic">Arithmetic</option>
+          <option value="decimals">Decimals</option>
+          <option value="fractions">Fractions</option>
+          <option value="geometry">Geometry</option>
+          <option value="measurement">Measurement</option>
+          <option value="money">Money</option>
+          <option value="number">Number</option>
+          <option value="percentages">Percentages</option>
+          <option value="ratio">Ratio &amp; Proportion</option>
+          <option value="statistics">Statistics</option>
+          <option value="probability">Probability</option>
+          <option value="networks">Networks</option>
+          <option value="trigonometry">Trigonometry</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="topic">Topic</label>
+        <select id="topic"></select>
+      </div>
+
+      <div class="form-group" id="denominatorGroup" style="display:none">
+        <label for="denominatorMode">Denominator</label>
+        <select id="denominatorMode">
+          <option value="same">Same</option>
+          <option value="mixed">Mixed</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="conversionTypeGroup" style="display:none">
+        <label for="conversionType">Unit Type</label>
+        <select id="conversionType">
+          <option value="length">Length</option>
+          <option value="capacity">Capacity / Volume</option>
+          <option value="weight">Weight</option>
+          <option value="time">Time</option>
+          <option value="mixed">Mixed</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="pythagorasModeGroup" style="display:none">
+        <label for="pythagorasMode">Find</label>
+        <select id="pythagorasMode">
+          <option value="hypotenuse">Hypotenuse (c)</option>
+          <option value="missing-leg">Missing leg (a or b)</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="patternModeGroup" style="display:none">
+        <label for="patternMode">Pattern Type</label>
+        <select id="patternMode">
+          <option value="random">Random</option>
+          <option value="add">Addition</option>
+          <option value="multiply-add">Multiply then Add</option>
+          <option value="multiply-divide">Multiply then Divide</option>
+          <option value="multiply-4-add-2">Multiply by 4 then Add 2</option>
+          <option value="multiply-4-divide-2">Multiply by 4 then Divide by 2</option>
+          <option value="alternate-add-subtract">Add then Subtract</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="termCountGroup" style="display:none">
+        <label for="termCount">Number of Terms</label>
+        <select id="termCount">
+          <option value="2">2 numbers</option>
+          <option value="3">3 numbers</option>
+          <option value="4">4 numbers</option>
+          <option value="5">5 numbers</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="mixedQuestionsPerPageGroup" style="display:none">
+        <label for="mixedQuestionsPerPage">Questions per Page</label>
+        <select id="mixedQuestionsPerPage">
+          <option value="6">6 questions</option>
+          <option value="4">4 questions</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="roundingPlaceGroup" style="display:none">
+        <label for="roundingPlace">Round to</label>
+        <select id="roundingPlace">
+          <option value="mixed">Mixed</option>
+          <option value="10">Nearest 10</option>
+          <option value="100">Nearest 100</option>
+          <option value="1000">Nearest 1,000</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="graphQuestionsPerPageGroup" style="display:none">
+        <label for="graphQuestionsPerPage">Graph Questions per Page</label>
+        <select id="graphQuestionsPerPage">
+          <option value="2">2 questions</option>
+          <option value="4">4 questions</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="timesTableGroup" style="display:none">
+        <label for="timesTable">Times Table</label>
+        <select id="timesTable">
+          <option value="2">2 times table</option>
+          <option value="3">3 times table</option>
+          <option value="4">4 times table</option>
+          <option value="5">5 times table</option>
+          <option value="6">6 times table</option>
+          <option value="7">7 times table</option>
+          <option value="8">8 times table</option>
+          <option value="9">9 times table</option>
+          <option value="10">10 times table</option>
+          <option value="11">11 times table</option>
+          <option value="12">12 times table</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="magicSquareSizeGroup" style="display:none">
+        <label for="magicSquareSize">Square Size</label>
+        <select id="magicSquareSize">
+          <option value="3">3 × 3</option>
+          <option value="4">4 × 4</option>
+          <option value="5">5 × 5</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="matrixOperationGroup" style="display:none">
+        <label for="matrixOperation">Operation</label>
+        <select id="matrixOperation">
+          <option value="addition">Addition (+)</option>
+          <option value="subtraction">Subtraction (−)</option>
+          <option value="multiplication">Multiplication (×)</option>
+          <option value="inverse">Inverse (−1)</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="matrixDimensionGroup" style="display:none">
+        <label for="matrixDimension">Matrix Dimensions</label>
+        <select id="matrixDimension">
+          <option value="2x2">2 × 2</option>
+          <option value="2x3">2 × 3</option>
+          <option value="3x2">3 × 2</option>
+          <option value="3x3">3 × 3</option>
+          <option value="2x4">2 × 4</option>
+          <option value="4x2">4 × 2</option>
+          <option value="mixed">Mixed sizes</option>
+        </select>
+      </div>
+
+      <div class="form-row" id="rangeRow">
+        <div class="form-group" id="rangeGroup">
+          <label for="minNum">Min</label>
+          <input type="number" id="minNum" value="1" min="0" max="999" />
+        </div>
+        <div class="form-group" id="rangeGroupMax">
+          <label for="maxNum">Max</label>
+          <input type="number" id="maxNum" value="12" min="1" max="999" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="numQuestions">Number of Questions</label>
+        <input type="number" id="numQuestions" value="20" min="1" max="100" />
+      </div>
+
+      <div class="form-group">
+        <label for="title">Worksheet Title</label>
+        <input type="text" id="title" maxlength="60" />
+      </div>
+
+      <div class="form-group checkbox-pair">
+        <label class="checkbox-label" for="coverPageRequired"><input type="checkbox" id="coverPageRequired" /> Cover Page Required</label>
+        <label class="checkbox-label" for="examRequired"><input type="checkbox" id="examRequired" /> Exam</label>
+        <button type="button" id="examDisclaimerEditBtn" class="exam-edit-button" aria-label="Edit exam disclaimer" title="Edit exam disclaimer" disabled>&#9998;</button>
+      </div>
+
+      <div class="exam-editor-backdrop" id="examEditorBackdrop" style="display:none"></div>
+      <div class="form-group exam-disclaimer-editor" id="examDisclaimerEditor" style="display:none">
+        <div class="exam-editor-title">Exam Cover Boxes</div>
+        
+        <div class="exam-editor-two-boxes">
+          <div class="exam-editor-box">
+            <h4>Examination Information</h4>
+            <div class="exam-editor-toolbar" role="toolbar" aria-label="Exam info formatting">
+              <button type="button" class="exam-format-button" data-command="bold" data-target="examInfoBox" title="Bold">B</button>
+              <button type="button" class="exam-format-button" data-command="italic" data-target="examInfoBox" title="Italic"><i>I</i></button>
+            </div>
+            <div class="exam-rich-editor exam-info-editor" id="examInfoBox" contenteditable="true" role="textbox" aria-label="Examination information editor"><strong>Reading Time:</strong> 5 minutes<br><strong>Writing Time:</strong> 55 minutes<br><strong>Total Time:</strong> 60 minutes<br><strong>Total Marks:</strong> ______</div>
+          </div>
+          
+          <div class="exam-editor-box">
+            <h4>Instructions</h4>
+            <div class="exam-editor-toolbar" role="toolbar" aria-label="Instructions formatting">
+              <button type="button" class="exam-format-button" data-command="bold" data-target="examInstructionsBox" title="Bold">B</button>
+              <button type="button" class="exam-format-button" data-command="italic" data-target="examInstructionsBox" title="Italic"><i>I</i></button>
+              <button type="button" class="exam-format-button" data-command="insertUnorderedList" data-target="examInstructionsBox" title="Bullet list">&#8226;</button>
+              <button type="button" class="exam-format-button" data-command="insertOrderedList" data-target="examInstructionsBox" title="Numbered list">1.</button>
+            </div>
+            <div class="exam-rich-editor exam-instructions-editor" id="examInstructionsBox" contenteditable="true" role="textbox" aria-label="Instructions editor"><ul><li>Read all questions carefully during the reading time.</li><li>Do not write in the examination booklet during reading time.</li><li>Answer all questions.</li><li>Show all working where appropriate.</li><li>Write clearly in the spaces provided.</li><li>If you make a mistake, rule through it neatly.</li></ul><strong>Permitted Materials</strong><ul><li>Pens (blue or black)</li><li>Pencil</li><li>Eraser</li><li>Ruler</li></ul><strong>Prohibited Materials</strong><ul><li>Mobile phones</li><li>Smart watches</li><li>Notes or textbooks</li><li>Calculators</li></ul></div>
+          </div>
+        </div>
+        
+        <div class="exam-preset-row">
+          <select id="examDisclaimerPreset" aria-label="Saved exam disclaimers"><option value="">Saved disclaimers</option></select>
+          <button type="button" id="examLoadPresetBtn" class="btn-secondary" disabled>Load</button>
+          <button type="button" id="examDeletePresetBtn" class="btn-secondary" disabled>Delete</button>
+        </div>
+        <div class="exam-preset-row">
+          <input type="text" id="examPresetName" maxlength="60" placeholder="Save preset as..." />
+          <button type="button" id="examSavePresetBtn" class="btn-secondary">Save</button>
+        </div>
+        <div class="exam-disclaimer-live-preview-label">Live Preview</div>
+        <div class="exam-disclaimer-live-preview" id="examDisclaimerLivePreview"></div>
+      </div>
+
+      <div class="form-group" id="coverPageTitleGroup" style="display:none">
+        <label for="coverPageTitle">Cover Page Title</label>
+        <input type="text" id="coverPageTitle" maxlength="60" placeholder="e.g. Week 3 Homework" />
+      </div>
+
+      <div class="form-group">
+        <label class="checkbox-label" for="formulaSheetRequired"><input type="checkbox" id="formulaSheetRequired" /> Formula Sheet Required</label>
+      </div>
+
+      <div class="form-group">
+        <label class="checkbox-label" for="solutionsRequired"><input type="checkbox" id="solutionsRequired" /> Solutions Required</label>
+      </div>
+
+      <div class="form-group">
+        <label class="checkbox-label" for="whiteLabelCheckbox"><input type="checkbox" id="whiteLabelCheckbox" /> White Label (Custom Logo)</label>
+      </div>
+
+      <div class="form-group" id="whiteLabelUploadGroup" style="display:none">
+        <label for="whiteLabelLogoInput">Upload Logo</label>
+        <input type="file" id="whiteLabelLogoInput" accept="image/*" />
+        <img id="whiteLabelLogoPreview" class="white-label-logo-preview" alt="Custom logo preview" style="display:none" />
+      </div>
+
+      <div class="button-group">
+        <button id="generateBtn" class="btn-primary">Generate Worksheet</button>
+        <button id="refreshBtn" class="btn-secondary" type="button">Refresh</button>
+        <button id="printBtn" class="btn-secondary" disabled>Print / Save PDF</button>
+        <button id="bulkAddBtn" class="btn-secondary" type="button">Bulk Add</button>
+        <button id="formulaLookupBtn" class="btn-secondary" type="button">Formula Lookup</button>
+        <button id="fullscreenBtn" class="btn-secondary" type="button" aria-pressed="false">Fullscreen</button>
+      </div>
+    </section>
+
+    <div class="preview-wrapper">
+      <div class="preview-toolbar" id="previewToolbar" style="display:none">
+        <div class="pagination-actions">
+          <div class="pagination" id="pagination" style="display:none">
+            <button id="prevBtn" class="btn-page" disabled>&#8592; Prev</button>
+            <span class="page-indicator">Page <input id="pageNumberInput" type="number" min="1" value="1" aria-label="Current page" /> of <span id="pageTotal">1</span></span>
+            <button id="nextBtn" class="btn-page">Next &#8594;</button>
+          </div>
+          <button id="solutionsJumpBtn" class="solutions-jump-btn" type="button" style="display:none">Solutions</button>
+        </div>
+
+        <div class="zoom-controls" id="zoomControls" aria-label="Preview zoom controls">
+          <button id="zoomOutBtn" class="btn-page" type="button" aria-label="Zoom out">-</button>
+          <button id="zoomResetBtn" class="btn-page btn-page-neutral" type="button">100%</button>
+          <button id="zoomInBtn" class="btn-page" type="button" aria-label="Zoom in">+</button>
+        </div>
+      </div>
+
+      <!-- Pagination controls -->
+      <section class="preview" id="worksheetPreview">
+        <p class="placeholder">Your worksheet will appear here after you click <strong>Generate Worksheet</strong>.</p>
+      </section>
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="bulkModalOverlay" style="display:none">
+    <div class="modal" id="bulkModal" role="dialog" aria-modal="true" aria-labelledby="bulkModalTitle">
+      <div class="modal-header">
+        <h2 id="bulkModalTitle">Bulk Add Worksheets</h2>
+        <button type="button" class="modal-close" id="bulkModalCloseBtn" aria-label="Close">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-hint">Design a day-by-day program: give each day its own worksheets so the program builds towards different skills. Set how many folders to generate and the day plan repeats to fill them - each folder gets its own merged PDF with freshly randomised questions.</p>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="bulkBatchName">Batch Name</label>
+            <input type="text" id="bulkBatchName" value="Bulk Worksheets" maxlength="60" />
+          </div>
+          <div class="form-group">
+            <label for="bulkFolderCount">Number of Folders to Generate</label>
+            <input type="number" id="bulkFolderCount" value="30" min="1" max="365" />
+          </div>
+        </div>
+
+        <div class="bulk-presets">
+          <h3 class="modal-subheading">Saved Filters</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="bulkPresetSelect">Load a Saved Filter</label>
+              <select id="bulkPresetSelect">
+                <option value="">-- Select a saved filter --</option>
+              </select>
+            </div>
+            <div class="form-group bulk-preset-actions">
+              <label>&nbsp;</label>
+              <div class="bulk-preset-buttons">
+                <button type="button" id="bulkLoadPresetBtn" class="btn-secondary" disabled>Load</button>
+                <button type="button" id="bulkDeletePresetBtn" class="btn-secondary" disabled>Delete</button>
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="bulkPresetNameInput">Save Current Filters As</label>
+              <input type="text" id="bulkPresetNameInput" maxlength="60" placeholder="e.g. Term 3 Homework" />
+            </div>
+            <div class="form-group bulk-preset-actions">
+              <label>&nbsp;</label>
+              <button type="button" id="bulkSavePresetBtn" class="btn-secondary">Save Filter</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="bulk-day-plan">
+          <h3 class="modal-subheading">Day Plan</h3>
+          <p class="modal-hint">Folders are filled by cycling through the days defined here, in order. Define as many days as your program needs (e.g. 5 days that repeat for 6 weeks = 30 folders).</p>
+          <div class="bulk-day-nav">
+            <button type="button" id="bulkPrevDayBtn" class="btn-page" aria-label="Previous day">&#8592;</button>
+            <input type="text" id="bulkDayLabelInput" maxlength="40" />
+            <span id="bulkDayIndicator">Day 1 of 1</span>
+            <button type="button" id="bulkNextDayBtn" class="btn-page" aria-label="Next day">&#8594;</button>
+          </div>
+          <div class="bulk-day-actions">
+            <button type="button" id="bulkAddDayBtn" class="btn-secondary">+ Add Day</button>
+            <button type="button" id="bulkDuplicateDayBtn" class="btn-secondary">Duplicate Day</button>
+            <button type="button" id="bulkRemoveDayBtn" class="btn-secondary">Remove Day</button>
+          </div>
+          <div class="bulk-day-formula">
+            <label class="bulk-day-formula-checkbox">
+              <input type="checkbox" id="bulkDayFormulaCheckbox" />
+              Add a Formula Sheet as the cover page for this day
+            </label>
+            <select id="bulkDayFormulaModule" disabled>
+              <option value="algebra">Algebra</option>
+              <option value="matrices">Matrices</option>
+              <option value="arithmetic">Arithmetic</option>
+              <option value="decimals">Decimals</option>
+              <option value="fractions">Fractions</option>
+              <option value="geometry">Geometry</option>
+              <option value="measurement">Measurement</option>
+              <option value="money">Money</option>
+              <option value="number">Number</option>
+              <option value="percentages">Percentages</option>
+              <option value="ratio">Ratio &amp; Proportion</option>
+              <option value="statistics">Statistics</option>
+              <option value="probability">Probability</option>
+              <option value="networks">Networks</option>
+              <option value="trigonometry">Trigonometry</option>
+            </select>
+          </div>
+        </div>
+
+        <h3 class="modal-subheading">Worksheets for this day</h3>
+        <ul class="bulk-items-list" id="bulkItemsList"></ul>
+        <p class="bulk-items-empty" id="bulkItemsEmpty">No worksheets added yet.</p>
+
+        <div class="bulk-item-form">
+          <div class="form-group">
+            <label for="bulkModule">Module</label>
+            <select id="bulkModule">
+              <option value="algebra">Algebra</option>
+              <option value="matrices">Matrices</option>
+              <option value="arithmetic">Arithmetic</option>
+              <option value="decimals">Decimals</option>
+              <option value="fractions">Fractions</option>
+              <option value="geometry">Geometry</option>
+              <option value="measurement">Measurement</option>
+              <option value="money">Money</option>
+              <option value="number">Number</option>
+              <option value="percentages">Percentages</option>
+              <option value="ratio">Ratio &amp; Proportion</option>
+              <option value="statistics">Statistics</option>
+              <option value="probability">Probability</option>
+              <option value="networks">Networks</option>
+              <option value="trigonometry">Trigonometry</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="bulkTopic">Topic</label>
+            <select id="bulkTopic"></select>
+          </div>
+
+          <div class="form-group" id="bulkDenominatorGroup" style="display:none">
+            <label for="bulkDenominatorMode">Denominator</label>
+            <select id="bulkDenominatorMode">
+              <option value="same">Same</option>
+              <option value="mixed">Mixed</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="bulkTermCountGroup" style="display:none">
+            <label for="bulkTermCount">Number of Terms</label>
+            <select id="bulkTermCount">
+              <option value="2">2 numbers</option>
+              <option value="3">3 numbers</option>
+              <option value="4">4 numbers</option>
+              <option value="5">5 numbers</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="bulkRoundingPlaceGroup" style="display:none">
+            <label for="bulkRoundingPlace">Round to</label>
+            <select id="bulkRoundingPlace">
+              <option value="mixed">Mixed</option>
+              <option value="10">Nearest 10</option>
+              <option value="100">Nearest 100</option>
+              <option value="1000">Nearest 1,000</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="bulkMixedQuestionsPerPageGroup" style="display:none">
+            <label for="bulkMixedQuestionsPerPage">Questions per Page</label>
+            <select id="bulkMixedQuestionsPerPage">
+              <option value="6">6 questions</option>
+              <option value="4">4 questions</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="bulkGraphQuestionsPerPageGroup" style="display:none">
+            <label for="bulkGraphQuestionsPerPage">Graph Questions per Page</label>
+            <select id="bulkGraphQuestionsPerPage">
+              <option value="2">2 questions</option>
+              <option value="4">4 questions</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="bulkTimesTableGroup" style="display:none">
+            <label for="bulkTimesTable">Times Table</label>
+            <select id="bulkTimesTable">
+              <option value="2">2 times table</option>
+              <option value="3">3 times table</option>
+              <option value="4">4 times table</option>
+              <option value="5">5 times table</option>
+              <option value="6">6 times table</option>
+              <option value="7">7 times table</option>
+              <option value="8">8 times table</option>
+              <option value="9">9 times table</option>
+              <option value="10">10 times table</option>
+              <option value="11">11 times table</option>
+              <option value="12">12 times table</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="bulkMagicSquareSizeGroup" style="display:none">
+            <label for="bulkMagicSquareSize">Square Size</label>
+            <select id="bulkMagicSquareSize">
+              <option value="3">3 × 3</option>
+              <option value="4">4 × 4</option>
+              <option value="5">5 × 5</option>
+            </select>
+          </div>
+
+          <div class="form-row" id="bulkRangeRow">
+            <div class="form-group">
+              <label for="bulkMinNum">Min</label>
+              <input type="number" id="bulkMinNum" value="1" min="0" max="999" />
+            </div>
+            <div class="form-group">
+              <label for="bulkMaxNum">Max</label>
+              <input type="number" id="bulkMaxNum" value="12" min="1" max="999" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="bulkNumQuestions">Number of Questions</label>
+            <input type="number" id="bulkNumQuestions" value="20" min="1" max="100" />
+          </div>
+
+          <div class="form-group">
+            <label for="bulkTitle">Worksheet Title (optional)</label>
+            <input type="text" id="bulkTitle" maxlength="60" />
+          </div>
+
+          <div class="form-group">
+            <input type="checkbox" id="bulkSolutions" />
+            <span>Solutions Required</span>
+          </div>
+
+          <button type="button" id="bulkAddItemBtn" class="btn-secondary">+ Add Worksheet to Folder</button>
+        </div>
+
+        <p class="bulk-progress" id="bulkProgress" style="display:none"></p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" id="bulkCancelBtn" class="btn-secondary">Cancel</button>
+        <button type="button" id="bulkGenerateBtn" class="btn-primary" disabled>Generate Bulk PDFs</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="formulaModalOverlay" style="display:none">
+    <div class="modal" id="formulaModal" role="dialog" aria-modal="true" aria-labelledby="formulaModalTitle">
+      <div class="modal-header">
+        <h2 id="formulaModalTitle">Formula &amp; Glossary Lookup</h2>
+        <button type="button" class="modal-close" id="formulaModalCloseBtn" aria-label="Close">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-hint">Look up key formulas and terms for a module at any time - handy as a quick reference or to print out for students.</p>
+
+        <div class="form-group">
+          <label for="formulaModuleSelect">Module</label>
+          <select id="formulaModuleSelect">
+            <option value="algebra">Algebra</option>
+            <option value="functions">Functions</option>
+            <option value="calculus">Calculus</option>
+            <option value="matrices">Matrices</option>
+            <option value="arithmetic">Arithmetic</option>
+            <option value="decimals">Decimals</option>
+            <option value="fractions">Fractions</option>
+            <option value="geometry">Geometry</option>
+            <option value="measurement">Measurement</option>
+            <option value="money">Money</option>
+            <option value="number">Number</option>
+            <option value="percentages">Percentages</option>
+            <option value="ratio">Ratio &amp; Proportion</option>
+            <option value="statistics">Statistics</option>
+            <option value="probability">Probability</option>
+            <option value="networks">Networks</option>
+            <option value="trigonometry">Trigonometry</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="formulaTopicSelect">Topic</label>
+          <select id="formulaTopicSelect"></select>
+        </div>
+
+        <div class="formula-lookup-preview" id="formulaLookupPreview"></div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" id="formulaModalCancelBtn" class="btn-secondary">Close</button>
+        <button type="button" id="formulaPrintBtn" class="btn-primary">Print / Save PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

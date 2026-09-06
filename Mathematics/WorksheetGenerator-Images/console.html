@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Worksheet Image Generator</title>
+  <style>
+    :root { color-scheme: dark; font-family: Segoe UI, sans-serif; }
+    * { box-sizing: border-box; }
+    body { background: #070c10; color: #e6f0f5; margin: 0; overflow-x: hidden; }
+    header { background: #080d12; border-bottom: 1px solid #20333f; color: white; min-height: 86px; overflow: hidden; padding: 22px 32px; }
+    .brand { float: left; }
+    .brand-mark { background: #d97706; border-radius: 9px; box-shadow: 0 0 22px #d9770640; float: left; font-size: 18px; font-weight: 700; height: 42px; line-height: 42px; text-align: center; width: 42px; }
+    .brand-copy { float: left; padding-left: 12px; }
+    h1 { font-size: 22px; letter-spacing: .2px; margin: 0; }
+    .subtitle { color: #b9d2e1; font-size: 11px; margin-top: 3px; }
+    .status { background: #0d211c; border: 1px solid #2b8065; border-radius: 20px; color: #a8e6ca; float: right; font-size: 12px; margin-top: 4px; padding: 7px 12px; white-space: nowrap; }
+    .dot { background: #63d391; border-radius: 50%; box-shadow: 0 0 0 3px #63d39133; height: 9px; width: 9px; }
+    main { margin: 0 auto; max-width: 1180px; padding: 28px 32px 36px; }
+    .panel { background: #0d171e; border: 1px solid #294352; border-radius: 8px; box-shadow: 0 4px 22px #00000070; padding: 0 18px 18px; }
+    .summary { margin-bottom: 18px; overflow: hidden; width: 100%; }
+    .metric { background: #0d171e; border: 1px solid #294352; border-left: 4px solid #4f9bd2; border-radius: 6px; box-shadow: 0 2px 8px #00000050; float: left; margin-right: 1.5%; min-height: 72px; padding: 9px 12px; width: 30%; }
+    .metric:nth-child(2) { border-left-color: #4fc3a1; }
+    .metric:nth-child(3) { border-left-color: #e3a24a; }
+    .metric strong { display: block; font-size: 22px; line-height: 1.1; }
+    .metric span { color: #a9bfca; font-size: 12px; }
+    .metric small { color: #718b98; display: block; font-size: 9px; margin-top: 3px; }
+    #logs { background: #05090c; border: 1px solid #1f3948; border-radius: 4px; color: #d8f3dc; font-family: Consolas, monospace; font-size: 12px; height: 410px; line-height: 1.5; overflow: auto; padding: 8px; }
+    button { background: #28658a; border: 1px solid #4386aa; border-radius: 4px; color: white; cursor: pointer; font-weight: 600; padding: 8px 13px; }
+    button:hover { background: #347ca3; }
+    .toolbar { background: #122633; border-bottom: 1px solid #294352; min-height: 44px; overflow: hidden; margin: 0 -18px 14px; padding: 12px 18px; }
+    .toolbar > div { float: left; }
+    .toolbar > button { float: right; }
+    .hint { color: #617789; font-size: 12px; margin-top: 3px; }
+    .log-entry { border-bottom: 1px solid #172c38; padding: 8px 9px; }
+    .log-entry:last-child { border-bottom: 0; }
+    .log-time { color: #668493; font-size: 10px; margin-right: 10px; }
+    .log-kind { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .08em; margin-right: 9px; min-width: 78px; }
+    .log-kind.request { color: #f4c477; }
+    .log-kind.generated { color: #63d391; }
+    .log-kind.error { color: #ff8a8a; }
+    .log-kind.status { color: #8fc5e1; }
+    .log-message { color: #f1f7fa; }
+    .log-detail { color: #91aab6; display: block; font-size: 10px; margin: 3px 0 0 84px; white-space: normal; }
+    .log-generated-preview { background: #f8fbfd; border: 1px solid #3a6478; border-radius: 4px; display: block; height: 58px; margin: 7px 0 0 84px; object-fit: contain; padding: 3px; width: 104px; }
+    .log-generated-link { display: block; margin-left: 84px; width: max-content; }
+    .library { margin-bottom: 18px; }
+    .library-grid { display: grid; gap: 12px; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    .library-card { background: #0a141b; border: 1px solid #294352; border-radius: 6px; min-width: 0; overflow: hidden; }
+    .library-card a { display: block; }
+    .library-card img { background: #f8fbfd; display: block; height: 112px; object-fit: contain; width: 100%; }
+    .library-card-copy { padding: 8px 9px 10px; }
+    .library-card strong { color: #f1f7fa; display: block; font-size: 12px; }
+    .library-card span { color: #91aab6; display: block; font-size: 10px; line-height: 1.35; margin-top: 4px; }
+    .terminal-bar { background: #0a141b; border-bottom: 1px solid #203744; border-radius: 8px 8px 0 0; height: 28px; margin: 0 -18px 0; padding: 9px 14px 0; }
+    .terminal-dot { border-radius: 50%; display: inline-block; height: 9px; margin-right: 7px; width: 9px; }
+    .terminal-dot.red { background: #f06c75; }
+    .terminal-dot.amber { background: #e3a24a; }
+    .terminal-dot.green { background: #63d391; }
+    .terminal-title { color: #91aab6; font-family: Consolas, monospace; font-size: 11px; }
+    @media (max-width: 560px) { header { display: block; } .status { float: none; margin-top: 12px; } main { padding: 18px; } .metric { float: none; margin-bottom: 8px; width: 100%; } }
+  </style>
+</head>
+<body>
+  <header><div class="brand"><div class="brand-mark">∑</div><div class="brand-copy"><h1>Worksheet Image Generator</h1><div class="subtitle">Shared visual resource service for every worksheet subject</div></div></div><div class="status"><span class="dot"></span> Server running · 127.0.0.1:4317</div></header>
+  <main>
+    <div class="summary"><div class="metric"><strong id="requestCount">0</strong><span>Requests</span><small>Incoming generator calls</small></div><div class="metric"><strong id="generatedCount">0</strong><span>Images generated</span><small>Saved SVG resources</small></div><div class="metric"><strong id="errorCount">0</strong><span>Errors</span><small>Service health</small></div></div>
+    <section class="panel library"><div class="toolbar"><div><strong>Image library</strong><div class="hint">Live examples of every visual type available to worksheet generators.</div></div></div><div id="library" class="library-grid">Loading image types...</div></section>
+    <section class="panel"><div class="terminal-bar"><span class="terminal-dot red"></span><span class="terminal-dot amber"></span><span class="terminal-dot green"></span><span class="terminal-title">worksheet-image-generator · live console</span></div><div class="toolbar"><div><strong>Live activity</strong><div class="hint">Image requests and generated resources appear here automatically.</div></div><div><button id="refresh">Refresh</button><button id="clearLogs">Clear Logs</button></div></div><div id="logs">Connecting to server...</div></section>
+  </main>
+  <script>
+    function refreshLogs() {
+      var url = 'http://127.0.0.1:4317/api/logs?time=' + new Date().getTime();
+      try {
+        var windowsRequest = new ActiveXObject('MSXML2.XMLHTTP');
+        windowsRequest.open('GET', url, false);
+        windowsRequest.send();
+        if (windowsRequest.status === 200) {
+          applyLogResponse(windowsRequest.responseText);
+          return;
+        }
+      } catch (error) {}
+      var request = new XMLHttpRequest();
+      request.open('GET', url, true);
+      request.onreadystatechange = function () {
+        if (request.readyState === 4 && request.status === 200) applyLogResponse(request.responseText);
+      };
+      request.send();
+    }
+    function loadLibrary() {
+      var request = new XMLHttpRequest();
+      request.open('GET', 'http://127.0.0.1:4317/api/catalog?time=' + new Date().getTime(), true);
+      request.onreadystatechange = function () {
+        if (request.readyState !== 4 || request.status !== 200) return;
+        try {
+          var data = JSON.parse(request.responseText);
+          var types = data.types || {};
+          var output = '';
+          for (var type in types) {
+            if (!Object.prototype.hasOwnProperty.call(types, type)) continue;
+            output += '<article class="library-card" data-library-type="' + escapeHtml(type) + '"><a class="library-link" target="_blank" rel="noopener"><img alt="Example ' + escapeHtml(type) + ' image"></a><div class="library-card-copy"><strong>' + escapeHtml(type) + '</strong><span>' + escapeHtml(types[type]) + '</span></div></article>';
+          }
+          document.getElementById('library').innerHTML = output || 'No image types available.';
+          for (var cardIndex = 0; cardIndex < document.querySelectorAll('.library-card').length; cardIndex += 1) {
+            loadLibrarySample(document.querySelectorAll('.library-card')[cardIndex]);
+          }
+        } catch (error) { document.getElementById('library').innerText = 'Unable to load image types.'; }
+      };
+      request.send();
+    }
+    function loadLibrarySample(card) {
+      var type = card.getAttribute('data-library-type');
+      var request = new XMLHttpRequest();
+      request.open('GET', 'http://127.0.0.1:4317/api/generate?type=' + encodeURIComponent(type) + '&name=library-' + encodeURIComponent(type), true);
+      request.onreadystatechange = function () {
+        if (request.readyState !== 4 || request.status !== 200) return;
+        try {
+          var result = JSON.parse(request.responseText);
+          var resourceUrl = 'http://127.0.0.1:4317' + result.url;
+          card.querySelector('img').src = resourceUrl;
+          card.querySelector('.library-link').href = resourceUrl;
+        } catch (error) {}
+      };
+      request.send();
+    }
+    function applyLogResponse(responseText) {
+      try {
+        var data = JSON.parse(responseText);
+        var lines = data.lines || [];
+        document.getElementById('logs').innerHTML = lines.length ? formatLogLines(lines) : 'Waiting for image requests...';
+        document.getElementById('logs').scrollTop = document.getElementById('logs').scrollHeight;
+        document.getElementById('requestCount').innerText = countLines(lines, '[request]');
+        document.getElementById('generatedCount').innerText = countLines(lines, '[generated]');
+        document.getElementById('errorCount').innerText = countLines(lines, '[error]');
+      } catch (error) {
+        document.getElementById('logs').innerText = 'Unable to read server logs.';
+      }
+    }
+    function countLines(lines, value) {
+      var count = 0;
+      for (var index = 0; index < lines.length; index += 1) {
+        if (lines[index].indexOf(value) !== -1) count += 1;
+      }
+      return count;
+    }
+    function escapeHtml(value) {
+      return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function formatLogLines(lines) {
+      var output = '';
+      for (var index = 0; index < lines.length; index += 1) {
+        var line = lines[index];
+        var match = line.match(/^\[([^\]]+)\] \[([^\]]+)\] ?(.*)$/);
+        if (!match) {
+          var statusMatch = line.match(/^\[([^\]]+)\] (.*)$/);
+          var statusTime = statusMatch ? statusMatch[1].split('T')[1].replace('Z', '') : '';
+          var statusMessage = statusMatch ? statusMatch[2] : line;
+          output += '<div class="log-entry"><span class="log-time">' + escapeHtml(statusTime) + '</span><span class="log-kind status">STATUS</span><span class="log-message">' + escapeHtml(statusMessage) + '</span></div>';
+          continue;
+        }
+        var time = match[1].split('T')[1] || match[1];
+        var kind = match[2];
+        var message = match[3];
+        var detail = '';
+        var preview = '';
+        if (kind === 'request') {
+          var requestMatch = message.match(/^([^ ]+) (.*)$/);
+          message = requestMatch ? requestMatch[1] + ' image requested' : message;
+          detail = requestMatch ? requestMatch[2] : '';
+        }
+        if (kind === 'generated' && /^[a-zA-Z][a-zA-Z0-9-]*\.svg$/.test(message)) {
+          var resourceUrl = 'http://127.0.0.1:4317/resources/' + encodeURIComponent(message);
+          preview = '<a class="log-generated-link" href="' + resourceUrl + '" target="_blank" rel="noopener" title="Open full generated image"><img class="log-generated-preview" src="' + resourceUrl + '" alt="Thumbnail of ' + escapeHtml(message) + '"></a>';
+        }
+        output += '<div class="log-entry"><span class="log-time">' + escapeHtml(time.replace('Z', '')) + '</span><span class="log-kind ' + escapeHtml(kind) + '">' + escapeHtml(kind.toUpperCase()) + '</span><span class="log-message">' + escapeHtml(message) + '</span>' + (detail ? '<span class="log-detail">' + escapeHtml(detail) + '</span>' : '') + preview + '</div>';
+      }
+      return output;
+    }
+    document.getElementById('refresh').onclick = refreshLogs;
+    document.getElementById('clearLogs').onclick = function () {
+      var request;
+      try { request = new ActiveXObject('MSXML2.XMLHTTP'); } catch (error) { request = new XMLHttpRequest(); }
+      request.open('POST', 'http://127.0.0.1:4317/api/logs/clear?time=' + new Date().getTime(), true);
+      request.onreadystatechange = function () { if (request.readyState === 4) refreshLogs(); };
+      request.send();
+    };
+    refreshLogs();
+    loadLibrary();
+    setInterval(refreshLogs, 1000);
+  </script>
+</body>
+</html>
