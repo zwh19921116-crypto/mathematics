@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mathematics Explorer</title>
+    <style>
+      :root {
+        --bg: #f5f8ff;
+        --panel: #ffffff;
+        --text: #14213d;
+        --accent: #2f6fed;
+        --accent-dark: #214fb3;
+        --muted: #56657d;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: linear-gradient(180deg, #eef5ff 0%, #f9fbff 100%);
+        color: var(--text);
+      }
+      .wrap {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 48px 20px 80px;
+      }
+      h1 {
+        margin: 0 0 12px;
+        font-size: clamp(2rem, 4vw, 3rem);
+      }
+      .subtitle {
+        margin: 0 0 32px;
+        color: var(--muted);
+        font-size: 1.05rem;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+      }
+      .card {
+        display: block;
+        background: var(--panel);
+        border: 1px solid rgba(47, 111, 237, 0.12);
+        border-radius: 16px;
+        padding: 20px 18px;
+        text-decoration: none;
+        color: var(--text);
+        box-shadow: 0 10px 28px rgba(20, 33, 61, 0.06);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+      .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 30px rgba(20, 33, 61, 0.1);
+      }
+      .card h2 {
+        margin: 0 0 8px;
+        font-size: 1.2rem;
+      }
+      .card p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Mathematics Explorer</h1>
+      <p class="subtitle">Choose an activity below to open the interactive app.</p>
+
+      <div class="grid">
+        <a class="card" href="./AlgebraExplorer/">
+          <h2>Algebra Explorer</h2>
+          <p>Work through algebra patterns and expressions.</p>
+        </a>
+
+        <a class="card" href="./FactorsExplorer/">
+          <h2>Factors Explorer</h2>
+          <p>Explore factors, prime structure, and multiples.</p>
+        </a>
+
+        <a class="card" href="./FractionVisualiser/">
+          <h2>Fraction Visualiser</h2>
+          <p>See fractions represented visually.</p>
+        </a>
+
+        <a class="card" href="./NumberLineExplorer/">
+          <h2>Number Line Explorer</h2>
+          <p>Investigate values and positions on a number line.</p>
+        </a>
+
+        <a class="card" href="./PlaceValueExplorer/">
+          <h2>Place Value Explorer</h2>
+          <p>Break numbers into place-value parts.</p>
+        </a>
+
+        <a class="card" href="./PrimeNumberExplorer/">
+          <h2>Prime Number Explorer</h2>
+          <p>Discover prime numbers and factor patterns.</p>
+        </a>
+
+        <a class="card" href="./VectorExplorer/">
+          <h2>Vector Explorer</h2>
+          <p>Visualise vector movement and direction.</p>
+        </a>
+
+        <a class="card" href="./WorksheetGenerator-Math/">
+          <h2>Worksheet Generator</h2>
+          <p>Open the worksheet generator and maths tasks.</p>
+        </a>
+      </div>
+    </div>
+  </body>
+</html>
