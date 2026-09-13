@@ -1101,9 +1101,9 @@ function ensureTrigonometryModuleOption() {
   moduleSelect.appendChild(option);
 }
 
-function populateTopicsFor(moduleEl, topicEl, selectedYearLevel = yearLevelSelect.value) {
-  let topics = MODULE_TOPICS[moduleEl.value] || [];
-  const allowedTopics = PRIMARY_TOPIC_LIMITS[selectedYearLevel === 'primary' ? moduleEl.value : ''];
+function getFilteredTopicsForModule(moduleValue, selectedYearLevel = yearLevelSelect.value) {
+  let topics = MODULE_TOPICS[moduleValue] || [];
+  const allowedTopics = PRIMARY_TOPIC_LIMITS[selectedYearLevel === 'primary' ? moduleValue : ''];
   if (allowedTopics) {
     topics = topics.filter((topic) => allowedTopics.has(topic.value));
   }
@@ -1111,21 +1111,50 @@ function populateTopicsFor(moduleEl, topicEl, selectedYearLevel = yearLevelSelec
     topics = topics.filter((topic) => !SECONDARY_EXCLUDED_TOPICS.has(topic.value));
   }
   if (selectedYearLevel === 'general-mathematics-12') {
-    topics = topics.filter((topic) => GENERAL_MATHEMATICS_12_TOPIC_LIMITS[moduleEl.value]?.has(topic.value));
+    topics = topics.filter((topic) => GENERAL_MATHEMATICS_12_TOPIC_LIMITS[moduleValue]?.has(topic.value));
   }
   if (selectedYearLevel === 'general-mathematics-34') {
-    topics = topics.filter((topic) => GENERAL_MATHEMATICS_34_TOPIC_LIMITS[moduleEl.value]?.has(topic.value));
+    topics = topics.filter((topic) => GENERAL_MATHEMATICS_34_TOPIC_LIMITS[moduleValue]?.has(topic.value));
   }
   if (selectedYearLevel === 'mathematical-methods-12') {
-    topics = topics.filter((topic) => MATHEMATICAL_METHODS_12_TOPIC_LIMITS[moduleEl.value]?.has(topic.value));
+    topics = topics.filter((topic) => MATHEMATICAL_METHODS_12_TOPIC_LIMITS[moduleValue]?.has(topic.value));
   }
   if (selectedYearLevel === 'mathematical-methods-34') {
-    topics = topics.filter((topic) => MATHEMATICAL_METHODS_34_TOPIC_LIMITS[moduleEl.value]?.has(topic.value));
+    topics = topics.filter((topic) => MATHEMATICAL_METHODS_34_TOPIC_LIMITS[moduleValue]?.has(topic.value));
   }
-  topics = topics.slice().sort((firstTopic, secondTopic) => firstTopic.label.localeCompare(secondTopic.label));
+
+  return topics.slice().sort((firstTopic, secondTopic) => firstTopic.label.localeCompare(secondTopic.label));
+}
+
+function populateTopicsFor(moduleEl, topicEl, selectedYearLevel = yearLevelSelect.value) {
+  const previousTopic = topicEl.value;
+  let topics = getFilteredTopicsForModule(moduleEl.value, selectedYearLevel);
+
+  if (topics.length === 0) {
+    const availableModules = MODULES_BY_YEAR_LEVEL[selectedYearLevel] || MODULES_BY_YEAR_LEVEL.primary;
+    const fallbackModule = Array.from(moduleEl.options).find((option) => (
+      availableModules.has(option.value) && getFilteredTopicsForModule(option.value, selectedYearLevel).length > 0
+    ));
+
+    if (fallbackModule && moduleEl.value !== fallbackModule.value) {
+      moduleEl.value = fallbackModule.value;
+      topics = getFilteredTopicsForModule(moduleEl.value, selectedYearLevel);
+    }
+  }
+
   topicEl.innerHTML = topics
     .map((topic) => `<option value="${topic.value}">${topic.label}</option>`)
     .join('');
+
+  if (topics.some((topic) => topic.value === previousTopic)) {
+    topicEl.value = previousTopic;
+  } else {
+    topicEl.value = topics[0]?.value || '';
+  }
+
+  if (!topicEl.value && topicEl.options.length > 0) {
+    topicEl.selectedIndex = 0;
+  }
 }
 
 function populateTopics() {
@@ -1241,7 +1270,7 @@ function applyModuleTopicSearchResult() {
 
   moduleSelect.value = result.module;
   populateTopics();
-  if (result.topic) {
+  if (result.topic && topicSelect.querySelector(`option[value="${result.topic}"]`)) {
     topicSelect.value = result.topic;
   }
   updateTopicControls();
@@ -1346,7 +1375,7 @@ function applyBulkModuleTopicSearchResult() {
 
   bulkModuleSelect.value = result.module;
   populateTopicsFor(bulkModuleSelect, bulkTopicSelect, bulkYearLevelSelect.value);
-  if (result.topic) {
+  if (result.topic && bulkTopicSelect.querySelector(`option[value="${result.topic}"]`)) {
     bulkTopicSelect.value = result.topic;
   }
   updateTopicControlsFor(bulkTopicSelect, bulkTimesTableGroup, bulkRangeRow, bulkDenominatorGroup, bulkDenominatorSelect);
