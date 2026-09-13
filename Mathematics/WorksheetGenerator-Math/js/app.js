@@ -90,12 +90,32 @@ const bulkModalOverlay  = document.getElementById('bulkModalOverlay');
 const bulkModalCloseBtn = document.getElementById('bulkModalCloseBtn');
 const bulkCancelBtn     = document.getElementById('bulkCancelBtn');
 const bulkGenerateBtn   = document.getElementById('bulkGenerateBtn');
+const bulkFooterStatus = document.getElementById('bulkFooterStatus');
 const bulkAddItemBtn    = document.getElementById('bulkAddItemBtn');
 const bulkItemsList     = document.getElementById('bulkItemsList');
 const bulkItemsEmpty    = document.getElementById('bulkItemsEmpty');
+const bulkWorksheetPreview = document.getElementById('bulkWorksheetPreview');
+const bulkPreviewPrevBtn = document.getElementById('bulkPreviewPrevBtn');
+const bulkPreviewNextBtn = document.getElementById('bulkPreviewNextBtn');
+const bulkPreviewIndicator = document.getElementById('bulkPreviewIndicator');
 const bulkProgress      = document.getElementById('bulkProgress');
+const bulkProgressPanel = document.getElementById('bulkProgressPanel');
+const bulkProgressBar = document.getElementById('bulkProgressBar');
+const bulkProgressFill = document.getElementById('bulkProgressFill');
+const bulkProgressPercent = document.getElementById('bulkProgressPercent');
+const bulkElapsedTime = document.getElementById('bulkElapsedTime');
+const bulkEtaTime = document.getElementById('bulkEtaTime');
+const bulkFinishTime = document.getElementById('bulkFinishTime');
+const bulkPauseResumeBtn = document.getElementById('bulkPauseResumeBtn');
+const bulkStopBtn = document.getElementById('bulkStopBtn');
 const bulkBatchNameInput = document.getElementById('bulkBatchName');
 const bulkFolderCountInput = document.getElementById('bulkFolderCount');
+const bulkYearLevelSelect = document.getElementById('bulkYearLevel');
+const bulkModuleTopicSearchToggle = document.getElementById('bulkModuleTopicSearchToggle');
+const bulkModuleTopicSearchBackdrop = document.getElementById('bulkModuleTopicSearchBackdrop');
+const bulkModuleTopicSearchPopup = document.getElementById('bulkModuleTopicSearchPopup');
+const bulkModuleTopicSearch = document.getElementById('bulkModuleTopicSearch');
+const bulkModuleTopicSearchResults = document.getElementById('bulkModuleTopicSearchResults');
 const bulkModuleSelect  = document.getElementById('bulkModule');
 const bulkTopicSelect   = document.getElementById('bulkTopic');
 const bulkDenominatorGroup = document.getElementById('bulkDenominatorGroup');
@@ -807,6 +827,10 @@ moduleTopicSearch.addEventListener('input', updateModuleTopicSearchResults);
 moduleTopicSearchResults.addEventListener('change', applyModuleTopicSearchResult);
 moduleTopicSearchToggle.addEventListener('click', toggleModuleTopicSearch);
 moduleTopicSearchBackdrop.addEventListener('click', closeModuleTopicSearch);
+bulkModuleTopicSearch.addEventListener('input', updateBulkModuleTopicSearchResults);
+bulkModuleTopicSearchResults.addEventListener('change', applyBulkModuleTopicSearchResult);
+bulkModuleTopicSearchToggle.addEventListener('click', toggleBulkModuleTopicSearch);
+bulkModuleTopicSearchBackdrop.addEventListener('click', closeBulkModuleTopicSearch);
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && examDisclaimerEditor.style.display !== 'none') {
     closeExamDisclaimerEditor();
@@ -815,6 +839,11 @@ document.addEventListener('keydown', (event) => {
 
   if (event.key === 'Escape' && moduleTopicSearchPopup.style.display !== 'none') {
     closeModuleTopicSearch();
+    return;
+  }
+
+  if (event.key === 'Escape' && bulkModuleTopicSearchPopup.style.display !== 'none') {
+    closeBulkModuleTopicSearch();
   }
 });
 
@@ -838,6 +867,28 @@ function closeModuleTopicSearch() {
   moduleTopicSearch.value = '';
   moduleTopicSearchResults.innerHTML = '';
   moduleTopicSearchResults.style.display = 'none';
+}
+
+function toggleBulkModuleTopicSearch() {
+  const isOpen = bulkModuleTopicSearchPopup.style.display !== 'none';
+  if (isOpen) {
+    closeBulkModuleTopicSearch();
+    return;
+  }
+
+  bulkModuleTopicSearchPopup.style.display = 'block';
+  bulkModuleTopicSearchBackdrop.style.display = 'block';
+  bulkModuleTopicSearchToggle.setAttribute('aria-expanded', 'true');
+  bulkModuleTopicSearch.focus();
+}
+
+function closeBulkModuleTopicSearch() {
+  bulkModuleTopicSearchPopup.style.display = 'none';
+  bulkModuleTopicSearchBackdrop.style.display = 'none';
+  bulkModuleTopicSearchToggle.setAttribute('aria-expanded', 'false');
+  bulkModuleTopicSearch.value = '';
+  bulkModuleTopicSearchResults.innerHTML = '';
+  bulkModuleTopicSearchResults.style.display = 'none';
 }
 
 yearLevelSelect.addEventListener('change', () => {
@@ -1040,28 +1091,26 @@ function ensureTrigonometryModuleOption() {
   moduleSelect.appendChild(option);
 }
 
-function populateTopicsFor(moduleEl, topicEl) {
+function populateTopicsFor(moduleEl, topicEl, selectedYearLevel = yearLevelSelect.value) {
   let topics = MODULE_TOPICS[moduleEl.value] || [];
-  if (moduleEl === moduleSelect) {
-    const allowedTopics = PRIMARY_TOPIC_LIMITS[yearLevelSelect.value === 'primary' ? moduleEl.value : ''];
-    if (allowedTopics) {
-      topics = topics.filter((topic) => allowedTopics.has(topic.value));
-    }
-    if (yearLevelSelect.value === 'secondary') {
-      topics = topics.filter((topic) => !SECONDARY_EXCLUDED_TOPICS.has(topic.value));
-    }
-    if (yearLevelSelect.value === 'general-mathematics-12') {
-      topics = topics.filter((topic) => GENERAL_MATHEMATICS_12_TOPIC_LIMITS[moduleEl.value]?.has(topic.value));
-    }
-    if (yearLevelSelect.value === 'general-mathematics-34') {
-      topics = topics.filter((topic) => GENERAL_MATHEMATICS_34_TOPIC_LIMITS[moduleEl.value]?.has(topic.value));
-    }
-    if (yearLevelSelect.value === 'mathematical-methods-12') {
-      topics = topics.filter((topic) => MATHEMATICAL_METHODS_12_TOPIC_LIMITS[moduleEl.value]?.has(topic.value));
-    }
-    if (yearLevelSelect.value === 'mathematical-methods-34') {
-      topics = topics.filter((topic) => MATHEMATICAL_METHODS_34_TOPIC_LIMITS[moduleEl.value]?.has(topic.value));
-    }
+  const allowedTopics = PRIMARY_TOPIC_LIMITS[selectedYearLevel === 'primary' ? moduleEl.value : ''];
+  if (allowedTopics) {
+    topics = topics.filter((topic) => allowedTopics.has(topic.value));
+  }
+  if (selectedYearLevel === 'secondary') {
+    topics = topics.filter((topic) => !SECONDARY_EXCLUDED_TOPICS.has(topic.value));
+  }
+  if (selectedYearLevel === 'general-mathematics-12') {
+    topics = topics.filter((topic) => GENERAL_MATHEMATICS_12_TOPIC_LIMITS[moduleEl.value]?.has(topic.value));
+  }
+  if (selectedYearLevel === 'general-mathematics-34') {
+    topics = topics.filter((topic) => GENERAL_MATHEMATICS_34_TOPIC_LIMITS[moduleEl.value]?.has(topic.value));
+  }
+  if (selectedYearLevel === 'mathematical-methods-12') {
+    topics = topics.filter((topic) => MATHEMATICAL_METHODS_12_TOPIC_LIMITS[moduleEl.value]?.has(topic.value));
+  }
+  if (selectedYearLevel === 'mathematical-methods-34') {
+    topics = topics.filter((topic) => MATHEMATICAL_METHODS_34_TOPIC_LIMITS[moduleEl.value]?.has(topic.value));
   }
   topics = topics.slice().sort((firstTopic, secondTopic) => firstTopic.label.localeCompare(secondTopic.label));
   topicEl.innerHTML = topics
@@ -1073,16 +1122,16 @@ function populateTopics() {
   populateTopicsFor(moduleSelect, topicSelect);
 }
 
-function populateModulesForYearLevel() {
-  const availableModules = MODULES_BY_YEAR_LEVEL[yearLevelSelect.value] || MODULES_BY_YEAR_LEVEL.primary;
-  const currentModule = moduleSelect.value;
-  Array.from(moduleSelect.options).forEach((option) => {
+function populateModulesForYearLevel(moduleEl = moduleSelect, selectedYearLevel = yearLevelSelect.value) {
+  const availableModules = MODULES_BY_YEAR_LEVEL[selectedYearLevel] || MODULES_BY_YEAR_LEVEL.primary;
+  const currentModule = moduleEl.value;
+  Array.from(moduleEl.options).forEach((option) => {
     option.hidden = !availableModules.has(option.value);
   });
 
   if (!availableModules.has(currentModule)) {
-    const firstAvailableOption = Array.from(moduleSelect.options).find((option) => availableModules.has(option.value));
-    moduleSelect.value = firstAvailableOption ? firstAvailableOption.value : '';
+    const firstAvailableOption = Array.from(moduleEl.options).find((option) => availableModules.has(option.value));
+    moduleEl.value = firstAvailableOption ? firstAvailableOption.value : '';
   }
 }
 
@@ -1193,6 +1242,108 @@ function applyModuleTopicSearchResult() {
   closeModuleTopicSearch();
 }
 
+function getAvailableBulkModuleTopicSearchResults() {
+  const results = [];
+
+  [
+    { value: 'primary', label: 'Primary' },
+    { value: 'secondary', label: 'Secondary' },
+    { value: 'general-mathematics-12', label: 'VCE General Mathematics - Units 1 & 2' },
+    { value: 'general-mathematics-34', label: 'VCE General Mathematics - Units 3 & 4' },
+    { value: 'mathematical-methods-12', label: 'VCE Mathematical Methods - Units 1 & 2' },
+    { value: 'mathematical-methods-34', label: 'VCE Mathematical Methods - Units 3 & 4' },
+  ].forEach((yearLevel) => {
+    results.push({ yearLevel: yearLevel.value, module: '', topic: '', label: `Year Level > ${yearLevel.label}`, searchText: yearLevel.label });
+    const availableModules = MODULES_BY_YEAR_LEVEL[yearLevel.value] || MODULES_BY_YEAR_LEVEL.primary;
+
+    Array.from(bulkModuleSelect.options)
+      .filter((option) => availableModules.has(option.value))
+      .forEach((moduleOption) => {
+        const moduleValue = moduleOption.value;
+        const moduleName = moduleOption.textContent;
+        const yearName = yearLevel.label;
+        results.push({ yearLevel: yearLevel.value, module: moduleValue, topic: '', label: `${yearName} > ${moduleName}`, searchText: `${yearName} ${moduleName}` });
+
+        const allowedTopics = PRIMARY_TOPIC_LIMITS[yearLevel.value === 'primary' ? moduleValue : ''];
+        const vceGeneralTopics = yearLevel.value === 'general-mathematics-12'
+          ? GENERAL_MATHEMATICS_12_TOPIC_LIMITS[moduleValue]
+          : yearLevel.value === 'general-mathematics-34'
+            ? GENERAL_MATHEMATICS_34_TOPIC_LIMITS[moduleValue]
+            : undefined;
+        const methodsTopics = yearLevel.value === 'mathematical-methods-12'
+          ? MATHEMATICAL_METHODS_12_TOPIC_LIMITS[moduleValue]
+          : yearLevel.value === 'mathematical-methods-34'
+            ? MATHEMATICAL_METHODS_34_TOPIC_LIMITS[moduleValue]
+            : undefined;
+        const topics = allowedTopics
+          ? (MODULE_TOPICS[moduleValue] || []).filter((topic) => allowedTopics.has(topic.value))
+          : vceGeneralTopics
+            ? (MODULE_TOPICS[moduleValue] || []).filter((topic) => vceGeneralTopics.has(topic.value))
+            : methodsTopics
+              ? (MODULE_TOPICS[moduleValue] || []).filter((topic) => methodsTopics.has(topic.value))
+            : (MODULE_TOPICS[moduleValue] || []);
+
+        topics.forEach((topic) => {
+          results.push({
+            yearLevel: yearLevel.value,
+            module: moduleValue,
+            topic: topic.value,
+            label: `${yearName} > ${moduleName} > ${topic.label}`,
+            searchText: `${yearName} ${moduleName} ${topic.label}`,
+          });
+        });
+      });
+  });
+
+  return results;
+}
+
+function updateBulkModuleTopicSearchResults() {
+  const query = bulkModuleTopicSearch.value.trim().toLowerCase();
+  if (!query) {
+    bulkModuleTopicSearchResults.innerHTML = '';
+    bulkModuleTopicSearchResults.style.display = 'none';
+    return;
+  }
+
+  const matches = getAvailableBulkModuleTopicSearchResults()
+    .filter((result) => result.searchText.toLowerCase().includes(query));
+  bulkModuleTopicSearchResults.innerHTML = matches
+    .map((result, index) => `<option value="${index}">${escapeHtml(result.label)}</option>`)
+    .join('');
+  bulkModuleTopicSearchResults._searchResults = matches;
+  bulkModuleTopicSearchResults.style.display = matches.length > 0 ? 'block' : 'none';
+}
+
+function applyBulkModuleTopicSearchResult() {
+  const result = bulkModuleTopicSearchResults._searchResults?.[Number(bulkModuleTopicSearchResults.value)];
+  if (!result) {
+    return;
+  }
+
+  if (result.yearLevel) {
+    bulkYearLevelSelect.value = result.yearLevel;
+    populateModulesForYearLevel(bulkModuleSelect, bulkYearLevelSelect.value);
+  }
+
+  if (!result.module) {
+    populateTopicsFor(bulkModuleSelect, bulkTopicSelect, bulkYearLevelSelect.value);
+    updateTopicControlsFor(bulkTopicSelect, bulkTimesTableGroup, bulkRangeRow, bulkDenominatorGroup, bulkDenominatorSelect);
+    updateBulkPrimaryControlVisibility();
+    closeBulkModuleTopicSearch();
+    return;
+  }
+
+  bulkModuleSelect.value = result.module;
+  populateTopicsFor(bulkModuleSelect, bulkTopicSelect, bulkYearLevelSelect.value);
+  if (result.topic) {
+    bulkTopicSelect.value = result.topic;
+  }
+  updateTopicControlsFor(bulkTopicSelect, bulkTimesTableGroup, bulkRangeRow, bulkDenominatorGroup, bulkDenominatorSelect);
+  updateBulkPrimaryControlVisibility();
+  closeBulkModuleTopicSearch();
+}
+
 // Show/hide controls based on topic
 function updateTopicControlsFor(topicEl, timesTableGroupEl, rangeRowEl, denominatorGroupEl, denominatorSelectEl) {
   const topic = topicEl.value;
@@ -1250,13 +1401,21 @@ populateTopics();
 updateTopicControls();
 updateTitleInput(true);
 
-populateTopicsFor(bulkModuleSelect, bulkTopicSelect);
+populateModulesForYearLevel(bulkModuleSelect, bulkYearLevelSelect.value);
+populateTopicsFor(bulkModuleSelect, bulkTopicSelect, bulkYearLevelSelect.value);
 updateTopicControlsFor(bulkTopicSelect, bulkTimesTableGroup, bulkRangeRow, bulkDenominatorGroup, bulkDenominatorSelect);
 updateBulkPrimaryControlVisibility();
 
-bulkModuleSelect.addEventListener('change', () => {
-  populateTopicsFor(bulkModuleSelect, bulkTopicSelect);
+bulkYearLevelSelect.addEventListener('change', () => {
+  populateModulesForYearLevel(bulkModuleSelect, bulkYearLevelSelect.value);
+  populateTopicsFor(bulkModuleSelect, bulkTopicSelect, bulkYearLevelSelect.value);
   updateTopicControlsFor(bulkTopicSelect, bulkTimesTableGroup, bulkRangeRow, bulkDenominatorGroup, bulkDenominatorSelect);
+  updateBulkPrimaryControlVisibility();
+});
+bulkModuleSelect.addEventListener('change', () => {
+  populateTopicsFor(bulkModuleSelect, bulkTopicSelect, bulkYearLevelSelect.value);
+  updateTopicControlsFor(bulkTopicSelect, bulkTimesTableGroup, bulkRangeRow, bulkDenominatorGroup, bulkDenominatorSelect);
+  updateBulkPrimaryControlVisibility();
 });
 bulkTopicSelect.addEventListener('change', () => {
   updateTopicControlsFor(bulkTopicSelect, bulkTimesTableGroup, bulkRangeRow, bulkDenominatorGroup, bulkDenominatorSelect);
@@ -1588,11 +1747,28 @@ async function exitNativeFullscreen() {
   }
 }
 
+function normalizeConfiguredRange(minValue, maxValue, fallbackMin = 1, fallbackMax = 12) {
+  const parsedMin = Number.isFinite(minValue) ? Math.trunc(minValue) : fallbackMin;
+  const parsedMax = Number.isFinite(maxValue) ? Math.trunc(maxValue) : fallbackMax;
+  const safeMin = Math.min(parsedMin, parsedMax);
+  const safeMax = Math.max(parsedMin, parsedMax);
+  return { min: safeMin, max: safeMax };
+}
+
+function pickConfiguredInt(defaultMin, defaultMax, configuredMin, configuredMax) {
+  const low = Math.max(defaultMin, configuredMin);
+  const high = Math.min(defaultMax, configuredMax);
+  if (low <= high) {
+    return randomInt(low, high);
+  }
+  return randomInt(defaultMin, defaultMax);
+}
+
 function generateWorksheet() {
   const module      = moduleSelect.value;
   const topic       = topicSelect.value;
-  const minNum      = parseInt(document.getElementById('minNum').value, 10);
-  const maxNum      = parseInt(document.getElementById('maxNum').value, 10);
+  const minNumRaw   = parseInt(document.getElementById('minNum').value, 10);
+  const maxNumRaw   = parseInt(document.getElementById('maxNum').value, 10);
   const numQ        = parseInt(document.getElementById('numQuestions').value, 10);
   const timesTable  = parseInt(document.getElementById('timesTable').value, 10);
   const denominatorMode = denominatorSelect.value;
@@ -1602,10 +1778,14 @@ function generateWorksheet() {
   const title       = titleSuffix;
   const includeSolutions = solutionsCheckbox.checked;
 
-  if (topic !== 'times-tables' && minNum > maxNum) {
-    alert('Min Number cannot be greater than Max Number.');
+  if (!Number.isFinite(minNumRaw) || !Number.isFinite(maxNumRaw)) {
+    alert('Please enter valid numbers for Min Number and Max Number.');
     return;
   }
+
+  const normalizedRange = normalizeConfiguredRange(minNumRaw, maxNumRaw);
+  const minNum = normalizedRange.min;
+  const maxNum = normalizedRange.max;
 
   const questions = buildQuestions(topic, minNum, maxNum, numQ, timesTable, denominatorMode, parseInt(magicSquareSizeSelect.value, 10), pythagorasModeSelect.value, patternModeSelect.value, parseInt(termCountSelect.value, 10), roundingPlaceSelect.value, matrixDimension, matrixOperation);
   lastGeneratedQuestions = questions;
@@ -1910,7 +2090,7 @@ function paginateQuestions(questions, title, module, includeSolutions, topic, ti
   }
 
   if (includeFormulaSheet || questions[0]?.topic === 'unit-conversions') {
-    pageModels.push({ type: 'formula-sheet', title, module, topic });
+    pageModels.push(...createFormulaSheetPageModels(title, module, topic));
   }
 
   for (let p = 0; p < worksheetPageCount; p++) {
@@ -1929,7 +2109,11 @@ function paginateQuestions(questions, title, module, includeSolutions, topic, ti
 
   if (includeSolutions) {
     const chartTopics = new Set(['plot-cartesian-plane', 'linear-graphs', 'gradient', 'box-plots', 'cumulative-frequency', 'stem-and-leaf', 'histograms', 'dot-plots', 'scatter-plots', 'frequency-distributions', 'draw-charts', 'distributions']);
-    const solutionsPerPage = topic === 'sudoku' ? 1 : chartTopics.has(topic) ? 2 : 20;
+    const solutionsPerPage = topic === 'sudoku'
+      ? 1
+      : chartTopics.has(topic)
+        ? 2
+        : 20;
     const solutionPageCount = Math.ceil(questions.length / solutionsPerPage);
     for (let p = 0; p < solutionPageCount; p++) {
       const slice = questions.slice(p * solutionsPerPage, (p + 1) * solutionsPerPage);
@@ -1951,7 +2135,18 @@ function paginateQuestions(questions, title, module, includeSolutions, topic, ti
     }
 
     if (pageModel.type === 'formula-sheet') {
-      return buildUnitConversionFormulaSheetHTML(pageModel.title, pageModel.module, pageModel.topic, index + 1, totalPages);
+      return buildStructuredFormulaSheetHTML({
+        title: pageModel.title,
+        module: pageModel.module,
+        topic: pageModel.topic,
+        groups: pageModel.groups || getTopicFormulaGroups(pageModel.module, pageModel.topic, []),
+        instructions: pageModel.instructions || getFormulaSheetInstructions(pageModel.module, pageModel.topic),
+        examples: pageModel.examples || getFormulaSheetExamples(pageModel.module, pageModel.topic),
+        pageNum: index + 1,
+        totalPages,
+        showHeaderInfo: true,
+        includeModuleHeader: true,
+      });
     }
 
     if (pageModel.type === 'solutions') {
@@ -2063,32 +2258,422 @@ function buildUnitConversionFormulaSheetHTML(title, module, topic, pageNum, tota
   ];
 
   const formulaGroups = getTopicFormulaGroups(module, topic, conversionGroups);
+  return buildStructuredFormulaSheetHTML({
+    title: `${moduleLabel(module)} Formula Sheet`,
+    module,
+    topic,
+    groups: formulaGroups,
+    pageNum,
+    totalPages,
+    showHeaderInfo: true,
+    includeModuleHeader: false,
+  });
+}
 
-  const groupsHTML = formulaGroups.map((group) => `
+function getFormulaSheetInstructions(module, topic) {
+  const instructionMap = {
+    arithmetic: [
+      'Read the question and identify the operation needed.',
+      'Use the correct order of operations: brackets, powers, multiplication/division, then addition/subtraction.',
+      'Write the working clearly and simplify the final answer.',
+      'Check your answer by estimating or substituting back into the original problem.'
+    ],
+    fractions: [
+      'Convert to a common denominator before adding or subtracting fractions.',
+      'Keep the answer in simplest form whenever possible.',
+      'For division, flip the second fraction and multiply.',
+      'Check whether the question asks for a mixed number or an improper fraction.'
+    ],
+    decimals: [
+      'Line up decimal points when adding or subtracting.',
+      'Count the total number of decimal places when multiplying.',
+      'Use place value to estimate whether the answer is reasonable.',
+      'Keep working neat so you do not lose a decimal place.'
+    ],
+    percentages: [
+      'Convert the percentage to a decimal or fraction before calculating.',
+      'Find the percentage of a quantity by multiplying by the rate.',
+      'For percentage increase or decrease, apply the change to the original amount.',
+      'Check the answer is reasonable compared with the original value.'
+    ],
+    algebra: [
+      'Write the formula or rule before substituting values.',
+      'Simplify one step at a time and keep both sides balanced.',
+      'Collect like terms carefully before solving.',
+      'Check the final answer by substitution.'
+    ],
+    geometry: [
+      'Identify the correct formula for the shape or measurement.',
+      'Use the right units and substitute values carefully.',
+      'Show all steps in your working where possible.',
+      'Check whether a diagram or angle fact applies before solving.'
+    ],
+    measurement: [
+      'Convert units before calculating when the question mixes them.',
+      'Use the correct dimension formula for area, perimeter, or volume.',
+      'Write the units in every final answer.',
+      'Check whether the shape is composite or requires multiple steps.'
+    ],
+    statistics: [
+      'Identify the data feature being asked for before choosing a formula.',
+      'Use the correct average or spread measure for the data type.',
+      'Label tables, plots, and axes clearly.',
+      'Interpret the result in words where appropriate.'
+    ],
+    trigonometry: [
+      'Label the triangle sides before choosing the trigonometric ratio.',
+      'Use SOH CAH TOA for right-angled triangles.',
+      'Use the appropriate rule and round only at the end.',
+      'Check whether the question asks for an angle or a side length.'
+    ],
+    probability: [
+      'Count all possible outcomes before calculating probability.',
+      'Use the correct formula for a single event, union, or conditional probability.',
+      'Keep the numerator and denominator in the same units or context.',
+      'Check that the final probability is between 0 and 1.'
+    ],
+    functions: [
+      'Substitute the input value carefully into the rule.',
+      'Interpret the result in context, especially for graphs and transformations.',
+      'Track domain restrictions and intercepts.',
+      'Read the question to decide whether a formula, graph, or table is needed.'
+    ],
+    calculus: [
+      'Differentiate or integrate the function carefully by term.',
+      'Check the power or coefficient rules before simplifying.',
+      'Use the derivative or integral to answer the question asked.',
+      'Verify the result using context or a quick estimate.'
+    ],
+    matrices: [
+      'Check the matrix dimensions before performing an operation.',
+      'Add or subtract corresponding entries only when dimensions match.',
+      'For multiplication, use row-by-column multiplication.',
+      'Check the determinant before finding the inverse of a matrix.'
+    ],
+    networks: [
+      'Identify whether the task is about paths, trees, flow, or scheduling.',
+      'Use edge weights and vertex connections carefully.',
+      'Check the objective: shortest route, minimal total cost, or maximum flow.',
+      'A diagram often reveals the rule needed for the solution.'
+    ]
+  };
+
+  const topicInstructionMap = {
+    'add-fractions': ['Check whether the denominators are the same.', 'If not, rewrite each fraction with a common denominator.', 'Add the numerators and keep the denominator the same.', 'Simplify the answer and convert to a mixed number if needed.'],
+    'subtract-fractions': ['Check whether the denominators are the same.', 'If not, rewrite each fraction with a common denominator.', 'Subtract the numerators and keep the denominator the same.', 'Simplify the answer where possible.'],
+    'multiply-fractions': ['Multiply the numerators together.', 'Multiply the denominators together.', 'Simplify the answer — cancelling common factors first makes this easier.'],
+    'divide-fractions': ['Keep the first fraction the same.', 'Flip the second fraction (find its reciprocal) and change ÷ to ×.', 'Multiply the fractions and simplify the result.'],
+    'fraction-of-quantity': ['Divide the quantity by the denominator.', 'Multiply the result by the numerator.', 'Include the units in your final answer.'],
+    'equivalent-fractions': ['Work out what the numerator or denominator was multiplied by.', 'Apply the same multiplication or division to the other part.', 'Check both fractions represent the same amount.'],
+    'decimal-operations': ['Line up the decimal points for addition and subtraction.', 'For multiplication, multiply as whole numbers, then count the total decimal places.', 'For division, move both decimal points so the divisor is a whole number.'],
+    'percentage-of-amount': ['Write the percentage as a decimal by dividing by 100.', 'Multiply the decimal by the amount.', 'Include units such as $ or cm in the answer.'],
+    'percentage-increase': ['Find the percentage of the original amount.', 'Add the increase to the original amount.', 'Shortcut: multiply the original by (1 + rate ÷ 100).'],
+    'percentage-decrease': ['Find the percentage of the original amount.', 'Subtract the decrease from the original amount.', 'Shortcut: multiply the original by (1 − rate ÷ 100).'],
+    'unit-conversions': ['Identify the starting unit and the target unit.', 'Choose the correct conversion factor.', 'Multiply when converting to a smaller unit; divide when converting to a larger unit.', 'Write the answer with the new unit.'],
+    'measurement-conversions': ['Identify the starting unit and the target unit.', 'Choose the correct conversion factor.', 'Multiply when converting to a smaller unit; divide when converting to a larger unit.', 'Write the answer with the new unit.'],
+    'elapsed-time': ['Note the start and finish times.', 'Count up to the next whole hour first.', 'Add the remaining minutes and combine the parts.'],
+    'analogue-clocks': ['Read the short hour hand first.', 'Read the long minute hand: each number equals 5 minutes.', 'Write the time in words or digits as asked.'],
+    mean: ['Add all the values together.', 'Count how many values there are.', 'Divide the total by the count.'],
+    median: ['Order the values from smallest to largest.', 'Choose the middle value.', 'If there are two middle values, find their average.'],
+    mode: ['Count how often each value occurs.', 'The most frequent value is the mode.', 'A data set can have no mode or more than one mode.'],
+    range: ['Identify the largest and smallest values.', 'Subtract: range = largest − smallest.'],
+    'rounding-estimation': ['Identify the place you are rounding to.', 'Look at the digit immediately to its right.', 'Round up if that digit is 5 or more; otherwise keep the digit the same.'],
+    factors: ['Test numbers in pairs starting from 1.', 'A number is a factor if it divides exactly with no remainder.', 'List every pair once.'],
+    multiples: ['Multiply the number by 1, 2, 3 and so on.', 'Each result is a multiple of the number.'],
+    'prime-numbers': ['Check whether any number other than 1 and the number itself divides it exactly.', 'If none do, the number is prime.'],
+    bodmas: ['Work out brackets first.', 'Then orders (powers and roots).', 'Then multiplication and division from left to right.', 'Finally addition and subtraction from left to right.'],
+    'word-problems': ['Read the problem twice and highlight the numbers.', 'Decide which operation the story needs.', 'Write a number sentence and solve it.', 'Answer in a sentence with units.'],
+    'linear-equations': ['Simplify each side if needed.', 'Undo addition or subtraction on both sides.', 'Undo multiplication or division on both sides.', 'Check by substituting the solution back.'],
+    'multi-step-linear-equations': ['Simplify each side if needed.', 'Undo addition or subtraction on both sides.', 'Undo multiplication or division on both sides.', 'Check by substituting the solution back.'],
+    'expanding-expressions': ['Multiply the term outside by each term inside the brackets.', 'Collect any like terms.', 'Check the signs carefully.'],
+    factorisation: ['Look for the highest common factor first.', 'Write the expression as a product of factors.', 'Expand your answer to check it matches.'],
+    quadratics: ['Set the equation equal to zero.', 'Factorise, or apply the quadratic formula.', 'Write all solutions and check by substitution.'],
+    pythagoras: ['Identify the hypotenuse (the side opposite the right angle).', 'Substitute into a² + b² = c².', 'Solve for the unknown side and take the square root.'],
+    'right-angle-trigonometry': ['Label opposite, adjacent and hypotenuse relative to the angle.', 'Choose sin, cos or tan using SOH CAH TOA.', 'Substitute the known values and solve.', 'Include units or round as directed.'],
+    'sine-rule': ['Match each side with its opposite angle.', 'Substitute the known angle–side pair into a/sin A = b/sin B.', 'Solve for the unknown side or angle.'],
+    'cosine-rule': ['Identify the two known sides and the included angle (or three known sides).', 'Substitute into c² = a² + b² − 2ab cos C.', 'Take the square root for a side, or solve for cos C for an angle.'],
+    area: ['Identify the shape and choose the correct area formula.', 'Substitute the dimensions.', 'Give the answer in square units, e.g. cm².'],
+    perimeter: ['Add the lengths of every side.', 'Give the answer in length units, e.g. cm.'],
+    volume: ['Identify the solid and choose the correct volume formula.', 'Substitute the dimensions.', 'Give the answer in cubic units, e.g. cm³.'],
+    'simple-interest': ['Write I = Prt with the rate as a decimal.', 'Substitute the principal, rate and time in years.', 'Calculate and add the correct units.'],
+    'compound-interest': ['Write A = P(1 + i)ⁿ.', 'Convert the rate to a decimal and count the periods.', 'Evaluate, rounding money to two decimal places.'],
+    'matrix-multiplication': ['Check that the inner dimensions match.', 'Multiply each row of the first matrix by each column of the second.', 'Add the products to form each entry.'],
+    differentiation: ['Apply the power rule to each term: multiply by the power, then reduce the power by 1.', 'Constants differentiate to zero.', 'Simplify the resulting expression.'],
+    integration: ['Increase each power by 1 and divide by the new power.', 'For a definite integral, evaluate at the limits and subtract.', 'Include + C for indefinite integrals.'],
+    'dividing-in-a-ratio': ['Add the ratio parts to find the total number of parts.', 'Divide the total quantity by the total parts to find one part.', 'Multiply one part by each number in the ratio.'],
+    'simple-probability': ['Count the favourable outcomes.', 'Count the total possible outcomes.', 'Write probability = favourable ÷ total and simplify.'],
+  };
+
+  if (topicInstructionMap[topic]) return topicInstructionMap[topic];
+  if (instructionMap[module]) return instructionMap[module];
+  return [
+    'Read the question carefully and identify the key information.',
+    'Write the correct formula before substituting values.',
+    'Complete each step in order and keep your working clear.',
+    'Check the units and reasonableness of the final answer.'
+  ];
+}
+
+function getFormulaSheetExamples(module, topic) {
+  const exampleMap = {
+    arithmetic: [
+      { label: 'Order of operations', problem: 'Evaluate 12 − 4 × 2.', steps: ['Multiply first: 4 × 2 = 8.', 'Then subtract: 12 − 8 = 4.'], answer: '4' },
+      { label: 'Compensation strategy', problem: 'Calculate 98 + 47 mentally.', steps: ['Add 50 instead of 47: 98 + 50 = 148.', 'Correct by 3: 148 − 3 = 145.'], answer: '145' }
+    ],
+    fractions: [
+      { label: 'Adding fractions', problem: 'Calculate 1/3 + 1/6.', steps: ['Use a common denominator: 6.', '1/3 = 2/6, so 2/6 + 1/6 = 3/6.', 'Simplify: 3/6 = 1/2.'], answer: '1/2' },
+      { label: 'Dividing fractions', problem: 'Calculate 2/3 ÷ 1/2.', steps: ['Flip the second fraction: 2/3 × 2/1.', 'Multiply: 4/3.', 'Convert: 4/3 = 1 1/3.'], answer: '1 1/3' }
+    ],
+    decimals: [
+      { label: 'Adding decimals', problem: 'Calculate 3.2 + 1.75.', steps: ['Line up the decimal points: 3.20 + 1.75.', 'Add column by column: 4.95.'], answer: '4.95' },
+      { label: 'Multiplying decimals', problem: 'Calculate 0.4 × 0.5.', steps: ['Multiply as whole numbers: 4 × 5 = 20.', 'Place 2 decimal places: 0.20.'], answer: '0.2' }
+    ],
+    percentages: [
+      { label: 'Percentage of an amount', problem: 'Find 20% of 80.', steps: ['Convert: 20% = 0.20.', 'Multiply: 0.20 × 80 = 16.'], answer: '16' },
+      { label: 'Percentage increase', problem: 'Increase 60 by 25%.', steps: ['Find 25% of 60: 0.25 × 60 = 15.', 'Add: 60 + 15 = 75.'], answer: '75' }
+    ],
+    algebra: [
+      { label: 'Substitution', problem: 'If x = 3, find the value of 2x + 5.', steps: ['Replace x with 3: 2(3) + 5.', 'Calculate: 6 + 5 = 11.'], answer: '11' },
+      { label: 'Solving an equation', problem: 'Solve 3x − 7 = 11.', steps: ['Add 7 to both sides: 3x = 18.', 'Divide both sides by 3.'], answer: 'x = 6' }
+    ],
+    geometry: [
+      { label: 'Angle sum of a triangle', problem: 'Two angles of a triangle are 50° and 70°. Find the third angle.', steps: ['Triangle angles sum to 180°.', '180 − 50 − 70 = 60.'], answer: '60°' },
+      { label: 'Area of a circle', problem: 'Find the area of a circle with radius 3.', steps: ['A = πr².', 'A = π × 9 ≈ 28.27.'], answer: '≈ 28.27 units²' }
+    ],
+    measurement: [
+      { label: 'Area of a rectangle', problem: 'Find the area of a rectangle 8 cm by 5 cm.', steps: ['A = length × width.', 'A = 8 × 5.'], answer: '40 cm²' },
+      { label: 'Volume of a prism', problem: 'Find the volume of a prism 4 × 3 × 2.', steps: ['V = length × width × height.', 'V = 4 × 3 × 2.'], answer: '24 units³' }
+    ],
+    money: [
+      { label: 'Adding money', problem: 'Add $12.50 and $7.85.', steps: ['Line up the decimal points.', '12.50 + 7.85 = 20.35.'], answer: '$20.35' },
+      { label: 'Making change', problem: 'An item costs $14.20 and you pay with $20.', steps: ['Change = amount paid − cost.', '20.00 − 14.20 = 5.80.'], answer: '$5.80' }
+    ],
+    number: [
+      { label: 'Finding factors', problem: 'List the factors of 12.', steps: ['Test pairs: 1×12, 2×6, 3×4.', 'List each factor once.'], answer: '1, 2, 3, 4, 6, 12' },
+      { label: 'Identifying primes', problem: 'Is 13 a prime number?', steps: ['Test divisors 2 and 3 (up to √13 ≈ 3.6).', 'Neither divides 13 exactly.'], answer: 'Yes, 13 is prime' }
+    ],
+    ratio: [
+      { label: 'Simplifying a ratio', problem: 'Simplify the ratio 12 : 18.', steps: ['The GCD of 12 and 18 is 6.', 'Divide both parts by 6.'], answer: '2 : 3' },
+      { label: 'Using proportion', problem: 'If 2 : 5 = x : 20, find x.', steps: ['Cross-multiply: 5x = 2 × 20 = 40.', 'Divide by 5: x = 8.'], answer: 'x = 8' }
+    ],
+    statistics: [
+      { label: 'Mean', problem: 'Find the mean of 6, 8 and 10.', steps: ['Sum: 6 + 8 + 10 = 24.', 'Divide by the count: 24 ÷ 3.'], answer: '8' },
+      { label: 'Median', problem: 'Find the median of 9, 2, 7, 4, 5.', steps: ['Order: 2, 4, 5, 7, 9.', 'The middle value is the median.'], answer: '5' }
+    ],
+    trigonometry: [
+      { label: 'Finding a side', problem: 'θ = 30° and the hypotenuse is 10. Find the opposite side.', steps: ['Use sin θ = opposite ÷ hypotenuse.', 'Opposite = 10 × sin 30° = 5.'], answer: '5' },
+      { label: 'Finding an angle', problem: 'Opposite = 4 and adjacent = 4. Find θ.', steps: ['tan θ = 4 ÷ 4 = 1.', 'θ = tan⁻¹(1).'], answer: '45°' }
+    ],
+    probability: [
+      { label: 'Simple probability', problem: 'What is the probability of rolling a 4 on a fair die?', steps: ['Favourable outcomes = 1 (the face 4).', 'Total outcomes = 6.'], answer: '1/6' },
+      { label: 'Complement', problem: 'P(rain) = 0.3. Find P(no rain).', steps: ['P(no rain) = 1 − P(rain).', '1 − 0.3 = 0.7.'], answer: '0.7' }
+    ],
+    functions: [
+      { label: 'Evaluating a function', problem: 'If f(x) = 2x + 1, find f(3).', steps: ['Substitute: f(3) = 2(3) + 1.', 'Calculate: 6 + 1 = 7.'], answer: '7' },
+      { label: 'Vertical shift', problem: 'Describe the transformation from f(x) to f(x) + 3.', steps: ['Adding outside the function shifts the graph vertically.', 'Positive 3 moves every point up.'], answer: 'Shift up 3 units' }
+    ],
+    calculus: [
+      { label: 'Derivative', problem: 'Differentiate y = x³.', steps: ['Apply the power rule: d/dx(xⁿ) = nxⁿ⁻¹.', 'n = 3: multiply by 3, reduce the power to 2.'], answer: 'dy/dx = 3x²' },
+      { label: 'Integral', problem: 'Find ∫ x² dx.', steps: ['Increase the power: x³.', 'Divide by the new power and add C.'], answer: 'x³/3 + C' }
+    ],
+    matrices: [
+      { label: 'Adding matrices', problem: 'Add [[1, 2], [3, 4]] and [[5, 6], [7, 8]].', steps: ['Add the entries in matching positions.', 'Top-left: 1 + 5 = 6, and so on.'], answer: '[[6, 8], [10, 12]]' },
+      { label: 'Scalar multiplication', problem: 'Calculate 2 × [[1, 3], [0, 5]].', steps: ['Multiply every entry by 2.'], answer: '[[2, 6], [0, 10]]' }
+    ],
+    networks: [
+      { label: 'Shortest path', problem: 'Route A→B→D has weights 4 + 6; route A→C→D has weights 7 + 5. Find the shortest path.', steps: ['Total each route: 10 and 12.', 'Choose the smaller total.'], answer: 'A→B→D = 10' },
+      { label: 'Euler’s formula', problem: 'A connected planar graph has 6 vertices and 9 edges. Find the number of faces.', steps: ['v − e + f = 2.', '6 − 9 + f = 2, so f = 5.'], answer: '5 faces' }
+    ]
+  };
+
+  const topicExampleMap = {
+    'add-fractions': [{ label: 'Adding with different denominators', problem: 'Calculate 1/4 + 2/3.', steps: ['Find a common denominator: 12.', 'Rewrite: 1/4 = 3/12 and 2/3 = 8/12.', 'Add the numerators: 3/12 + 8/12 = 11/12.'], answer: '11/12' }],
+    'subtract-fractions': [{ label: 'Subtracting with different denominators', problem: 'Calculate 5/6 − 1/4.', steps: ['Find a common denominator: 12.', 'Rewrite: 5/6 = 10/12 and 1/4 = 3/12.', 'Subtract the numerators: 10/12 − 3/12 = 7/12.'], answer: '7/12' }],
+    'multiply-fractions': [{ label: 'Multiplying fractions', problem: 'Calculate 2/3 × 3/5.', steps: ['Multiply the numerators: 2 × 3 = 6.', 'Multiply the denominators: 3 × 5 = 15.', 'Simplify: 6/15 = 2/5.'], answer: '2/5' }],
+    'divide-fractions': [{ label: 'Dividing fractions', problem: 'Calculate 3/4 ÷ 1/2.', steps: ['Keep the first fraction: 3/4.', 'Flip the second and multiply: 3/4 × 2/1.', 'Multiply: 6/4 = 3/2.'], answer: '3/2 (= 1½)' }],
+    'fraction-of-quantity': [{ label: 'Fraction of a quantity', problem: 'Find 3/4 of 24.', steps: ['Divide by the denominator: 24 ÷ 4 = 6.', 'Multiply by the numerator: 6 × 3 = 18.'], answer: '18' }],
+    'equivalent-fractions': [{ label: 'Making an equivalent fraction', problem: 'Write 2/3 as an equivalent fraction with denominator 12.', steps: ['12 ÷ 3 = 4, so the denominator was multiplied by 4.', 'Multiply the numerator by 4 as well: 2 × 4 = 8.'], answer: '8/12' }],
+    'percentage-of-amount': [{ label: 'Percentage of an amount', problem: 'Find 35% of $240.', steps: ['Convert: 35% = 0.35.', 'Multiply: 0.35 × 240 = 84.'], answer: '$84' }],
+    'percentage-increase': [{ label: 'Percentage increase', problem: 'Increase 80 kg by 15%.', steps: ['Find 15% of 80: 0.15 × 80 = 12.', 'Add the increase: 80 + 12 = 92.'], answer: '92 kg' }],
+    'percentage-decrease': [{ label: 'Percentage decrease', problem: 'Decrease $60 by 25%.', steps: ['Find 25% of 60: 0.25 × 60 = 15.', 'Subtract the decrease: 60 − 15 = 45.'], answer: '$45' }],
+    'unit-conversions': [{ label: 'Converting to a smaller unit', problem: 'Convert 3.5 km to metres.', steps: ['Conversion factor: 1 km = 1000 m.', 'Metres are smaller, so multiply: 3.5 × 1000 = 3500.'], answer: '3500 m' }],
+    'measurement-conversions': [{ label: 'Converting metres to centimetres', problem: 'Convert 2.4 m to centimetres.', steps: ['Conversion factor: 1 m = 100 cm.', 'Centimetres are smaller, so multiply: 2.4 × 100 = 240.'], answer: '240 cm' }],
+    bodmas: [{ label: 'Order of operations', problem: 'Evaluate 5 + 3 × 2.', steps: ['Multiplication before addition: 3 × 2 = 6.', 'Then add: 5 + 6 = 11.'], answer: '11' }],
+    mean: [{ label: 'Finding the mean', problem: 'Find the mean of 4, 7 and 9.', steps: ['Add the values: 4 + 7 + 9 = 20.', 'Count the values: 3.', 'Divide: 20 ÷ 3 ≈ 6.7.'], answer: '≈ 6.7' }],
+    median: [{ label: 'Finding the median', problem: 'Find the median of 8, 3, 9, 4, 7.', steps: ['Order the data: 3, 4, 7, 8, 9.', 'The middle value is the 3rd one.'], answer: '7' }],
+    mode: [{ label: 'Finding the mode', problem: 'Find the mode of 2, 5, 5, 3, 5, 2.', steps: ['Count each value: 2 appears twice, 3 once, 5 three times.', 'The most frequent value is the mode.'], answer: '5' }],
+    range: [{ label: 'Finding the range', problem: 'Find the range of 12, 4, 19, 7.', steps: ['Largest = 19, smallest = 4.', 'Range = 19 − 4 = 15.'], answer: '15' }],
+    'rounding-estimation': [{ label: 'Rounding to the nearest hundred', problem: 'Round 467 to the nearest 100.', steps: ['The hundreds digit is 4; look at the tens digit: 6.', '6 is 5 or more, so round the 4 up to 5.'], answer: '500' }],
+    'linear-equations': [{ label: 'Solving a linear equation', problem: 'Solve 3x − 7 = 11.', steps: ['Add 7 to both sides: 3x = 18.', 'Divide both sides by 3: x = 6.', 'Check: 3(6) − 7 = 11 ✓.'], answer: 'x = 6' }],
+    'multi-step-linear-equations': [{ label: 'Solving a two-step equation', problem: 'Solve 4x + 5 = 25.', steps: ['Subtract 5 from both sides: 4x = 20.', 'Divide both sides by 4: x = 5.', 'Check: 4(5) + 5 = 25 ✓.'], answer: 'x = 5' }],
+    pythagoras: [{ label: 'Finding the hypotenuse', problem: 'A right triangle has legs 6 and 8. Find the hypotenuse c.', steps: ['c² = a² + b² = 6² + 8².', 'c² = 36 + 64 = 100.', 'c = √100 = 10.'], answer: 'c = 10' }],
+    'right-angle-trigonometry': [{ label: 'Finding an opposite side', problem: 'θ = 30° and the hypotenuse is 10. Find the side opposite θ.', steps: ['Opposite and hypotenuse are involved, so use sin.', 'sin 30° = opposite ÷ 10.', 'Opposite = 10 × sin 30° = 10 × 0.5.'], answer: '5' }],
+    area: [{ label: 'Area of a triangle', problem: 'Find the area of a triangle with base 10 cm and height 6 cm.', steps: ['A = ½ × base × height.', 'A = ½ × 10 × 6.', 'A = 30.'], answer: '30 cm²' }],
+    perimeter: [{ label: 'Perimeter of a rectangle', problem: 'Find the perimeter of a rectangle 8 cm long and 5 cm wide.', steps: ['P = 2(length + width).', 'P = 2(8 + 5) = 2 × 13.'], answer: '26 cm' }],
+    volume: [{ label: 'Volume of a rectangular prism', problem: 'Find the volume of a prism measuring 4 × 3 × 2.', steps: ['V = length × width × height.', 'V = 4 × 3 × 2.'], answer: '24 units³' }],
+    'simple-interest': [{ label: 'Simple interest', problem: 'Find the simple interest on $2000 at 5% per year for 3 years.', steps: ['I = P × r × t.', 'I = 2000 × 0.05 × 3.', 'I = 300.'], answer: '$300' }],
+    'compound-interest': [{ label: 'Compound interest', problem: 'Find the value of $2000 invested at 5% per year, compounded annually for 3 years.', steps: ['A = P(1 + i)ⁿ.', 'A = 2000 × (1.05)³.', 'A = 2000 × 1.157625 ≈ 2315.25.'], answer: '$2315.25' }],
+    quadratics: [{ label: 'Solving a quadratic by factorising', problem: 'Solve x² − 7x + 12 = 0.', steps: ['Find two numbers that multiply to 12 and add to −7: −3 and −4.', 'Factorise: (x − 3)(x − 4) = 0.', 'Set each factor equal to zero.'], answer: 'x = 3 or x = 4' }],
+    gradient: [{ label: 'Gradient between two points', problem: 'Find the gradient of the line through (1, 2) and (5, 10).', steps: ['Rise = 10 − 2 = 8.', 'Run = 5 − 1 = 4.', 'Gradient = rise ÷ run = 8 ÷ 4.'], answer: '2' }],
+    'dividing-in-a-ratio': [{ label: 'Dividing in a ratio', problem: 'Share $60 in the ratio 2 : 3.', steps: ['Total parts = 2 + 3 = 5.', 'One part = 60 ÷ 5 = 12.', 'Shares: 2 × 12 = 24 and 3 × 12 = 36.'], answer: '$24 and $36' }],
+    'simple-probability': [{ label: 'Probability of a single event', problem: 'A bag has 3 red and 5 blue counters. Find P(red).', steps: ['Favourable outcomes = 3.', 'Total outcomes = 3 + 5 = 8.', 'P(red) = favourable ÷ total.'], answer: '3/8' }],
+    'elapsed-time': [{ label: 'Elapsed time', problem: 'A movie starts at 2:45 and ends at 4:10. How long is it?', steps: ['2:45 to 3:00 = 15 minutes.', '3:00 to 4:10 = 1 hour 10 minutes.', 'Add the parts: 15 + 70 minutes.'], answer: '1 hour 25 minutes' }],
+    'making-change': [{ label: 'Making change', problem: 'An item costs $13.75 and you pay with $20. Find the change.', steps: ['Change = amount paid − cost.', '20.00 − 13.75 = 6.25.'], answer: '$6.25' }],
+    'times-tables': [{ label: 'Using known facts', problem: 'Use 6 × 7 to find 6 × 70.', steps: ['Recall: 6 × 7 = 42.', '70 is ten times 7, so the product is ten times larger.'], answer: '420' }],
+    'word-problems': [{ label: 'One-step word problem', problem: 'Sam has 17 stickers and buys 8 more. How many does he have now?', steps: ['“More” means addition: 17 + 8.', 'Calculate: 17 + 8 = 25.'], answer: '25 stickers' }],
+    'factorisation': [{ label: 'Taking out a common factor', problem: 'Factorise 6x + 12.', steps: ['The highest common factor of 6x and 12 is 6.', 'Write 6 outside the bracket: 6(? + ?).', 'Divide each term by 6: x and 2.'], answer: '6(x + 2)' }],
+    'expanding-expressions': [{ label: 'Expanding brackets', problem: 'Expand 3(x + 4).', steps: ['Multiply 3 by each term inside the brackets.', '3 × x = 3x and 3 × 4 = 12.'], answer: '3x + 12' }],
+  };
+
+  if (topicExampleMap[topic]) return topicExampleMap[topic];
+  if (exampleMap[module]) return exampleMap[module];
+  if (exampleMap[topic]) return exampleMap[topic];
+
+  return [
+    { label: 'Applying the rule', problem: 'Work through a typical question from this topic.', steps: ['Write down the correct rule or formula first.', 'Substitute the known values carefully.', 'Simplify to find the answer.'] },
+    { label: 'Checking your answer', problem: 'Confirm a result before moving on.', steps: ['Estimate what a reasonable answer would be.', 'Compare it with your calculated result.', 'Use the inverse operation or substitution to verify.'] }
+  ];
+}
+
+function createFormulaSheetPageModels(title, module, topic) {
+  const groups = getTopicFormulaGroups(module, topic, []);
+  const instructions = getFormulaSheetInstructions(module, topic);
+  const examples = getFormulaSheetExamples(module, topic);
+  const maxGroupsPerPage = 4;
+
+  if (groups.length <= maxGroupsPerPage && instructions.length <= 5 && examples.length <= 3) {
+    return [{
+      type: 'formula-sheet',
+      title,
+      module,
+      topic,
+      groups,
+      instructions,
+      examples,
+    }];
+  }
+
+  const pageGroups = [];
+  for (let index = 0; index < groups.length; index += maxGroupsPerPage) {
+    pageGroups.push(groups.slice(index, index + maxGroupsPerPage));
+  }
+
+  return pageGroups.map((groupChunk, chunkIndex) => ({
+    type: 'formula-sheet',
+    title,
+    module,
+    topic,
+    groups: groupChunk,
+    instructions: chunkIndex === 0 ? instructions : [],
+    examples: chunkIndex === pageGroups.length - 1 ? examples : [],
+  }));
+}
+
+function buildStructuredFormulaSheetHTML({ title, module, topic, groups, instructions, examples, pageNum, totalPages, showHeaderInfo = true, includeModuleHeader = true }) {
+  const safeInstructions = instructions || getFormulaSheetInstructions(module, topic);
+  const safeExamples = examples || getFormulaSheetExamples(module, topic);
+  const topicName = topic ? topicLabel(topic).replace(/ Practice$/, '') : moduleLabel(module);
+
+  const groupsHTML = groups.map((group) => `
     <section class="conversion-formula-group">
-      <h3>${group.heading}</h3>
-      <ul>${group.rules.map((rule) => `<li>${rule}</li>`).join('')}</ul>
+      <h3>${escapeHtml(group.heading)}</h3>
+      <ul>${group.rules.map((rule) => `<li>${escapeHtml(rule)}</li>`).join('')}</ul>
     </section>`).join('');
+
+  const infoStrip = showHeaderInfo ? `
+    <div class="worksheet-info-strip">
+      ${buildInfoStripItem('book', 'Module', moduleLabel(module))}
+      ${buildInfoStripItem('clipboard', 'Topic', topicName)}
+      ${buildInfoStripBlankItem('calendar', 'Date', 'date')}
+    </div>` : '';
+
+  const sectionHead = (num, label) => `
+    <div class="fs-section-head">
+      <span class="fs-section-num" aria-hidden="true">${num}</span>
+      <h3>${escapeHtml(label)}</h3>
+    </div>`;
+
+  const exampleCards = safeExamples.map((example, exampleIndex) => {
+    const steps = Array.isArray(example.steps) && example.steps.length
+      ? example.steps
+      : [example.text || ''].filter(Boolean);
+    const stepList = steps.map((step, index) => `
+      <li class="formula-sheet-example-step">
+        <span class="formula-sheet-example-step-number">${index + 1}</span>
+        <span class="formula-sheet-example-step-text">${escapeHtml(step)}</span>
+      </li>
+    `).join('');
+
+    return `
+      <article class="formula-sheet-example">
+        <div class="fs-example-head">
+          <span class="fs-example-tag">Example ${exampleIndex + 1}</span>
+          <strong>${escapeHtml(example.label)}</strong>
+        </div>
+        ${example.problem ? `<p class="fs-example-problem">${escapeHtml(example.problem)}</p>` : ''}
+        <ol class="formula-sheet-example-steps">${stepList}</ol>
+        ${example.answer ? `
+          <div class="formula-sheet-example-answer">
+            <span class="fs-answer-label">Answer</span>
+            <span class="fs-answer-value">${escapeHtml(example.answer)}</span>
+          </div>
+        ` : ''}
+      </article>
+    `;
+  }).join('');
 
   return `
     <div class="a4-page conversion-formula-page">
       <div class="worksheet-header">
-        ${buildWorksheetHeaderBrandHTML(title, module)}
-        <div class="worksheet-info-strip">
-          ${buildInfoStripItem('book', 'Module', moduleLabel(module))}
-          ${buildInfoStripItem('clipboard', 'Topic', topicLabel(topic).replace(/ Practice$/, ''))}
-          ${buildInfoStripBlankItem('calendar', 'Date', 'date')}
-        </div>
+        ${buildWorksheetHeaderBrandHTML(includeModuleHeader ? title : '', module)}
+        ${infoStrip}
       </div>
       <div class="conversion-formula-content">
-        <h2>${escapeHtml(moduleLabel(module))} Formula Sheet</h2>
-        <div class="conversion-formula-grid">${groupsHTML}</div>
+        <div class="formula-sheet-titleblock">
+          <h2>${escapeHtml(title)}</h2>
+          <p class="formula-sheet-subtitle">Reference guide &amp; worked examples</p>
+        </div>
+
+        ${safeInstructions.length ? `
+          <section class="fs-section fs-instructions">
+            ${sectionHead(1, 'How to approach these questions')}
+            <ol class="fs-step-list">${safeInstructions.map((step) => `<li>${escapeHtml(step)}</li>`).join('')}</ol>
+          </section>
+        ` : ''}
+
+        <section class="fs-section fs-formulas">
+          ${sectionHead(2, 'Key formulas & rules')}
+          <div class="conversion-formula-grid">${groupsHTML}</div>
+        </section>
+
+        ${safeExamples.length ? `
+          <section class="fs-section fs-examples">
+            ${sectionHead(3, 'Worked examples')}
+            <div class="formula-sheet-example-list">${exampleCards}</div>
+          </section>
+        ` : ''}
       </div>
       <div class="page-footer">
         <div class="page-footer-left">${buildFooterLegalHTML()}</div>
         <span class="page-footer-right">Page ${pageNum} of ${totalPages}</span>
       </div>
     </div>`;
+}
+
+function buildFormulaSheetHTML(module, topic = '') {
+  const groups = topic ? getTopicFormulaGroups(module, topic, []) : (FORMULA_SHEETS[module] || []);
+  const sheetTitle = topic ? `${moduleLabel(module)} - ${topicLabel(topic).replace(/ Practice$/, '')}` : moduleLabel(module);
+
+  return buildStructuredFormulaSheetHTML({
+    title: `${sheetTitle} - Key Formulas & Terms`,
+    module,
+    topic,
+    groups,
+    pageNum: 1,
+    totalPages: 1,
+    showHeaderInfo: true,
+    includeModuleHeader: true,
+  });
 }
 
 function getQuestionsPerPage(questions, topic = '', mixedQuestionsPerPage = 6, graphQuestionsPerPage = 2) {
@@ -2130,6 +2715,10 @@ function getQuestionsPerPage(questions, topic = '', mixedQuestionsPerPage = 6, g
     return 4;
   }
 
+  if (topic === 'advanced-probability') {
+    return 6;
+  }
+
   if (magicSquareOnly) {
     return 4;
   }
@@ -2143,6 +2732,10 @@ function getQuestionsPerPage(questions, topic = '', mixedQuestionsPerPage = 6, g
   }
 
   if (fractionOnly) {
+    return 8;
+  }
+
+  if (DECIMAL_TOPICS.has(topic) || PERCENTAGE_TOPICS.has(topic)) {
     return 8;
   }
 
@@ -2274,6 +2867,90 @@ function sanitizeFileNamePart(value) {
     .replace(/\s+/g, '_')
     .replace(/_+/g, '_')
     .replace(/^_+|_+$/g, '') || 'worksheet';
+}
+
+function getMissingBulkExportLibraries() {
+  const missing = [];
+  if (typeof JSZip !== 'function') {
+    missing.push('JSZip');
+  }
+  if (typeof html2canvas !== 'function') {
+    missing.push('html2canvas');
+  }
+  if (!window.jspdf || typeof window.jspdf.jsPDF !== 'function') {
+    missing.push('jsPDF');
+  }
+  return missing;
+}
+
+function downloadBlobAsFile(blob, fileName) {
+  if (typeof navigator !== 'undefined' && typeof navigator.msSaveOrOpenBlob === 'function') {
+    navigator.msSaveOrOpenBlob(blob, fileName);
+    return;
+  }
+
+  const anchor = document.createElement('a');
+  const objectUrl = URL.createObjectURL(blob);
+  const canUseDownloadAttr = 'download' in HTMLAnchorElement.prototype;
+
+  anchor.href = objectUrl;
+  if (canUseDownloadAttr) {
+    anchor.download = fileName;
+  } else {
+    anchor.target = '_blank';
+    anchor.rel = 'noopener';
+  }
+
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+
+  // Delay cleanup slightly for stricter webviews where immediate revoke can cancel download.
+  setTimeout(() => URL.revokeObjectURL(objectUrl), 2000);
+}
+
+function isSafeImageSrcForCanvas(src) {
+  if (!src) {
+    return false;
+  }
+
+  const value = String(src).trim();
+  if (!value) {
+    return false;
+  }
+
+  if (value.startsWith('data:') || value.startsWith('blob:')) {
+    return true;
+  }
+
+  try {
+    const parsed = new URL(value, window.location.href);
+    if (parsed.protocol === 'data:' || parsed.protocol === 'blob:') {
+      return true;
+    }
+
+    // On non-http(s) app/file webviews, treat URL-based images as taint risks.
+    if (window.location.protocol !== 'http:' && window.location.protocol !== 'https:') {
+      return false;
+    }
+
+    return parsed.origin === window.location.origin;
+  } catch (error) {
+    return false;
+  }
+}
+
+function stripUnsafeImagesForCanvas(rootEl) {
+  const transparentPixel = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+  const images = rootEl.querySelectorAll('img');
+
+  images.forEach((img) => {
+    const src = img.getAttribute('src') || '';
+    if (!isSafeImageSrcForCanvas(src)) {
+      img.setAttribute('src', transparentPixel);
+      img.setAttribute('data-export-image-stripped', 'true');
+    }
+  });
 }
 
 function buildPageHTML(questions, startIdx, title, module, pageNum, totalPages, topic, timesTable) {
@@ -3085,171 +3762,175 @@ function renderSolutionHTML(question) {
 }
 
 function buildQuestions(topic, min, max, count, timesTable, denominatorMode, magicSquareSize = 3, pythagorasMode = 'hypotenuse', patternMode = 'random', termCount = 2, roundingPlace = 'mixed', matrixDimension = '2x2', matrixOperation = 'addition') {
+  const normalizedRange = normalizeConfiguredRange(min, max);
+  const safeMin = normalizedRange.min;
+  const safeMax = normalizedRange.max;
+  const safeCount = Number.isFinite(count) ? Math.max(1, Math.trunc(count)) : 10;
   const mixedOps = ['addition', 'subtraction', 'multiplication', 'division'];
   const questions = [];
   const seenSignatures = new Set();
 
   if (PRIMARY_ADDITIONAL_TOPICS.has(topic)) {
-    for (let i = 0; i < count; i++) {
-      pushUniqueQuestion(questions, seenSignatures, () => buildPrimaryAdditionalQuestion(topic, min, max, roundingPlace));
+    for (let i = 0; i < safeCount; i++) {
+      pushUniqueQuestion(questions, seenSignatures, () => buildPrimaryAdditionalQuestion(topic, safeMin, safeMax, roundingPlace));
     }
     return questions;
   }
 
   if (ADVANCED_WORKSHEET_TOPICS.has(topic)) {
-    for (let i = 0; i < count; i++) {
-      pushUniqueQuestion(questions, seenSignatures, () => buildAdvancedWorksheetQuestion(topic, pythagorasMode));
+    for (let i = 0; i < safeCount; i++) {
+      pushUniqueQuestion(questions, seenSignatures, () => buildAdvancedWorksheetQuestion(topic, pythagorasMode, safeMin, safeMax));
     }
     return questions;
   }
 
   if (NETWORK_TOPICS.has(topic)) {
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < safeCount; i++) {
       pushUniqueQuestion(questions, seenSignatures, () => buildNetworkQuestion(topic));
     }
     return questions;
   }
 
   if (MATRIX_TOPICS.has(topic)) {
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < safeCount; i++) {
       pushUniqueQuestion(questions, seenSignatures, () => buildMatrixQuestion(topic, matrixDimension, matrixOperation));
     }
     return questions;
   }
 
   if (GEOMETRY_TOPICS.has(topic)) {
-    return buildGeometryQuestions(topic, count);
+    return buildGeometryQuestions(topic, safeCount, safeMin, safeMax);
   }
 
   if (ALGEBRA_TOPICS.has(topic)) {
-    for (let i = 0; i < count; i++) {
-      pushUniqueQuestion(questions, seenSignatures, () => buildAlgebraQuestion(topic, min, max, patternMode));
+    for (let i = 0; i < safeCount; i++) {
+      pushUniqueQuestion(questions, seenSignatures, () => buildAlgebraQuestion(topic, safeMin, safeMax, patternMode));
     }
     return questions;
   }
 
   if (MEASUREMENT_TOPICS.has(topic)) {
-    for (let i = 0; i < count; i++) {
-      pushUniqueQuestion(questions, seenSignatures, () => buildMeasurementQuestion(topic, min, max));
+    for (let i = 0; i < safeCount; i++) {
+      pushUniqueQuestion(questions, seenSignatures, () => buildMeasurementQuestion(topic, safeMin, safeMax));
     }
     return questions;
   }
   if (STATISTICS_TOPICS.has(topic)) {
-    for (let i = 0; i < count; i++) {
-      pushUniqueQuestion(questions, seenSignatures, () => buildStatisticsQuestion(topic, min, max));
+    for (let i = 0; i < safeCount; i++) {
+      pushUniqueQuestion(questions, seenSignatures, () => buildStatisticsQuestion(topic, safeMin, safeMax));
     }
     return questions;
   }
 
   if (TRIGONOMETRY_TOPICS.has(topic)) {
-    for (let i = 0; i < count; i++) {
-      pushUniqueQuestion(questions, seenSignatures, () => buildTrigonometryQuestion(topic, min, max));
+    for (let i = 0; i < safeCount; i++) {
+      pushUniqueQuestion(questions, seenSignatures, () => buildTrigonometryQuestion(topic, safeMin, safeMax));
     }
     return questions;
   }
 
   if (PERCENTAGE_TOPICS.has(topic)) {
-    for (let i = 0; i < count; i++) {
-      pushUniqueQuestion(questions, seenSignatures, () => buildPercentageQuestion(topic));
+    for (let i = 0; i < safeCount; i++) {
+      pushUniqueQuestion(questions, seenSignatures, () => buildPercentageQuestion(topic, safeMin, safeMax));
     }
     return questions;
   }
 
   if (DECIMAL_TOPICS.has(topic)) {
-    for (let i = 0; i < count; i++) {
-      pushUniqueQuestion(questions, seenSignatures, () => buildDecimalQuestion(topic));
+    for (let i = 0; i < safeCount; i++) {
+      pushUniqueQuestion(questions, seenSignatures, () => buildDecimalQuestion(topic, safeMin, safeMax));
     }
     return questions;
   }
 
   if (FRACTION_TOPICS.has(topic)) {
-    for (let i = 0; i < count; i++) {
-      pushUniqueQuestion(questions, seenSignatures, () => buildFractionQuestion(topic, denominatorMode));
+    for (let i = 0; i < safeCount; i++) {
+      pushUniqueQuestion(questions, seenSignatures, () => buildFractionQuestion(topic, denominatorMode, safeMin, safeMax));
     }
     return questions;
   }
 
   if (NUMBER_TOPICS.has(topic)) {
     if (topic === 'sudoku') {
-      for (let i = 0; i < count; i++) {
+      for (let i = 0; i < safeCount; i++) {
         pushUniqueQuestion(questions, seenSignatures, buildSudokuQuestion);
       }
       return questions;
     }
 
     if (topic === 'magic-squares') {
-      for (let i = 0; i < count; i++) {
+      for (let i = 0; i < safeCount; i++) {
         pushUniqueQuestion(questions, seenSignatures, () => buildMagicSquareQuestion(magicSquareSize));
       }
       return questions;
     }
 
-    for (let i = 0; i < count; i++) {
-      pushUniqueQuestion(questions, seenSignatures, () => buildNumberQuestion(topic, min, max, i));
+    for (let i = 0; i < safeCount; i++) {
+      pushUniqueQuestion(questions, seenSignatures, () => buildNumberQuestion(topic, safeMin, safeMax, i));
     }
     return questions;
   }
 
   if (MULTIPLICATION_GROUPING_TOPICS.has(topic)) {
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < safeCount; i++) {
       pushUniqueQuestion(questions, seenSignatures, () => buildMultiplicationGroupingQuestion(topic));
     }
     return questions;
   }
 
   if (WORD_PROBLEM_TOPICS.has(topic)) {
-    for (let i = 0; i < count; i++) {
-      pushUniqueQuestion(questions, seenSignatures, () => buildWordProblemQuestion(min, max));
+    for (let i = 0; i < safeCount; i++) {
+      pushUniqueQuestion(questions, seenSignatures, () => buildWordProblemQuestion(safeMin, safeMax));
     }
     return questions;
   }
 
   if (MONEY_TOPICS.has(topic)) {
-    for (let i = 0; i < count; i++) {
-      pushUniqueQuestion(questions, seenSignatures, () => buildMoneyQuestion(topic, min, max));
+    for (let i = 0; i < safeCount; i++) {
+      pushUniqueQuestion(questions, seenSignatures, () => buildMoneyQuestion(topic, safeMin, safeMax));
     }
     return questions;
   }
 
   if (RATIO_TOPICS.has(topic)) {
-    for (let i = 0; i < count; i++) {
-      pushUniqueQuestion(questions, seenSignatures, () => buildRatioQuestion(topic, min, max));
+    for (let i = 0; i < safeCount; i++) {
+      pushUniqueQuestion(questions, seenSignatures, () => buildRatioQuestion(topic, safeMin, safeMax));
     }
     return questions;
   }
 
-  for (let i = 0; i < count; i++) {
+  for (let i = 0; i < safeCount; i++) {
     pushUniqueQuestion(questions, seenSignatures, () => {
       if (topic === 'times-tables') {
         return { a: timesTable, b: randomInt(1, 12), operation: 'multiplication' };
       }
 
       if (topic === 'bodmas') {
-        return buildBodmasQuestion(min, max);
+        return buildBodmasQuestion(safeMin, safeMax);
       }
 
       let operation, a, b;
       if (topic === 'mixed') {
         operation = mixedOps[randomInt(0, 3)];
         if (['addition', 'subtraction'].includes(operation) && termCount > 2) {
-          return buildMultiTermArithmeticQuestion(operation, min, max, termCount);
+          return buildMultiTermArithmeticQuestion(operation, safeMin, safeMax, termCount);
         }
-        a = randomInt(min, max);
-        b = randomInt(min, max);
+        a = randomInt(safeMin, safeMax);
+        b = randomInt(safeMin, safeMax);
         if (operation === 'subtraction' && a < b) [a, b] = [b, a];
         if (operation === 'division') {
-          ({ a, b } = buildExactDivisionOperands(min, max));
+          ({ a, b } = buildExactDivisionOperands(safeMin, safeMax));
         }
       } else {
         operation = topic;
         if (['addition', 'subtraction'].includes(operation) && termCount > 2) {
-          return buildMultiTermArithmeticQuestion(operation, min, max, termCount);
+          return buildMultiTermArithmeticQuestion(operation, safeMin, safeMax, termCount);
         }
-        a = randomInt(min, max);
-        b = randomInt(min, max);
+        a = randomInt(safeMin, safeMax);
+        b = randomInt(safeMin, safeMax);
         if (operation === 'subtraction' && a < b) [a, b] = [b, a];
         if (operation === 'division') {
-          ({ a, b } = buildExactDivisionOperands(min, max));
+          ({ a, b } = buildExactDivisionOperands(safeMin, safeMax));
         }
       }
 
@@ -3515,10 +4196,15 @@ function buildBodmasQuestion(min, max) {
   }
 }
 
-function buildFractionQuestion(topic, denominatorMode) {
+function buildFractionQuestion(topic, denominatorMode, min, max) {
+  const normalizedRange = normalizeConfiguredRange(min, max, 2, 12);
+  const safeMin = Math.max(2, normalizedRange.min);
+  const safeMax = Math.max(safeMin, normalizedRange.max);
+  const randomDenominator = (minimum = 2) => randomInt(Math.max(2, minimum, safeMin), Math.max(Math.max(2, minimum, safeMin), safeMax));
+
   switch (topic) {
     case 'recognising-fractions': {
-      const denominator = randomInt(2, 12);
+      const denominator = randomDenominator();
       const numerator = randomInt(1, denominator - 1);
       return {
         kind: 'fraction',
@@ -3528,9 +4214,9 @@ function buildFractionQuestion(topic, denominatorMode) {
       };
     }
     case 'comparing-fractions': {
-      const d1 = randomInt(2, 12);
+      const d1 = randomDenominator();
       const n1 = randomInt(1, d1 - 1);
-      const d2 = randomInt(2, 12);
+      const d2 = randomDenominator();
       const n2 = randomInt(1, d2 - 1);
       const symbol = (n1 / d1) > (n2 / d2) ? '>' : (n1 / d1) < (n2 / d2) ? '<' : '=';
       return {
@@ -3541,7 +4227,7 @@ function buildFractionQuestion(topic, denominatorMode) {
       };
     }
     case 'equivalent-fractions': {
-      const fraction = createProperFraction();
+      const fraction = createProperFraction(false, safeMin, safeMax);
       const multiplier = randomInt(2, 5);
       return {
         kind: 'fraction',
@@ -3551,7 +4237,7 @@ function buildFractionQuestion(topic, denominatorMode) {
       };
     }
     case 'simplifying-fractions': {
-      const simplified = createProperFraction(true);
+      const simplified = createProperFraction(true, safeMin, safeMax);
       const multiplier = randomInt(2, 5);
       const unsimplified = {
         numerator: simplified.numerator * multiplier,
@@ -3566,7 +4252,7 @@ function buildFractionQuestion(topic, denominatorMode) {
     }
     case 'mixed-fractions': {
       const whole = randomInt(1, 9);
-      const fraction = createProperFraction();
+      const fraction = createProperFraction(false, safeMin, safeMax);
       return {
         kind: 'fraction',
         topic,
@@ -3576,7 +4262,7 @@ function buildFractionQuestion(topic, denominatorMode) {
     }
     case 'improper-fractions': {
       const whole = randomInt(1, 9);
-      const fraction = createProperFraction();
+      const fraction = createProperFraction(false, safeMin, safeMax);
       return {
         kind: 'fraction',
         topic,
@@ -3585,11 +4271,12 @@ function buildFractionQuestion(topic, denominatorMode) {
       };
     }
     case 'add-fractions': {
-      if ((denominatorMode || getDefaultDenominatorMode(topic)) === 'mixed') {
-        const firstDenominator = randomInt(2, 12);
-        let secondDenominator = randomInt(2, 12);
+      const useMixedDenominators = (denominatorMode || getDefaultDenominatorMode(topic)) === 'mixed' && safeMax > safeMin;
+      if (useMixedDenominators) {
+        const firstDenominator = randomDenominator();
+        let secondDenominator = randomDenominator();
         while (secondDenominator === firstDenominator) {
-          secondDenominator = randomInt(2, 12);
+          secondDenominator = randomDenominator();
         }
 
         const firstNumerator = randomInt(1, firstDenominator - 1);
@@ -3606,7 +4293,7 @@ function buildFractionQuestion(topic, denominatorMode) {
         };
       }
 
-      const denominator = randomInt(2, 12);
+      const denominator = randomDenominator();
       const first = randomInt(1, denominator - 1);
       const second = randomInt(1, denominator - first);
       return {
@@ -3618,11 +4305,12 @@ function buildFractionQuestion(topic, denominatorMode) {
       };
     }
     case 'subtract-fractions': {
-      if ((denominatorMode || getDefaultDenominatorMode(topic)) === 'mixed') {
-        const firstDenominator = randomInt(2, 12);
-        let secondDenominator = randomInt(2, 12);
+      const useMixedDenominators = (denominatorMode || getDefaultDenominatorMode(topic)) === 'mixed' && safeMax > safeMin;
+      if (useMixedDenominators) {
+        const firstDenominator = randomDenominator();
+        let secondDenominator = randomDenominator();
         while (secondDenominator === firstDenominator) {
-          secondDenominator = randomInt(2, 12);
+          secondDenominator = randomDenominator();
         }
 
         const commonDenominator = firstDenominator * secondDenominator;
@@ -3648,7 +4336,7 @@ function buildFractionQuestion(topic, denominatorMode) {
         };
       }
 
-      const denominator = randomInt(3, 12);
+      const denominator = randomDenominator(3);
       const first = randomInt(2, denominator - 1);
       const second = randomInt(1, first - 1);
       return {
@@ -3661,7 +4349,7 @@ function buildFractionQuestion(topic, denominatorMode) {
     }
     case 'multiply-fractions': {
       if ((denominatorMode || getDefaultDenominatorMode(topic)) === 'same') {
-        const denominator = randomInt(2, 12);
+        const denominator = randomDenominator();
         const first = { numerator: randomInt(1, denominator - 1), denominator };
         const second = { numerator: randomInt(1, denominator - 1), denominator };
         return {
@@ -3673,8 +4361,8 @@ function buildFractionQuestion(topic, denominatorMode) {
         };
       }
 
-      const first = createProperFraction();
-      const second = createProperFraction();
+      const first = createProperFraction(false, safeMin, safeMax);
+      const second = createProperFraction(false, safeMin, safeMax);
       return {
         kind: 'fraction',
         topic,
@@ -3685,7 +4373,7 @@ function buildFractionQuestion(topic, denominatorMode) {
     }
     case 'divide-fractions': {
       if ((denominatorMode || getDefaultDenominatorMode(topic)) === 'same') {
-        const denominator = randomInt(2, 12);
+        const denominator = randomDenominator();
         const first = { numerator: randomInt(1, denominator - 1), denominator };
         const second = { numerator: randomInt(1, denominator - 1), denominator };
         return {
@@ -3697,8 +4385,8 @@ function buildFractionQuestion(topic, denominatorMode) {
         };
       }
 
-      const first = createProperFraction();
-      const second = createProperFraction();
+      const first = createProperFraction(false, safeMin, safeMax);
+      const second = createProperFraction(false, safeMin, safeMax);
       return {
         kind: 'fraction',
         topic,
@@ -3717,7 +4405,11 @@ function buildFractionQuestion(topic, denominatorMode) {
   }
 }
 
-function buildDecimalQuestion(topic) {
+function buildDecimalQuestion(topic, min, max) {
+  const normalizedRange = normalizeConfiguredRange(min, max, 1, 99);
+  const safeMin = Math.max(1, normalizedRange.min);
+  const safeMax = Math.max(safeMin, normalizedRange.max);
+
   switch (topic) {
     case 'decimal-place-value': {
       const wholeDigits = randomInt(1, 3);
@@ -3736,7 +4428,7 @@ function buildDecimalQuestion(topic) {
     }
     case 'decimal-operations': {
       const operation = ['addition', 'subtraction', 'multiplication', 'division'][randomInt(0, 3)];
-      const question = buildDecimalOperation(operation);
+      const question = buildDecimalOperation(operation, safeMin, safeMax);
       return {
         kind: 'decimal',
         topic,
@@ -3758,11 +4450,15 @@ function buildDecimalQuestion(topic) {
   }
 }
 
-function buildPercentageQuestion(topic) {
+function buildPercentageQuestion(topic, min, max) {
+  const normalizedRange = normalizeConfiguredRange(min, max, 20, 400);
+  const safeMin = Math.max(1, normalizedRange.min);
+  const safeMax = Math.max(safeMin, normalizedRange.max);
+
   switch (topic) {
     case 'percentage-of-amount': {
       const percent = pickRandomFromList([5, 10, 20, 25, 50, 75]);
-      const amount = randomInt(2, 40) * 10;
+      const amount = randomInt(safeMin, safeMax);
       return {
         kind: 'percentage',
         topic,
@@ -3787,7 +4483,7 @@ function buildPercentageQuestion(topic) {
       };
     }
     case 'percentage-increase': {
-      const base = randomInt(2, 20) * 20;
+      const base = randomInt(safeMin, safeMax);
       const percent = randomInt(1, 10) * 5;
       return {
         kind: 'percentage',
@@ -3797,7 +4493,7 @@ function buildPercentageQuestion(topic) {
       };
     }
     case 'percentage-decrease': {
-      const base = randomInt(2, 20) * 20;
+      const base = randomInt(safeMin, safeMax);
       const percent = randomInt(1, 10) * 5;
       return {
         kind: 'percentage',
@@ -3807,7 +4503,7 @@ function buildPercentageQuestion(topic) {
       };
     }
     case 'percentage-to-decimal': {
-      const percent = randomInt(5, 100);
+      const percent = pickConfiguredInt(5, 100, safeMin, safeMax);
       return {
         kind: 'percentage',
         topic,
@@ -3825,7 +4521,11 @@ function buildPercentageQuestion(topic) {
   }
 }
 
-function buildGeometryQuestion(topic) {
+function buildGeometryQuestion(topic, min, max) {
+  const normalizedRange = normalizeConfiguredRange(min, max, 1, 12);
+  const safeMin = normalizedRange.min;
+  const safeMax = normalizedRange.max;
+
   switch (topic) {
     case 'position-direction': {
       const dirs = ['North', 'East', 'South', 'West'];
@@ -3842,8 +4542,8 @@ function buildGeometryQuestion(topic) {
       };
     }
     case 'coordinates': {
-      const x = randomInt(1, 10);
-      const y = randomInt(1, 10);
+      const x = pickConfiguredInt(1, 10, safeMin, safeMax);
+      const y = pickConfiguredInt(1, 10, safeMin, safeMax);
       return {
         kind: 'geometry',
         topic,
@@ -3854,8 +4554,8 @@ function buildGeometryQuestion(topic) {
     case 'plot-cartesian-plane': {
       const points = Array.from({ length: 3 }, (_, index) => ({
         label: String.fromCharCode(65 + index),
-        x: randomInt(-4, 4),
-        y: randomInt(-4, 4),
+        x: pickConfiguredInt(-4, 4, safeMin, safeMax),
+        y: pickConfiguredInt(-4, 4, safeMin, safeMax),
       }));
       return {
         kind: 'geometry',
@@ -3919,8 +4619,8 @@ function buildGeometryQuestion(topic) {
       };
     }
     case 'angles': {
-      const first = randomInt(30, 80);
-      const second = randomInt(20, 70);
+      const first = pickConfiguredInt(30, 80, safeMin, safeMax);
+      const second = pickConfiguredInt(20, 70, safeMin, safeMax);
       const missing = 180 - first - second;
       return {
         kind: 'geometry',
@@ -3947,10 +4647,10 @@ function buildGeometryQuestion(topic) {
       };
     }
     case 'transformations': {
-      const x = randomInt(-6, 6);
-      const y = randomInt(-6, 6);
-      const dx = randomInt(-4, 4);
-      const dy = randomInt(-4, 4);
+      const x = pickConfiguredInt(-6, 6, safeMin, safeMax);
+      const y = pickConfiguredInt(-6, 6, safeMin, safeMax);
+      const dx = pickConfiguredInt(-4, 4, safeMin, safeMax);
+      const dy = pickConfiguredInt(-4, 4, safeMin, safeMax);
       return {
         kind: 'geometry',
         topic,
@@ -3959,9 +4659,9 @@ function buildGeometryQuestion(topic) {
       };
     }
     case 'congruence': {
-      const a = randomInt(3, 10);
-      const b = randomInt(3, 10);
-      const c = randomInt(3, 10);
+      const a = pickConfiguredInt(3, 10, safeMin, safeMax);
+      const b = pickConfiguredInt(3, 10, safeMin, safeMax);
+      const c = pickConfiguredInt(3, 10, safeMin, safeMax);
       const congruent = randomInt(0, 1) === 0;
       const d = congruent ? a : a + randomInt(1, 3);
       const e = congruent ? b : b + randomInt(1, 3);
@@ -3974,8 +4674,8 @@ function buildGeometryQuestion(topic) {
       };
     }
     case 'similarity': {
-      const side = randomInt(2, 14);
-      const scale = randomInt(2, 5);
+      const side = pickConfiguredInt(2, 14, safeMin, safeMax);
+      const scale = pickConfiguredInt(2, 5, safeMin, safeMax);
       return {
         kind: 'geometry',
         topic,
@@ -3986,7 +4686,7 @@ function buildGeometryQuestion(topic) {
     case 'circle-geometry': {
       const askDiameter = randomInt(0, 1) === 0;
       if (askDiameter) {
-        const diameter = randomInt(4, 30);
+        const diameter = pickConfiguredInt(4, 30, safeMin, safeMax);
         return {
           kind: 'geometry',
           topic,
@@ -3995,7 +4695,7 @@ function buildGeometryQuestion(topic) {
         };
       }
 
-      const radius = randomInt(2, 15);
+      const radius = pickConfiguredInt(2, 15, safeMin, safeMax);
       return {
         kind: 'geometry',
         topic,
@@ -4004,7 +4704,7 @@ function buildGeometryQuestion(topic) {
       };
     }
     case 'geometric-reasoning': {
-      const angle = randomInt(35, 145);
+      const angle = pickConfiguredInt(35, 145, safeMin, safeMax);
       return {
         kind: 'geometry',
         topic,
@@ -4037,8 +4737,11 @@ function buildGeometryQuestion(topic) {
   }
 }
 
-function buildSecondaryChartQuestion(topic) {
-  const values = Array.from({ length: 8 }, () => randomInt(1, 9));
+function buildSecondaryChartQuestion(topic, min, max) {
+  const normalizedRange = normalizeConfiguredRange(min, max, 1, 9);
+  const safeMin = normalizedRange.min;
+  const safeMax = normalizedRange.max;
+  const values = Array.from({ length: 8 }, () => pickConfiguredInt(1, 9, safeMin, safeMax));
 
   if (topic === 'stem-and-leaf') {
     const data = values.map((value) => value * 10 + randomInt(0, 9)).sort((a, b) => a - b);
@@ -4107,7 +4810,7 @@ function buildStatisticsQuestion(topic, min, max) {
     const standardDeviation = Math.sqrt(meanSquared);
 
     if (['stem-and-leaf', 'histograms', 'dot-plots', 'scatter-plots', 'frequency-distributions', 'draw-charts', 'distributions'].includes(topic)) {
-      return buildSecondaryChartQuestion(topic);
+      return buildSecondaryChartQuestion(topic, safeMin, safeMax);
     }
 
     switch (topic) {
@@ -4825,12 +5528,12 @@ function buildTrigonometryQuestion(topic, min, max) {
   }
 }
 
-function buildGeometryQuestions(topic, count) {
+function buildGeometryQuestions(topic, count, min, max) {
   if (topic !== '2d-shapes' && topic !== '3d-shapes') {
     const items = [];
     const seenSignatures = new Set();
     for (let i = 0; i < count; i++) {
-      pushUniqueQuestion(items, seenSignatures, () => buildGeometryQuestion(topic));
+      pushUniqueQuestion(items, seenSignatures, () => buildGeometryQuestion(topic, min, max));
     }
     return items;
   }
@@ -5597,7 +6300,11 @@ function buildNetworkQuestion(topic) {
   return { kind: 'number', topic, prompt: 'A network can carry 12, 8 and 5 units through three independent routes. Find the maximum total flow.', answer: '25 units' };
 }
 
-function buildAdvancedWorksheetQuestion(topic, pythagorasMode = 'hypotenuse') {
+function buildAdvancedWorksheetQuestion(topic, pythagorasMode = 'hypotenuse', min, max) {
+  const normalizedRange = normalizeConfiguredRange(min, max, 1, 30);
+  const safeMin = normalizedRange.min;
+  const safeMax = normalizedRange.max;
+
   if (topic === 'multi-step-linear-equations') {
     const coefficient = randomInt(2, 8);
     const solution = randomInt(2, 12);
@@ -5630,7 +6337,7 @@ function buildAdvancedWorksheetQuestion(topic, pythagorasMode = 'hypotenuse') {
   }
 
   if (topic === 'box-plots') {
-    const values = Array.from({ length: 5 }, () => randomInt(1, 30)).sort((a, b) => a - b);
+    const values = Array.from({ length: 5 }, () => randomInt(safeMin, safeMax)).sort((a, b) => a - b);
     return { kind: 'number', topic, prompt: `A box plot has five-number summary ${values.join(', ')}. What is the interquartile range?`, visual: { type: 'box-plot', values }, answer: values[3] - values[1] };
   }
 
@@ -6152,13 +6859,15 @@ function pickRandomFromList(list) {
   return list[randomInt(0, list.length - 1)];
 }
 
-function createProperFraction(alreadyReduced = false) {
-  let denominator = randomInt(2, 12);
+function createProperFraction(alreadyReduced = false, minDenominator = 2, maxDenominator = 12) {
+  const safeMin = Math.max(2, Math.min(minDenominator, maxDenominator));
+  const safeMax = Math.max(safeMin, Math.max(minDenominator, maxDenominator));
+  let denominator = randomInt(safeMin, safeMax);
   let numerator = randomInt(1, denominator - 1);
 
   if (alreadyReduced) {
     while (gcd(numerator, denominator) !== 1) {
-      denominator = randomInt(2, 12);
+      denominator = randomInt(safeMin, safeMax);
       numerator = randomInt(1, denominator - 1);
     }
   }
@@ -6465,10 +7174,13 @@ function buildDecimalNumber(wholeDigits, decimalDigits, highlightIndex) {
   return { value, highlightDigit, highlightPower };
 }
 
-function buildDecimalOperation(operation) {
+function buildDecimalOperation(operation, min, max) {
+  const normalizedRange = normalizeConfiguredRange(min, max, 1, 99);
+  const safeMin = Math.max(1, normalizedRange.min);
+  const safeMax = Math.max(safeMin, normalizedRange.max);
   const places = randomInt(1, 2);
-  const left = randomInt(1, 99) / Math.pow(10, places);
-  const right = randomInt(1, 99) / Math.pow(10, places);
+  const left = randomInt(safeMin, safeMax) / Math.pow(10, places);
+  const right = randomInt(safeMin, safeMax) / Math.pow(10, places);
 
   if (operation === 'addition') {
     return { left: left.toFixed(places), right: right.toFixed(places), answer: formatDecimalResult(left + right) };
@@ -6484,8 +7196,8 @@ function buildDecimalOperation(operation) {
     return { left: left.toFixed(places), right: right.toFixed(places), answer: formatDecimalResult(left * right) };
   }
 
-  const divisor = randomInt(2, 9);
-  const quotient = randomInt(1, 99) / 10;
+  const divisor = pickConfiguredInt(2, 9, safeMin, safeMax);
+  const quotient = randomInt(safeMin, safeMax) / 10;
   const dividend = divisor * quotient;
   return { left: formatDecimalResult(dividend), right: String(divisor), answer: formatDecimalResult(quotient) };
 }
@@ -6511,6 +7223,12 @@ function createBulkDay(label) {
 
 let bulkDays = [createBulkDay('Day 1')];
 let currentBulkDayIndex = 0;
+let bulkPreviewPages = [];
+let bulkPreviewPageIndex = 0;
+let bulkExportController = null;
+let bulkProgressTickerId = null;
+
+const BULK_EXPORT_CANCELED_MESSAGE = 'Bulk export canceled by user.';
 
 function buildWorksheetPagesForConfig(config) {
   const questions = buildQuestions(
@@ -6530,6 +7248,18 @@ function buildWorksheetPagesForConfig(config) {
   return paginateQuestions(questions, title, config.module, config.includeSolutions, config.topic, config.timesTable, null, false, config.mixedQuestionsPerPage, config.graphQuestionsPerPage);
 }
 
+function buildUniqueWorksheetPages(config, previousSignature = '') {
+  let pages = buildWorksheetPagesForConfig(config);
+  let signature = pages.join('');
+
+  for (let attempt = 0; attempt < 20 && signature === previousSignature; attempt++) {
+    pages = buildWorksheetPagesForConfig(config);
+    signature = pages.join('');
+  }
+
+  return { pages, signature };
+}
+
 function buildBulkItemLabel(config) {
   const topicTitle = topicLabel(config.topic, config.timesTable).replace(/ Practice$/, '');
   const sizeLabel = config.topic === 'magic-squares' ? `, ${config.magicSquareSize} × ${config.magicSquareSize}` : '';
@@ -6537,10 +7267,13 @@ function buildBulkItemLabel(config) {
 }
 
 function openBulkModal() {
+  bulkCancelBtn.disabled = false;
+  closeBulkModuleTopicSearch();
   bulkModalOverlay.style.display = 'flex';
 }
 
 function closeBulkModal() {
+  closeBulkModuleTopicSearch();
   bulkModalOverlay.style.display = 'none';
 }
 
@@ -6551,7 +7284,7 @@ function getCurrentBulkDay() {
 function renderBulkDayNav() {
   const day = getCurrentBulkDay();
   bulkDayLabelInput.value = day.label;
-  bulkDayIndicator.textContent = `Day ${currentBulkDayIndex + 1} of ${bulkDays.length}`;
+  bulkDayIndicator.textContent = `Template ${currentBulkDayIndex + 1} of ${bulkDays.length}`;
   bulkPrevDayBtn.disabled = currentBulkDayIndex === 0;
   bulkNextDayBtn.disabled = currentBulkDayIndex === bulkDays.length - 1;
   bulkRemoveDayBtn.disabled = bulkDays.length <= 1;
@@ -6575,6 +7308,37 @@ function renderBulkItemsList() {
 
   bulkItemsEmpty.style.display = items.length === 0 ? 'block' : 'none';
   updateBulkGenerateButtonState();
+  renderBulkWorksheetPreview();
+}
+
+function renderBulkWorksheetPreview() {
+  const day = getCurrentBulkDay();
+  bulkPreviewPages = [];
+
+  if (day.formulaSheetModule) {
+    bulkPreviewPages.push(buildFormulaSheetHTML(day.formulaSheetModule));
+  }
+
+  day.items.forEach((item) => {
+    bulkPreviewPages.push(...buildWorksheetPagesForConfig(item));
+  });
+
+  bulkPreviewPageIndex = 0;
+  renderBulkPreviewPage();
+}
+
+function renderBulkPreviewPage() {
+  const totalPages = bulkPreviewPages.length;
+  const hasPages = totalPages > 0;
+
+  bulkPreviewIndicator.textContent = hasPages
+    ? `Page ${bulkPreviewPageIndex + 1} of ${totalPages}`
+    : 'Page 0 of 0';
+  bulkPreviewPrevBtn.disabled = !hasPages || bulkPreviewPageIndex === 0;
+  bulkPreviewNextBtn.disabled = !hasPages || bulkPreviewPageIndex === totalPages - 1;
+  bulkWorksheetPreview.innerHTML = hasPages
+    ? bulkPreviewPages[bulkPreviewPageIndex]
+    : '<p class="bulk-preview-empty">Add a worksheet to see its preview.</p>';
 }
 
 function updateBulkGenerateButtonState() {
@@ -6585,8 +7349,8 @@ function updateBulkGenerateButtonState() {
 function readBulkItemConfigFromForm() {
   const module = bulkModuleSelect.value;
   const topic = bulkTopicSelect.value;
-  const minNum = parseInt(bulkMinNumInput.value, 10);
-  const maxNum = parseInt(bulkMaxNumInput.value, 10);
+  const minNumRaw = parseInt(bulkMinNumInput.value, 10);
+  const maxNumRaw = parseInt(bulkMaxNumInput.value, 10);
   const numQuestions = parseInt(bulkNumQuestionsInput.value, 10);
   const timesTable = parseInt(bulkTimesTableSelect.value, 10);
   const denominatorMode = bulkDenominatorSelect.value;
@@ -6598,10 +7362,14 @@ function readBulkItemConfigFromForm() {
   const mixedQuestionsPerPage = parseInt(bulkMixedQuestionsPerPageSelect.value, 10);
   const graphQuestionsPerPage = parseInt(bulkGraphQuestionsPerPageSelect.value, 10);
 
-  if (topic !== 'times-tables' && minNum > maxNum) {
-    alert('Min Number cannot be greater than Max Number.');
+  if (!Number.isFinite(minNumRaw) || !Number.isFinite(maxNumRaw)) {
+    alert('Please enter valid numbers for Min Number and Max Number.');
     return null;
   }
+
+  const normalizedRange = normalizeConfiguredRange(minNumRaw, maxNumRaw);
+  const minNum = normalizedRange.min;
+  const maxNum = normalizedRange.max;
 
   if (!Number.isFinite(numQuestions) || numQuestions < 1) {
     alert('Number of Questions must be at least 1.');
@@ -6670,6 +7438,13 @@ function renameBulkDay() {
 function setBulkBusy(isBusy, message = '') {
   updateBulkGenerateButtonState();
   bulkGenerateBtn.disabled = isBusy || bulkGenerateBtn.disabled;
+  if (isBusy) {
+    if (!bulkExportController) {
+      bulkGenerateBtn.textContent = 'Exporting... 0%';
+    }
+  } else {
+    bulkGenerateBtn.textContent = 'Generate Bulk PDFs';
+  }
   bulkCancelBtn.disabled = isBusy;
   bulkAddItemBtn.disabled = isBusy;
   bulkModalCloseBtn.disabled = isBusy;
@@ -6678,8 +7453,224 @@ function setBulkBusy(isBusy, message = '') {
   bulkRemoveDayBtn.disabled = isBusy || bulkDays.length <= 1;
   bulkPrevDayBtn.disabled = isBusy || currentBulkDayIndex === 0;
   bulkNextDayBtn.disabled = isBusy || currentBulkDayIndex === bulkDays.length - 1;
-  bulkProgress.style.display = message ? 'block' : 'none';
+  bulkProgressPanel.style.display = (isBusy || message) ? 'block' : 'none';
   bulkProgress.textContent = message;
+  bulkPauseResumeBtn.disabled = !isBusy;
+  bulkStopBtn.disabled = !isBusy;
+  bulkFooterStatus.style.display = isBusy ? 'inline' : 'none';
+
+  if (!isBusy) {
+    bulkPauseResumeBtn.textContent = 'Pause Export';
+    bulkProgressBar.value = 0;
+    if (bulkProgressFill) {
+      bulkProgressFill.style.width = '0%';
+    }
+    bulkProgressPercent.textContent = '0%';
+    bulkElapsedTime.textContent = 'Elapsed: 00:00';
+    bulkEtaTime.textContent = 'Remaining: --:--';
+    bulkFinishTime.textContent = 'Finish: --:--';
+    bulkFooterStatus.textContent = 'Exporting... 0% | Remaining: --:--';
+  }
+}
+
+function computeBulkExportStepCount(folderCount) {
+  let total = 1; // zip packaging
+  for (let folderNum = 1; folderNum <= folderCount; folderNum++) {
+    const dayConfig = bulkDays[(folderNum - 1) % bulkDays.length];
+    total += dayConfig.items.length;
+    if (dayConfig.formulaSheetModule) {
+      total += 1;
+    }
+  }
+  return Math.max(total, 1);
+}
+
+function createBulkExportController(totalSteps) {
+  return {
+    totalSteps,
+    completedSteps: 0,
+    stepPartialCompleted: 0,
+    stepPartialTotal: 0,
+    paused: false,
+    canceled: false,
+    startedAtMs: Date.now(),
+    pausedAtMs: 0,
+    pausedTotalMs: 0,
+    lastMessage: 'Preparing export...',
+    resumeResolver: null,
+  };
+}
+
+function formatDuration(ms) {
+  const safeMs = Math.max(0, Math.floor(ms));
+  const totalSeconds = Math.floor(safeMs / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  if (hours > 0) {
+    return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  }
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+function formatClockTimeOfDay(timestampMs) {
+  const dt = new Date(timestampMs);
+  return `${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}`;
+}
+
+function getBulkElapsedMs(controller) {
+  if (!controller) {
+    return 0;
+  }
+
+  const now = Date.now();
+  const activePauseMs = controller.paused && controller.pausedAtMs ? (now - controller.pausedAtMs) : 0;
+  return Math.max(0, now - controller.startedAtMs - controller.pausedTotalMs - activePauseMs);
+}
+
+function getBulkEffectiveCompleted(controller) {
+  if (!controller) {
+    return 0;
+  }
+
+  const partialRatio = controller.stepPartialTotal > 0
+    ? Math.min(1, controller.stepPartialCompleted / controller.stepPartialTotal)
+    : 0;
+  return Math.min(controller.totalSteps, controller.completedSteps + partialRatio);
+}
+
+function getBulkRemainingMs(controller, effectiveCompleted) {
+  if (!controller || effectiveCompleted <= 0) {
+    return null;
+  }
+
+  const elapsedMs = getBulkElapsedMs(controller);
+  const stepsLeft = Math.max(0, controller.totalSteps - effectiveCompleted);
+  const avgPerStep = elapsedMs / effectiveCompleted;
+  return Math.max(0, Math.round(avgPerStep * stepsLeft));
+}
+
+function beginBulkStepPartial(controller, totalPages) {
+  if (!controller) {
+    return;
+  }
+  controller.stepPartialTotal = Math.max(0, totalPages);
+  controller.stepPartialCompleted = 0;
+}
+
+function advanceBulkStepPartial(controller) {
+  if (!controller || controller.stepPartialTotal <= 0) {
+    return;
+  }
+  controller.stepPartialCompleted = Math.min(controller.stepPartialTotal, controller.stepPartialCompleted + 1);
+}
+
+function startBulkProgressTicker(controller) {
+  if (bulkProgressTickerId || !controller) {
+    return;
+  }
+
+  bulkProgressTickerId = window.setInterval(() => {
+    const msg = controller.lastMessage || bulkProgress.textContent || 'Exporting...';
+    updateBulkProgressUI(msg, controller);
+  }, 500);
+}
+
+function stopBulkProgressTicker() {
+  if (!bulkProgressTickerId) {
+    return;
+  }
+  clearInterval(bulkProgressTickerId);
+  bulkProgressTickerId = null;
+}
+
+function updateBulkProgressUI(message, controller = bulkExportController) {
+  const safeTotal = controller ? Math.max(controller.totalSteps, 1) : 1;
+  const effectiveCompleted = controller ? getBulkEffectiveCompleted(controller) : 0;
+  const percent = Math.min(100, Math.round((effectiveCompleted / safeTotal) * 100));
+  const elapsedMs = getBulkElapsedMs(controller);
+  const remainingMs = getBulkRemainingMs(controller, effectiveCompleted);
+  const finishAtMs = remainingMs === null ? null : Date.now() + remainingMs;
+
+  if (controller) {
+    controller.lastMessage = message;
+  }
+
+  bulkProgressPanel.style.display = 'block';
+  bulkProgress.textContent = message;
+  bulkProgressBar.value = percent;
+  if (bulkProgressFill) {
+    bulkProgressFill.style.width = `${percent}%`;
+  }
+  bulkProgressPercent.textContent = `${percent}%`;
+  bulkGenerateBtn.textContent = `Exporting... ${percent}%`;
+  bulkElapsedTime.textContent = `Elapsed: ${formatDuration(elapsedMs)}`;
+  bulkEtaTime.textContent = `Remaining: ${remainingMs === null ? '--:--' : formatDuration(remainingMs)}`;
+  bulkFinishTime.textContent = `Finish: ${finishAtMs === null ? '--:--' : formatClockTimeOfDay(finishAtMs)}`;
+  bulkFooterStatus.textContent = `Exporting... ${percent}% | Remaining: ${remainingMs === null ? '--:--' : formatDuration(remainingMs)}`;
+}
+
+function markBulkExportProgress(controller, message) {
+  controller.completedSteps += 1;
+  controller.stepPartialCompleted = 0;
+  controller.stepPartialTotal = 0;
+  updateBulkProgressUI(message, controller);
+}
+
+function requestBulkExportPauseToggle() {
+  const controller = bulkExportController;
+  if (!controller) {
+    return;
+  }
+
+  controller.paused = !controller.paused;
+  if (controller.paused) {
+    controller.pausedAtMs = Date.now();
+  } else if (controller.pausedAtMs) {
+    controller.pausedTotalMs += Date.now() - controller.pausedAtMs;
+    controller.pausedAtMs = 0;
+  }
+  bulkPauseResumeBtn.textContent = controller.paused ? 'Resume Export' : 'Pause Export';
+  if (!controller.paused && controller.resumeResolver) {
+    controller.resumeResolver();
+    controller.resumeResolver = null;
+  }
+
+  updateBulkProgressUI(controller.paused ? 'Export paused.' : 'Resuming export...', controller);
+}
+
+function requestBulkExportCancel() {
+  const controller = bulkExportController;
+  if (!controller) {
+    return;
+  }
+
+  controller.canceled = true;
+  if (controller.resumeResolver) {
+    controller.resumeResolver();
+    controller.resumeResolver = null;
+  }
+  updateBulkProgressUI('Canceling export...', controller);
+}
+
+function ensureBulkExportNotCanceled(controller) {
+  if (controller && controller.canceled) {
+    throw new Error(BULK_EXPORT_CANCELED_MESSAGE);
+  }
+}
+
+async function waitForBulkExportResume(controller) {
+  while (controller && controller.paused && !controller.canceled) {
+    await new Promise((resolve) => {
+      controller.resumeResolver = resolve;
+    });
+  }
+}
+
+async function bulkExportCheckpoint(controller) {
+  ensureBulkExportNotCanceled(controller);
+  await waitForBulkExportResume(controller);
+  ensureBulkExportNotCanceled(controller);
 }
 
 function getPdfCaptureSandbox() {
@@ -6693,13 +7684,20 @@ function getPdfCaptureSandbox() {
   return sandbox;
 }
 
-async function renderPagesIntoPdf(pdf, pageHtmlList, hasExistingPages) {
+async function renderPagesIntoPdf(pdf, pageHtmlList, hasExistingPages, controller = null, stepLabel = '') {
   const sandbox = getPdfCaptureSandbox();
   let addedFirstPage = hasExistingPages;
+  beginBulkStepPartial(controller, pageHtmlList.length);
 
-  for (const pageHtml of pageHtmlList) {
+  for (let pageIndex = 0; pageIndex < pageHtmlList.length; pageIndex++) {
+    const pageHtml = pageHtmlList[pageIndex];
+    await bulkExportCheckpoint(controller);
+
     sandbox.innerHTML = pageHtml;
     const pageEl = sandbox.firstElementChild;
+
+    // Avoid tainted canvas errors caused by app/webview URL-based images.
+    stripUnsafeImagesForCanvas(pageEl);
 
     // Let the browser lay out/paint the page before capturing it.
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
@@ -6712,6 +7710,10 @@ async function renderPagesIntoPdf(pdf, pageHtmlList, hasExistingPages) {
     }
     pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
     addedFirstPage = true;
+    advanceBulkStepPartial(controller);
+    if (stepLabel) {
+      updateBulkProgressUI(`${stepLabel} (page ${pageIndex + 1}/${pageHtmlList.length})`, controller);
+    }
   }
 
   sandbox.innerHTML = '';
@@ -6724,11 +7726,16 @@ function padFolderNumber(num, total) {
 }
 
 async function generateBulkPdfs() {
+  if (bulkExportController) {
+    alert('A bulk export is already running. Use Pause, Resume, or Cancel Export.');
+    return;
+  }
+
   const folderCount = parseInt(bulkFolderCountInput.value, 10);
   const batchName = bulkBatchNameInput.value.trim() || 'Bulk Worksheets';
 
   if (!Number.isFinite(folderCount) || folderCount < 1) {
-    alert('Number of Folders must be at least 1.');
+    alert('Number of Days must be at least 1.');
     return;
   }
 
@@ -6738,63 +7745,78 @@ async function generateBulkPdfs() {
     return;
   }
 
-  const { jsPDF } = window.jspdf || {};
-  if (!jsPDF || typeof html2canvas !== 'function' || typeof JSZip !== 'function') {
-    alert('Bulk PDF generation requires an internet connection to load required libraries. Please check your connection and try again.');
+  const missingLibraries = getMissingBulkExportLibraries();
+  if (missingLibraries.length > 0) {
+    alert(`Bulk export cannot start because required libraries are missing: ${missingLibraries.join(', ')}. If this only happens in the app, the app webview is likely blocking CDN script loading.`);
     return;
   }
 
+  const { jsPDF } = window.jspdf;
+  const totalSteps = computeBulkExportStepCount(folderCount);
+  const controller = createBulkExportController(totalSteps);
+  bulkExportController = controller;
+
   setBulkBusy(true, 'Preparing...');
+  startBulkProgressTicker(controller);
+  updateBulkProgressUI('Preparing export...', controller);
 
   try {
     const zip = new JSZip();
     const batchFolder = zip.folder(sanitizeFileNamePart(batchName));
+    const previousWorksheetSignatures = [];
 
     for (let folderNum = 1; folderNum <= folderCount; folderNum++) {
+      await bulkExportCheckpoint(controller);
+
       const dayConfig = bulkDays[(folderNum - 1) % bulkDays.length];
       setBulkBusy(true, `Generating folder ${folderNum} of ${folderCount} (${dayConfig.label})...`);
+      updateBulkProgressUI(`Generating folder ${folderNum} of ${folderCount} (${dayConfig.label})...`, controller);
 
       const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
       let hasPages = false;
 
       if (dayConfig.formulaSheetModule) {
+        await bulkExportCheckpoint(controller);
         setBulkBusy(true, `Folder ${folderNum} of ${folderCount} (${dayConfig.label}) - adding formula sheet cover page...`);
-        hasPages = await renderPagesIntoPdf(pdf, [buildFormulaSheetHTML(dayConfig.formulaSheetModule)], hasPages);
+        hasPages = await renderPagesIntoPdf(pdf, [buildFormulaSheetHTML(dayConfig.formulaSheetModule)], hasPages, controller, `Folder ${folderNum} of ${folderCount} (${dayConfig.label}) - formula sheet`);
+        markBulkExportProgress(controller, `Completed formula sheet for folder ${folderNum} of ${folderCount}.`);
       }
 
       for (let i = 0; i < dayConfig.items.length; i++) {
+        await bulkExportCheckpoint(controller);
+
         const config = dayConfig.items[i];
         setBulkBusy(true, `Folder ${folderNum} of ${folderCount} (${dayConfig.label}) - worksheet ${i + 1} of ${dayConfig.items.length}...`);
-        const pages = buildWorksheetPagesForConfig(config);
-        hasPages = await renderPagesIntoPdf(pdf, pages, hasPages);
+        const generatedWorksheet = buildUniqueWorksheetPages(config, previousWorksheetSignatures[i] || '');
+        const pages = generatedWorksheet.pages;
+        previousWorksheetSignatures[i] = generatedWorksheet.signature;
+        hasPages = await renderPagesIntoPdf(pdf, pages, hasPages, controller, `Folder ${folderNum} of ${folderCount} (${dayConfig.label}) - worksheet ${i + 1} of ${dayConfig.items.length}`);
+        markBulkExportProgress(controller, `Completed worksheet ${i + 1} of ${dayConfig.items.length} for folder ${folderNum}.`);
       }
 
-      const folderLabel = `Day ${padFolderNumber(folderNum, folderCount)}`;
+      const dayFileName = `Day ${folderNum}.pdf`;
       const pdfBlob = pdf.output('blob');
-      batchFolder.folder(folderLabel).file(`${sanitizeFileNamePart(dayConfig.label)}.pdf`, pdfBlob);
+      batchFolder.file(dayFileName, pdfBlob);
     }
 
+    await bulkExportCheckpoint(controller);
     setBulkBusy(true, 'Packaging folders into a zip file...');
     const zipBlob = await zip.generateAsync({ type: 'blob' });
-
-    const url = URL.createObjectURL(zipBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${sanitizeFileNamePart(batchName)}.zip`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-
-    bulkDays = [createBulkDay('Day 1')];
-    currentBulkDayIndex = 0;
-    renderBulkDayNav();
-    renderBulkItemsList();
-    closeBulkModal();
+    markBulkExportProgress(controller, 'Packaging complete. Starting download...');
+    downloadBlobAsFile(zipBlob, `${sanitizeFileNamePart(batchName)}.zip`);
+    updateBulkProgressUI('Bulk export complete.', controller);
   } catch (error) {
+    if (error && error.message === BULK_EXPORT_CANCELED_MESSAGE) {
+      updateBulkProgressUI('Export canceled.', controller);
+      return;
+    }
+
     console.error('Bulk PDF generation failed:', error);
-    alert('Something went wrong while generating the bulk PDFs. Please try again.');
+    const details = error && error.message ? `\n\nDetails: ${error.message}` : '';
+    alert(`Something went wrong while generating the bulk PDFs. Please try again.${details}`);
   } finally {
+    stopBulkProgressTicker();
+    bulkExportController = null;
     setBulkBusy(false, '');
   }
 }
@@ -6802,16 +7824,8 @@ async function generateBulkPdfs() {
 bulkAddBtn.addEventListener('click', openBulkModal);
 bulkModalCloseBtn.addEventListener('click', closeBulkModal);
 bulkCancelBtn.addEventListener('click', closeBulkModal);
-bulkModalOverlay.addEventListener('click', (event) => {
-  if (event.target === bulkModalOverlay) {
-    closeBulkModal();
-  }
-});
-document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape' && bulkModalOverlay.style.display !== 'none') {
-    closeBulkModal();
-  }
-});
+bulkPauseResumeBtn.addEventListener('click', requestBulkExportPauseToggle);
+bulkStopBtn.addEventListener('click', requestBulkExportCancel);
 bulkAddItemBtn.addEventListener('click', addBulkItem);
 bulkItemsList.addEventListener('click', (event) => {
   const button = event.target.closest('.bulk-item-remove');
@@ -6820,6 +7834,18 @@ bulkItemsList.addEventListener('click', (event) => {
   }
 });
 bulkGenerateBtn.addEventListener('click', generateBulkPdfs);
+bulkPreviewPrevBtn.addEventListener('click', () => {
+  if (bulkPreviewPageIndex > 0) {
+    bulkPreviewPageIndex -= 1;
+    renderBulkPreviewPage();
+  }
+});
+bulkPreviewNextBtn.addEventListener('click', () => {
+  if (bulkPreviewPageIndex < bulkPreviewPages.length - 1) {
+    bulkPreviewPageIndex += 1;
+    renderBulkPreviewPage();
+  }
+});
 bulkPrevDayBtn.addEventListener('click', () => goToBulkDay(currentBulkDayIndex - 1));
 bulkNextDayBtn.addEventListener('click', () => goToBulkDay(currentBulkDayIndex + 1));
 bulkAddDayBtn.addEventListener('click', addBulkDay);
@@ -6972,6 +7998,13 @@ renderBulkPresetOptions();
 //  Formula & Glossary Lookup
 // ===========================
 
+const UNIT_CONVERSION_GROUPS = [
+  { heading: 'Length', rules: ['km → m: multiply by 1,000', 'm → km: divide by 1,000', 'm → cm: multiply by 100', 'cm → m: divide by 100', 'cm → mm: multiply by 10', 'mm → cm: divide by 10'] },
+  { heading: 'Mass', rules: ['tonnes → kg: multiply by 1,000', 'kg → tonnes: divide by 1,000', 'kg → g: multiply by 1,000', 'g → kg: divide by 1,000', 'g → mg: multiply by 1,000', 'mg → g: divide by 1,000'] },
+  { heading: 'Capacity', rules: ['L → mL: multiply by 1,000', 'mL → L: divide by 1,000', '1 mL = 1 cm³'] },
+  { heading: 'Time', rules: ['hours → minutes: multiply by 60', 'minutes → hours: divide by 60', 'minutes → seconds: multiply by 60', 'seconds → minutes: divide by 60', 'days → hours: multiply by 24', 'hours → days: divide by 24'] },
+];
+
 const FORMULA_SHEETS = {
   arithmetic: [
     { heading: 'Order of Operations (BODMAS)', rules: ['Brackets first', 'Orders (powers & roots) next', 'Division and Multiplication, left to right', 'Addition and Subtraction, left to right'] },
@@ -7071,7 +8104,7 @@ const TOPIC_FORMULA_GROUPS = {
     'communication-matrices': [{ heading: 'Communication Matrices', rules: ['An entry of 1 in A² indicates a two-step communication path'] }],
     'dominance-matrices': [{ heading: 'Dominance Matrices', rules: ['Entry dᵢⱼ = 1 indicates that player i defeats player j'] }],
     'culling-restocking': [{ heading: 'Culling and Restocking', rules: ['Sₙ₊₁ = TSₙ + B', 'B represents additions or removals applied after the transition'] }],
-    'network-graphs': [{ heading: 'Graphs and Networks', rules: ['Degree = number of edges incident to a vertex', 'For a connected planar graph, v − e + f = 2'] }],
+    'network-graphs': [{ heading: 'Graphs and Networks', rules: ['Vertices represent objects and edges represent connections', 'Edge weights represent distance, time or cost', 'Degree = number of edges meeting at a vertex'] }],
     'eulerian-trails': [{ heading: 'Eulerian Trails', rules: ['An Eulerian circuit uses every edge once and starts and ends at the same vertex', 'A connected graph has an Eulerian trail when it has exactly zero or two odd-degree vertices'] }],
     'hamiltonian-paths': [{ heading: 'Hamiltonian Paths', rules: ['A Hamiltonian path visits every vertex exactly once'] }],
     bridges: [{ heading: 'Bridges', rules: ['A bridge is an edge whose removal increases the number of connected components'] }],
@@ -7107,7 +8140,6 @@ const TOPIC_FORMULA_GROUPS = {
   'time-series': [{ heading: 'Time Series', rules: ['Look for long-term trend, seasonal pattern, or irregular variation', 'A time series can show increasing, decreasing or cyclical movement'] }],
   'seasonal-trends': [{ heading: 'Seasonal Trends', rules: ['Seasonal patterns repeat over a regular cycle', 'Use context to describe a likely seasonal increase or decrease'] }],
   'financial-mathematics': [{ heading: 'Financial Modelling', rules: ['Simple interest = principal × rate × time', 'Future value can be built from repeated growth or repeated repayments'] }],
-  'network-graphs': [{ heading: 'Network Graphs', rules: ['Vertices represent objects and edges represent connections', 'Edge weights represent distance, time or cost'] }],
   'shortest-paths': [{ heading: 'Shortest Paths', rules: ['Add edge weights along each route', 'Choose the route with the smallest total weight'] }],
   'minimum-spanning-trees': [{ heading: 'Minimum Spanning Trees', rules: ['Connect every vertex without cycles', 'Choose edges with the smallest possible total weight'] }],
   'critical-paths': [{ heading: 'Critical Path Analysis', rules: ['Critical path duration is the sum of activity durations on the longest dependent path'] }],
@@ -7166,40 +8198,163 @@ const TOPIC_FORMULA_GROUPS = {
   'continuous-distributions': [{ heading: 'Continuous Distributions', rules: ['P(X = a) = 0', 'Probabilities are areas under the density curve', 'The total area under the density curve is 1'] }],
   'normal-distribution': [{ heading: 'Normal Distribution', rules: ['z = (x − μ) ÷ σ', 'Use the normal CDF or inverse CDF for probabilities and percentiles'] }],
   'sample-proportions': [{ heading: 'Sample Proportions', rules: ['p̂ = number of successes ÷ sample size', 'The sample proportion estimates the population proportion'] }],
+  // Arithmetic (primary & secondary)
+  addition: [{ heading: 'Addition', rules: ['Line up the place value columns and add from right to left', 'Regroup (carry) when a column totals 10 or more', 'Check by estimating or using subtraction'] }],
+  subtraction: [{ heading: 'Subtraction', rules: ['Line up the place value columns and subtract from right to left', 'Borrow from the next column when the top digit is smaller', 'Check: difference + amount subtracted = starting number'] }],
+  multiplication: [{ heading: 'Multiplication', rules: ['Multiply each digit and regroup as needed', 'For multiples of 10, multiply the non-zero digits then add the zeros', 'a × b = b × a — order does not change the product'] }],
+  'multiplication-groups': [{ heading: 'Groups & Arrays', rules: ['Total = number of groups × size of each group', 'An array with r rows and c columns shows r × c'] }],
+  'multiplication-strategies': [{ heading: 'Multiplication Strategies', rules: ['Double and halve: 4 × 16 = 8 × 8', 'Split strategy: 6 × 14 = 6 × 10 + 6 × 4', 'Build unknown facts from known ones'] }],
+  division: [{ heading: 'Division', rules: ['Division shares equally or groups repeatedly', 'Dividend ÷ divisor = quotient', 'Check: quotient × divisor = dividend'] }],
+  'division-strategies': [{ heading: 'Division Strategies', rules: ['Use fact families: if 6 × 7 = 42 then 42 ÷ 6 = 7', 'Halving twice is the same as dividing by 4', 'Chunking: subtract easy multiples of the divisor'] }],
+  'word-problems': [{ heading: 'Solving Word Problems', rules: ['Combine or add to → addition', 'Compare, remove or find the difference → subtraction', 'Equal groups → multiplication or division', 'Answer in a sentence with units'] }],
+  'multi-step-word-problems': [{ heading: 'Multi-step Problems', rules: ['Work one step at a time and label each result', 'Keep track of what each number represents', 'Check the final answer against the story'] }],
+  'fact-families': [{ heading: 'Fact Families', rules: ['If a × b = c, then b × a = c, c ÷ a = b and c ÷ b = a', 'If a + b = c, then b + a = c, c − a = b and c − b = a'] }],
+  'number-bonds': [{ heading: 'Number Bonds', rules: ['Part + part = whole', 'Missing part = whole − known part'] }],
+  'mental-maths': [{ heading: 'Mental Strategies', rules: ['Compensation: 49 + 25 = 50 + 24', 'Bridge through 10: 8 + 7 = 8 + 2 + 5', 'Use doubles and near-doubles'] }],
+  'times-tables': [{ heading: 'Times Tables', rules: ['A times table is repeated addition', 'Turnaround: 6 × 9 = 9 × 6', 'Use known facts: 7 × 8 = (7 × 4) doubled'] }],
+  bodmas: [{ heading: 'Order of Operations (BODMAS)', rules: ['Brackets first', 'Orders (powers and roots) next', 'Division and Multiplication, left to right', 'Addition and Subtraction, left to right'] }],
+  // Fractions
+  'recognising-fractions': [{ heading: 'Reading Fractions', rules: ['The denominator (bottom) shows the number of equal parts', 'The numerator (top) shows how many parts are counted'] }],
+  'comparing-fractions': [{ heading: 'Comparing Fractions', rules: ['Same denominators: compare the numerators', 'Same numerators: the larger denominator is the smaller fraction', 'Otherwise convert to a common denominator first'] }],
+  'equivalent-fractions': [{ heading: 'Equivalent Fractions', rules: ['Multiply or divide the numerator and denominator by the same number', 'Equivalent fractions name the same amount: 1/2 = 2/4 = 4/8'] }],
+  'fraction-models': [{ heading: 'Fraction Models', rules: ['Fraction shaded = shaded parts ÷ total equal parts', 'The whole must be divided into equal parts'] }],
+  'fraction-of-quantity': [{ heading: 'Fraction of a Quantity', rules: ['Fraction of a quantity = numerator × (quantity ÷ denominator)', 'Divide by the denominator first, then multiply'] }],
+  'simplifying-fractions': [{ heading: 'Simplifying Fractions', rules: ['Divide the numerator and denominator by their greatest common divisor', 'A fraction is in simplest form when the GCD is 1'] }],
+  'mixed-fractions': [{ heading: 'Mixed & Improper Fractions', rules: ['Mixed to improper: (whole × denominator + numerator) over the denominator', 'Improper to mixed: divide the numerator by the denominator; the remainder becomes the new numerator'] }],
+  'improper-fractions': [{ heading: 'Improper Fractions', rules: ['An improper fraction has a numerator larger than its denominator', 'Convert to a mixed number by dividing'] }],
+  // Decimals & Percentages
+  'decimal-place-value': [{ heading: 'Decimal Place Value', rules: ['Each column to the right is ten times smaller', '0.1 = one tenth, 0.01 = one hundredth', 'A zero at the end does not change the value: 0.5 = 0.50'] }],
+  'decimal-operations': [{ heading: 'Decimal Operations', rules: ['Add/Subtract: line up the decimal points', 'Multiply: multiply as whole numbers, then place the total decimal places', 'Divide: move the decimal points to make the divisor a whole number'] }],
+  'percentage-of-amount': [{ heading: 'Percentage of an Amount', rules: ['Percentage of an amount = (percentage ÷ 100) × amount', 'Write the percentage as a decimal first'] }],
+  'fraction-decimal-percentage': [{ heading: 'Converting Between Forms', rules: ['% to decimal: divide by 100', 'Decimal to %: multiply by 100', 'Fraction to %: (numerator ÷ denominator) × 100'] }],
+  'percentage-increase': [{ heading: 'Percentage Increase', rules: ['New value = original + (rate ÷ 100) × original', 'Shortcut: original × (1 + rate ÷ 100)'] }],
+  'percentage-decrease': [{ heading: 'Percentage Decrease', rules: ['New value = original − (rate ÷ 100) × original', 'Shortcut: original × (1 − rate ÷ 100)'] }],
+  'percentage-to-decimal': [{ heading: 'Percentage to Decimal', rules: ['Divide by 100 and remove the % sign', '37.5% = 0.375'] }],
+  // Geometry
+  '2d-shapes': [{ heading: '2D Shapes', rules: ['Triangle: 3 sides; quadrilateral: 4; pentagon: 5; hexagon: 6', 'A regular shape has all sides and angles equal'] }],
+  '3d-shapes': [{ heading: '3D Shapes', rules: ['A prism has a constant cross-section', 'A pyramid tapers to an apex', 'Faces are flat surfaces; edges join faces; vertices are corners'] }],
+  angles: [{ heading: 'Angle Facts', rules: ['Acute < 90°; right = 90°; obtuse between 90° and 180°; reflex between 180° and 360°', 'Angles on a straight line sum to 180°', 'Angles around a point sum to 360°', 'Vertically opposite angles are equal'] }],
+  symmetry: [{ heading: 'Symmetry', rules: ['A line of symmetry divides a shape into mirror halves', 'Rotational symmetry: the shape matches itself during a turn'] }],
+  'position-direction': [{ heading: 'Position & Direction', rules: ['Use compass directions and quarter/half turns', 'A full turn = 360°; a quarter turn = 90°'] }],
+  coordinates: [{ heading: 'Coordinates', rules: ['Coordinates are written (x, y): along first, then up', 'The origin is (0, 0)'] }],
+  transformations: [{ heading: 'Transformations', rules: ['Translation slides; rotation turns; reflection flips', 'Enlargement changes size by a scale factor', 'Only enlargement changes the size of the shape'] }],
+  congruence: [{ heading: 'Congruence', rules: ['Congruent shapes are identical in shape and size', 'Tests for triangles: SSS, SAS, ASA, RHS'] }],
+  similarity: [{ heading: 'Similarity', rules: ['Similar shapes have equal angles and proportional sides', 'Scale factor = image length ÷ original length'] }],
+  'circle-geometry': [{ heading: 'Circles', rules: ['Radius = half the diameter', 'Circumference = 2πr = πd', 'Area = πr²'] }],
+  'geometric-reasoning': [{ heading: 'Geometric Reasoning', rules: ['State the angle fact used at each step', 'Angles in a triangle sum to 180°', 'Base angles of an isosceles triangle are equal'] }],
+  proof: [{ heading: 'Proof', rules: ['Start from what is given and reach the conclusion step by step', 'Justify every statement with a known fact or theorem'] }],
+  pythagoras: [{ heading: 'Pythagoras’ Theorem', rules: ['a² + b² = c² for a right-angled triangle', 'c is the hypotenuse — the side opposite the right angle', 'Missing leg: leg² = c² − other leg²'] }],
+  'shape-properties': [{ heading: 'Shape Properties', rules: ['Count sides, vertices and angles to classify a shape', 'Regular polygons have equal sides and equal angles'] }],
+  // Measurement
+  'visual-measurement': [{ heading: 'Measuring', rules: ['Align the zero mark with one end of the object', 'Read the scale at the other end and include the unit'] }],
+  length: [{ heading: 'Length', rules: ['Units: mm, cm, m, km', '10 mm = 1 cm; 100 cm = 1 m; 1000 m = 1 km'] }],
+  volume: [{ heading: 'Volume', rules: ['Rectangular prism = l × w × h', 'Cube = s³', 'Cylinder = πr²h', 'Volume is measured in cubic units (cm³, m³)'] }],
+  'surface-area': [{ heading: 'Surface Area', rules: ['Surface area = total area of all faces', 'Cube = 6s²', 'Rectangular prism = 2(lw + lh + wh)'] }],
+  capacity: [{ heading: 'Capacity', rules: ['1 L = 1000 mL', '1 mL = 1 cm³', 'Capacity measures how much a container can hold'] }],
+  mass: [{ heading: 'Mass', rules: ['1 kg = 1000 g; 1 tonne = 1000 kg', 'Mass is measured in mg, g, kg and tonnes'] }],
+  time: [{ heading: 'Time', rules: ['1 minute = 60 seconds; 1 hour = 60 minutes; 1 day = 24 hours', 'Use a timeline to bridge across hours'] }],
+  'analogue-clocks': [{ heading: 'Reading Clocks', rules: ['The short hand shows the hour; the long hand shows the minutes', 'Each number on the clock face equals 5 minutes', 'Quarter past = :15, half past = :30, quarter to = :45'] }],
+  calendars: [{ heading: 'Calendars', rules: ['7 days = 1 week; months have 28 to 31 days', 'A leap year has 366 days, with 29 days in February'] }],
+  temperature: [{ heading: 'Temperature', rules: ['Temperature is measured in degrees Celsius (°C)', 'Water freezes at 0°C and boils at 100°C'] }],
+  'measurement-conversions': [{ heading: 'Measurement Conversions', rules: ['Bigger unit → smaller unit: multiply', 'Smaller unit → bigger unit: divide', '1 m = 100 cm; 1 km = 1000 m; 1 kg = 1000 g'] }],
+  'elapsed-time': [{ heading: 'Elapsed Time', rules: ['Elapsed time = finish time − start time', 'Bridge to the next hour first, then add the remaining minutes'] }],
+  // Money
+  'making-change': [{ heading: 'Making Change', rules: ['Change = amount paid − total cost', 'Count up from the cost to the amount paid'] }],
+  'coin-note-recognition': [{ heading: 'Australian Currency', rules: ['Coins: 5c, 10c, 20c, 50c, $1, $2', 'Notes: $5, $10, $20, $50, $100'] }],
+  'adding-money': [{ heading: 'Adding Money', rules: ['Line up the decimal points', 'Write money to two decimal places and include the $ sign'] }],
+  'money-word-problems': [{ heading: 'Money Problems', rules: ['Total cost = sum of the item prices', 'Change = amount paid − total cost', 'Answer in dollars and cents'] }],
+  'saving-money': [{ heading: 'Saving Money', rules: ['Total saved = regular deposit × number of deposits', 'Balance = starting amount + deposits − withdrawals'] }],
+  budgeting: [{ heading: 'Budgeting', rules: ['Income − expenses = money left over', 'A budget balances when expenses are no more than income'] }],
+  'best-buy': [{ heading: 'Best Buy', rules: ['Unit price = price ÷ quantity', 'The lower unit price is the better buy'] }],
+  discounts: [{ heading: 'Discounts', rules: ['Discount = (rate ÷ 100) × original price', 'Sale price = original price − discount'] }],
+  // Statistics
+  'collecting-data': [{ heading: 'Collecting Data', rules: ['A tally groups counts in fives', 'Frequency is the number of times a value occurs'] }],
+  tables: [{ heading: 'Tables', rules: ['Read across the row and down the column', 'Totals belong in the final row or column'] }],
+  'picture-graphs': [{ heading: 'Picture Graphs', rules: ['Each picture stands for a set number of items — check the key', 'Half a picture represents half the key value'] }],
+  'bar-graphs': [{ heading: 'Bar Graphs', rules: ['Bar height shows the frequency', 'Keep bar widths and gaps equal', 'Label both axes and add a title'] }],
+  graphs: [{ heading: 'Reading Graphs', rules: ['Read the title, axes and scale first', 'Each axis needs a label and an even scale'] }],
+  mean: [{ heading: 'Mean', rules: ['Mean = sum of values ÷ number of values'] }],
+  median: [{ heading: 'Median', rules: ['Order the data from smallest to largest', 'The median is the middle value — or the average of the two middle values'] }],
+  mode: [{ heading: 'Mode', rules: ['The mode is the most frequent value', 'A data set can have no mode or more than one mode'] }],
+  range: [{ heading: 'Range', rules: ['Range = maximum value − minimum value'] }],
+  'interquartile-range': [{ heading: 'Interquartile Range', rules: ['IQR = Q3 − Q1', 'Quartiles split ordered data into quarters'] }],
+  'standard-deviation': [{ heading: 'Standard Deviation', rules: ['Standard deviation measures spread around the mean', 'A larger value means the data is more spread out'] }],
+  'data-analysis': [{ heading: 'Data Analysis', rules: ['Describe shape, centre and spread', 'Support every statement with values from the data'] }],
+  'data-interpretation': [{ heading: 'Interpreting Data', rules: ['Read the title, scale and labels first', 'Compare values using the scale, not the look alone'] }],
+  'two-way-tables': [{ heading: 'Two-way Tables', rules: ['Each cell shows the frequency for a row–column combination', 'Row and column totals must match the grand total'] }],
+  'segmented-bar-charts': [{ heading: 'Segmented Bar Charts', rules: ['Each bar shows 100% split into category segments', 'Compare segment sizes between bars'] }],
+  'back-to-back-stem-plots': [{ heading: 'Back-to-back Stem Plots', rules: ['Two data sets share one stem', 'Read leaves outward from the stem on each side', 'Always include a key'] }],
+  'parallel-boxplots': [{ heading: 'Parallel Box Plots', rules: ['Compare medians, spreads and skewness on the same scale', 'A longer box means a larger IQR'] }],
+  regression: [{ heading: 'Regression', rules: ['Least-squares line: y = a + bx', 'Use the line for prediction within the data range'] }],
+  causation: [{ heading: 'Correlation & Causation', rules: ['Correlation does not prove causation', 'A lurking variable may explain an observed association'] }],
+  // Probability
+  'chance-language': [{ heading: 'Chance Language', rules: ['Impossible → unlikely → even chance → likely → certain', 'Even chance means a probability of 1/2'] }],
+  'chance-experiments': [{ heading: 'Chance Experiments', rules: ['Each trial is independent of previous trials', 'More trials bring results closer to the theoretical probability'] }],
+  'simple-probability': [{ heading: 'Simple Probability', rules: ['P(event) = favourable outcomes ÷ total outcomes', 'Probability always lies between 0 and 1', 'Impossible = 0, certain = 1'] }],
+  'advanced-probability': [{ heading: 'Probability', rules: ['P(event) = favourable ÷ total, simplified where possible', 'Complement: P(not A) = 1 − P(A)'] }],
+  'tree-diagrams': [{ heading: 'Tree Diagrams', rules: ['Multiply along the branches (AND)', 'Add between the branches (OR)', 'The branches at each level sum to 1'] }],
+  'compound-probability': [{ heading: 'Compound Probability', rules: ['Independent events: P(A and B) = P(A) × P(B)', 'Mutually exclusive events: P(A or B) = P(A) + P(B)'] }],
+  'conditional-probability': [{ heading: 'Conditional Probability', rules: ['P(A|B) = P(A ∩ B) ÷ P(B)', 'Use the reduced sample space described by B'] }],
+  'theoretical-vs-experimental': [{ heading: 'Theoretical vs Experimental', rules: ['Theoretical probability = favourable ÷ total', 'Experimental probability = successes ÷ trials'] }],
+  // Trigonometry
+  'right-angle-trigonometry': [{ heading: 'SOH CAH TOA', rules: ['sin θ = opposite ÷ hypotenuse', 'cos θ = adjacent ÷ hypotenuse', 'tan θ = opposite ÷ adjacent', 'Label the sides relative to the angle before choosing a ratio'] }],
+  'sine-rule': [{ heading: 'Sine Rule', rules: ['a/sin A = b/sin B = c/sin C', 'Use it when you know a matching angle–side pair'] }],
+  'cosine-rule': [{ heading: 'Cosine Rule', rules: ['c² = a² + b² − 2ab cos C', 'Use with two sides and the included angle, or with three sides'] }],
+  bearings: [{ heading: 'Bearings', rules: ['Bearings are measured clockwise from north', 'Write bearings with three digits, e.g. 047°', 'Back bearing = bearing ± 180°'] }],
+  'applications-of-trigonometry': [{ heading: 'Applying Trigonometry', rules: ['Angle of elevation is measured up from the horizontal', 'Angle of depression is measured down from the horizontal', 'Draw and label a right-angled triangle first'] }],
+  // Algebra (secondary)
+  patterns: [{ heading: 'Patterns', rules: ['Find the rule linking each term to its position', 'Check the rule against at least two terms'] }],
+  variables: [{ heading: 'Variables', rules: ['A variable (like x) stands for an unknown or changing number', '3x means 3 × x'] }],
+  expressions: [{ heading: 'Algebraic Expressions', rules: ['Like terms have the same variable and power', 'Only like terms can be added or subtracted'] }],
+  substitution: [{ heading: 'Substitution', rules: ['Replace each variable with its given value', 'Use brackets around substituted values', 'Evaluate using the order of operations'] }],
+  'expanding-expressions': [{ heading: 'Expanding', rules: ['a(b + c) = ab + ac', '(a + b)(c + d) = ac + ad + bc + bd', 'Every term in one bracket multiplies every term in the other'] }],
+  factorisation: [{ heading: 'Factorising', rules: ['Take out the highest common factor first', 'Difference of squares: a² − b² = (a − b)(a + b)', 'x² + (p + q)x + pq = (x + p)(x + q)'] }],
+  'linear-equations': [{ heading: 'Linear Equations', rules: ['Do the same operation to both sides', 'Undo operations in reverse order', 'Check by substituting the solution back'] }],
+  'simultaneous-equations': [{ heading: 'Simultaneous Equations', rules: ['Eliminate one variable by adding or subtracting the equations', 'Or substitute one equation into the other', 'Check the solution in both equations'] }],
+  quadratics: [{ heading: 'Quadratics', rules: ['Standard form: ax² + bx + c = 0', 'Factorise, or use x = (−b ± √(b² − 4ac)) ÷ 2a', 'A quadratic can have 0, 1 or 2 real solutions'] }],
+  indices: [{ heading: 'Index Laws', rules: ['aᵐ × aⁿ = aᵐ⁺ⁿ', 'aᵐ ÷ aⁿ = aᵐ⁻ⁿ', '(aᵐ)ⁿ = aᵐⁿ', 'a⁰ = 1 and a⁻ⁿ = 1/aⁿ'] }],
+  surds: [{ heading: 'Surds', rules: ['√(ab) = √a × √b', 'Simplify by taking out square factors', '√a × √a = a'] }],
+  vectors: [{ heading: 'Vectors', rules: ['Add vectors by adding corresponding components', 'Scalar multiplication scales every component', 'Magnitude of (a, b) = √(a² + b²)'] }],
+  sequences: [{ heading: 'Sequences', rules: ['Arithmetic: uₙ = u₁ + (n − 1)d', 'Geometric: uₙ = u₁ × rⁿ⁻¹'] }],
+  'simple-interest': [{ heading: 'Simple Interest', rules: ['I = P × r × t (rate as a decimal, t in years)', 'Total value = principal + interest'] }],
+  'compound-interest': [{ heading: 'Compound Interest', rules: ['A = P(1 + i)ⁿ', 'Each period, interest is earned on the growing balance'] }],
+  depreciation: [{ heading: 'Depreciation', rules: ['Reducing balance: A = P(1 − i)ⁿ', 'Each period the rate applies to the reduced value'] }],
+  loans: [{ heading: 'Reducing-Balance Loans', rules: ['PMT = Pi ÷ (1 − (1 + i)⁻ⁿ)', 'Interest each period = opening balance × periodic rate'] }],
+  annuities: [{ heading: 'Annuities', rules: ['FV = PMT × ((1 + i)ⁿ − 1) ÷ i', 'Payments are made at regular intervals'] }],
+  perpetuities: [{ heading: 'Perpetuities', rules: ['PV = payment ÷ i', 'A perpetuity makes payments forever'] }],
+  'periodic-investments': [{ heading: 'Periodic Investments', rules: ['FV = P(1 + i)ⁿ + PMT × ((1 + i)ⁿ − 1) ÷ i', 'Combine the growth of the lump sum and the payments'] }],
+  'exponential-functions': [{ heading: 'Exponential Functions', rules: ['y = A × kˣ has initial value A', 'Growth when k > 1, decay when 0 < k < 1'] }],
+  'logarithmic-functions': [{ heading: 'Logarithmic Functions', rules: ['logₐ(x) = y means aʸ = x', 'The logarithm is only defined for positive arguments'] }],
+  polynomials: [{ heading: 'Polynomials', rules: ['The degree is the highest power of x', 'x-intercepts occur where the polynomial equals zero'] }],
+  // Number
+  'whole-numbers': [{ heading: 'Whole Numbers', rules: ['Whole numbers are 0, 1, 2, 3, …', 'Place value determines the value of each digit'] }],
+  'place-value': [{ heading: 'Place Value', rules: ['Each place is ten times the place to its right', 'In 4 352, the digit 3 is worth 300'] }],
+  'odd-even': [{ heading: 'Odd & Even', rules: ['Even numbers end in 0, 2, 4, 6 or 8', 'Odd numbers end in 1, 3, 5, 7 or 9'] }],
+  'comparing-numbers': [{ heading: 'Comparing Numbers', rules: ['Compare digits from the left', 'Use <, > and = to record the comparison'] }],
+  'ordering-numbers': [{ heading: 'Ordering Numbers', rules: ['Line up the place values and compare from the left', 'Ascending = smallest to largest; descending = largest to smallest'] }],
+  'missing-numbers': [{ heading: 'Missing Numbers', rules: ['Use the inverse operation to find the missing value', 'Check by substituting your answer back'] }],
+  'number-sentences': [{ heading: 'Number Sentences', rules: ['Both sides of = must have the same value', 'Use inverse operations to find unknowns'] }],
+  equality: [{ heading: 'Equality', rules: ['The equals sign means “is the same as”', 'A balanced equation: 5 + 3 = 4 + 4'] }],
+  factors: [{ heading: 'Factors', rules: ['A factor divides exactly with no remainder', 'Factors come in pairs: for 12, 1×12, 2×6, 3×4'] }],
+  multiples: [{ heading: 'Multiples', rules: ['Multiples of n are n, 2n, 3n, …', 'The first multiple of a number is the number itself'] }],
+  'prime-numbers': [{ heading: 'Prime Numbers', rules: ['A prime has exactly two factors: 1 and itself', '2 is the only even prime number'] }],
+  'composite-numbers': [{ heading: 'Composite Numbers', rules: ['A composite number has more than two factors', 'Every composite can be written as a product of primes'] }],
+  integers: [{ heading: 'Integers', rules: ['Integers include negatives, zero and positives', 'Adding a negative is the same as subtracting', 'Subtracting a negative is the same as adding'] }],
+  'magic-squares': [{ heading: 'Magic Squares', rules: ['Every row, column and diagonal has the same sum', 'Magic sum = total of all numbers ÷ number of rows'] }],
+  sudoku: [{ heading: 'Sudoku', rules: ['Each row, column and box contains 1–9 exactly once', 'Scan for the only possible placement of a number'] }],
+  'complex-numbers': [{ heading: 'Complex Numbers', rules: ['i² = −1', 'Add or subtract real and imaginary parts separately', 'The conjugate of a + bi is a − bi'] }],
+  // Ratio
+  'writing-ratios': [{ heading: 'Writing Ratios', rules: ['A ratio compares quantities: a : b', 'Simplify by dividing both parts by their GCD'] }],
+  'equivalent-ratios': [{ heading: 'Equivalent Ratios', rules: ['Multiply or divide both parts by the same number', '2 : 3 = 4 : 6 = 6 : 9'] }],
+  'dividing-in-a-ratio': [{ heading: 'Dividing in a Ratio', rules: ['Total parts = sum of the ratio parts', 'One part = total quantity ÷ total parts', 'Multiply one part by each ratio number'] }],
+  proportion: [{ heading: 'Proportion', rules: ['a/b = c/d', 'Cross-multiply: a × d = b × c'] }],
 };
 
 function getTopicFormulaGroups(module, topic, unitConversionGroups) {
-  if (topic === 'unit-conversions') return unitConversionGroups;
+  if (topic === 'unit-conversions') {
+    return (Array.isArray(unitConversionGroups) && unitConversionGroups.length) ? unitConversionGroups : UNIT_CONVERSION_GROUPS;
+  }
   return TOPIC_FORMULA_GROUPS[topic] || FORMULA_SHEETS[module] || [];
-}
-
-function buildFormulaSheetHTML(module, topic = '') {
-  const groups = topic ? getTopicFormulaGroups(module, topic, []) : (FORMULA_SHEETS[module] || []);
-  const sheetTitle = topic ? `${moduleLabel(module)} - ${topicLabel(topic).replace(/ Practice$/, '')}` : moduleLabel(module);
-  const groupsHTML = groups.map((group) => `
-    <section class="conversion-formula-group">
-      <h3>${escapeHtml(group.heading)}</h3>
-      <ul>${group.rules.map((rule) => `<li>${escapeHtml(rule)}</li>`).join('')}</ul>
-    </section>`).join('');
-
-  return `
-    <div class="a4-page conversion-formula-page">
-      <div class="worksheet-header">
-        ${buildWorksheetHeaderBrandHTML(`${sheetTitle} Formula Sheet`, module)}
-        <div class="worksheet-info-strip">
-          ${buildInfoStripItem('book', 'Module', moduleLabel(module))}
-          ${buildInfoStripItem('clipboard', 'Topic', topic ? topicLabel(topic).replace(/ Practice$/, '') : 'Module Overview')}
-        </div>
-      </div>
-      <div class="conversion-formula-content">
-        <h2>${escapeHtml(sheetTitle)} - Key Formulas &amp; Terms</h2>
-        <div class="conversion-formula-grid">${groupsHTML}</div>
-      </div>
-      <div class="page-footer">
-        <div class="page-footer-left">${buildFooterLegalHTML()}</div>
-        <span class="page-footer-right">Page 1 of 1</span>
-      </div>
-    </div>`;
 }
 
 function renderFormulaLookupPreview() {
