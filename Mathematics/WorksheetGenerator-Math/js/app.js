@@ -746,6 +746,16 @@ const RATIO_TOPICS = new Set([
   'dividing-in-a-ratio',
   'proportion',
 ]);
+const PROBABILITY_TOPICS = new Set([
+  'chance-language',
+  'chance-experiments',
+  'simple-probability',
+  'advanced-probability',
+  'tree-diagrams',
+  'compound-probability',
+  'conditional-probability',
+  'theoretical-vs-experimental',
+]);
 const STATISTICS_TOPICS = new Set([
   'collecting-data',
   'tables',
@@ -1845,6 +1855,11 @@ function moduleLabel(module) {
 }
 
 function topicLabel(topic, timesTable) {
+  if (topic === 'times-tables') {
+    const parsedTimesTable = Number(timesTable);
+    return Number.isFinite(parsedTimesTable) ? `${parsedTimesTable} Times Table` : 'Times Tables Practice';
+  }
+
   const map = {
     'multiplication-strategies': 'Multiplication Strategies Practice',
     'division-strategies': 'Division Strategies Practice',
@@ -1899,6 +1914,7 @@ function topicLabel(topic, timesTable) {
       'piecewise-linear': 'Piecewise Linear Models Practice',
       'direct-variation': 'Direct Variation Practice',
       'inverse-variation': 'Inverse Variation Practice',
+      'transformations-to-linearity': 'Transformations to Linearity Practice',
       'logarithmic-scale': 'Logarithmic Scale Practice',
       'orders-of-magnitude': 'Orders of Magnitude Practice',
       arcs: 'Arc Length Practice',
@@ -1958,7 +1974,6 @@ function topicLabel(topic, timesTable) {
     'multiplication-groups': 'Multiplication Groups & Arrays Practice',
     'multiplication-strategies': 'Multiplication Strategies Practice',
     division: 'Division Practice',
-    'times-tables': `${timesTable} Times Table`,
     bodmas: 'B.O.D.M.A.S Practice',
     mixed: 'Mixed Operations Practice',
     'whole-numbers': 'Whole Numbers Practice',
@@ -2027,6 +2042,10 @@ function topicLabel(topic, timesTable) {
     'chance-language': 'Chance Practice',
     'simple-probability': 'Simple Probability Practice',
     'advanced-probability': 'Advanced Probability Practice',
+    'tree-diagrams': 'Tree Diagrams Practice',
+    'compound-probability': 'Compound Probability Practice',
+    'conditional-probability': 'Conditional Probability Practice',
+    'theoretical-vs-experimental': 'Theoretical vs Experimental Practice',
     '2d-shapes': '2D Shapes Practice',
     '3d-shapes': '3D Shapes Practice',
     angles: 'Angles Practice',
@@ -3815,6 +3834,14 @@ function buildQuestions(topic, min, max, count, timesTable, denominatorMode, mag
     }
     return questions;
   }
+
+  if (PROBABILITY_TOPICS.has(topic)) {
+    for (let i = 0; i < safeCount; i++) {
+      pushUniqueQuestion(questions, seenSignatures, () => buildProbabilityQuestion(topic, safeMin, safeMax));
+    }
+    return questions;
+  }
+
   if (STATISTICS_TOPICS.has(topic)) {
     for (let i = 0; i < safeCount; i++) {
       pushUniqueQuestion(questions, seenSignatures, () => buildStatisticsQuestion(topic, safeMin, safeMax));
@@ -6835,6 +6862,122 @@ function buildRatioQuestion(topic) {
         answer: '',
       };
   }
+}
+
+function buildProbabilityQuestion(topic, min, max) {
+  const normalizedRange = normalizeConfiguredRange(min, max, 1, 12);
+  const safeMin = Math.max(1, normalizedRange.min);
+  const safeMax = Math.max(safeMin, normalizedRange.max);
+  const rangeInt = (minimumValue = 1) => {
+    const low = Math.max(minimumValue, safeMin);
+    const high = Math.max(low, safeMax);
+    return randomInt(low, high);
+  };
+
+  if (topic === 'chance-language') {
+    const statements = [
+      { prompt: 'Rolling a 7 on a standard six-sided die', answer: 'Impossible' },
+      { prompt: 'The sun rising tomorrow', answer: 'Certain' },
+      { prompt: 'Flipping a coin and it landing on heads', answer: 'Even chance' },
+      { prompt: 'It raining in a desert tomorrow', answer: 'Unlikely' },
+      { prompt: 'Picking a red ball from a bag of only red balls', answer: 'Certain' },
+      { prompt: 'Picking a blue ball from a bag with 9 red balls and 1 blue ball', answer: 'Unlikely' },
+      { prompt: 'Getting a number less than 7 when rolling a standard die', answer: 'Certain' },
+    ];
+    const statement = pickRandomFromList(statements);
+    return {
+      kind: 'number',
+      topic,
+      prompt: `Describe the chance: ${statement.prompt}. (Impossible, Unlikely, Even chance, Likely, or Certain)`,
+      answer: statement.answer,
+    };
+  }
+
+  if (topic === 'chance-experiments') {
+    const red = rangeInt(1);
+    const blue = rangeInt(1);
+    const total = red + blue;
+    const divisor = gcd(red, total);
+    return {
+      kind: 'number',
+      topic,
+      prompt: `A bag has ${red} red and ${blue} blue counters. What is the probability of choosing red?`,
+      answer: fractionToText({ numerator: red / divisor, denominator: total / divisor }),
+    };
+  }
+
+  if (topic === 'simple-probability' || topic === 'advanced-probability') {
+    const totalOutcomes = rangeInt(4);
+    const favourable = randomInt(1, Math.max(1, totalOutcomes - 1));
+    const scenario = pickRandomFromList(['marbles', 'cards', 'spinner sections']);
+    return {
+      kind: 'number',
+      topic,
+      prompt: `A set has ${totalOutcomes} ${scenario}, ${favourable} of which are winning outcomes. What is the probability of winning?`,
+      answer: reduceFraction(favourable, totalOutcomes),
+    };
+  }
+
+  if (topic === 'tree-diagrams') {
+    const firstDenominator = rangeInt(3);
+    const secondDenominator = rangeInt(3);
+    const firstNumerator = randomInt(1, Math.max(1, firstDenominator - 1));
+    const secondNumerator = randomInt(1, Math.max(1, secondDenominator - 1));
+    const first = reduceFraction(firstNumerator, firstDenominator);
+    const second = reduceFraction(secondNumerator, secondDenominator);
+    const [aNum, aDen] = first.split('/').map(Number);
+    const [bNum, bDen] = second.split('/').map(Number);
+    const both = reduceFraction(aNum * bNum, aDen * bDen);
+    return {
+      kind: 'number',
+      topic,
+      prompt: `Event A has probability ${first} and event B has probability ${second} (independent). Use a tree diagram idea to find P(A and B).`,
+      answer: both,
+    };
+  }
+
+  if (topic === 'compound-probability') {
+    const denominator = rangeInt(6);
+    const a = randomInt(1, Math.max(1, denominator - 2));
+    const b = randomInt(1, Math.max(1, denominator - 1));
+    const unionNumerator = Math.min(denominator, a + b);
+    return {
+      kind: 'number',
+      topic,
+      prompt: `If P(A) = ${reduceFraction(a, denominator)} and P(B) = ${reduceFraction(b, denominator)} for mutually exclusive events, find P(A or B).`,
+      answer: reduceFraction(unionNumerator, denominator),
+    };
+  }
+
+  if (topic === 'conditional-probability') {
+    const denominator = rangeInt(6);
+    const bNumerator = randomInt(2, Math.max(2, denominator - 1));
+    const intersectionNumerator = randomInt(1, bNumerator - 1);
+    return {
+      kind: 'number',
+      topic,
+      prompt: `If P(A and B) = ${reduceFraction(intersectionNumerator, denominator)} and P(B) = ${reduceFraction(bNumerator, denominator)}, find P(A|B).`,
+      answer: reduceFraction(intersectionNumerator, bNumerator),
+    };
+  }
+
+  if (topic === 'theoretical-vs-experimental') {
+    const trials = rangeInt(8);
+    const successes = randomInt(1, Math.max(1, trials - 1));
+    return {
+      kind: 'number',
+      topic,
+      prompt: `An event occurs ${successes} times in ${trials} trials. Write the experimental probability and state whether this is theoretical or experimental data.`,
+      answer: `${reduceFraction(successes, trials)}, experimental`,
+    };
+  }
+
+  return {
+    kind: 'number',
+    topic,
+    prompt: 'Write the answer.',
+    answer: '',
+  };
 }
 
 function getFactors(value) {
