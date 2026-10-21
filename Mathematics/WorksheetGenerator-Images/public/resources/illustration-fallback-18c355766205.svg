@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="768" height="768" viewBox="0 0 768 768">
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1f8fc"/><stop offset="1" stop-color="#dbeaf4"/></linearGradient>
+      <linearGradient id="card" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#eff6fa"/></linearGradient>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#bg)"/>
+    <rect x="24" y="24" width="720" height="66" rx="12" fill="#0f6b5f"/>
+    <text x="40" y="62" font-size="28" fill="#ffffff" font-family="Public Sans,Segoe UI,sans-serif" font-weight="700">Worksheet Illustration</text>
+    <text x="40" y="84" font-size="12" fill="#d6f2ea" font-family="Public Sans,Segoe UI,sans-serif">AI key not configured, showing local fallback visual</text>
+
+    <rect x="48" y="116" width="672" height="588" rx="14" fill="url(#card)" stroke="#b8cfde"/>
+    <text x="66" y="146" font-size="14" fill="#345267" font-family="Public Sans,Segoe UI,sans-serif">simple cartoon of three children measuring water in beakers</text>
+
+    <line x1="72" y1="662" x2="696" y2="662" stroke="#8cb0c7" stroke-width="3"/>
+
+    <circle cx="264" cy="308" r="22" fill="#f2b782"/>
+    <rect x="242" y="330" width="44" height="66" rx="10" fill="#4c86b7"/>
+    <rect x="245" y="384" width="14" height="34" rx="6" fill="#2b5f88"/>
+    <rect x="269" y="384" width="14" height="34" rx="6" fill="#2b5f88"/>
+
+    <circle cx="384" cy="302" r="22" fill="#f2b782"/>
+    <rect x="362" y="324" width="44" height="72" rx="10" fill="#0f6b5f"/>
+    <rect x="365" y="384" width="14" height="34" rx="6" fill="#0b4f47"/>
+    <rect x="389" y="384" width="14" height="34" rx="6" fill="#0b4f47"/>
+
+    <circle cx="504" cy="308" r="22" fill="#f2b782"/>
+    <rect x="482" y="330" width="44" height="66" rx="10" fill="#de8b2a"/>
+    <rect x="485" y="384" width="14" height="34" rx="6" fill="#b66f1e"/>
+    <rect x="509" y="384" width="14" height="34" rx="6" fill="#b66f1e"/>
+
+    <rect x="298" y="402" width="172" height="52" rx="9" fill="#ffffff" stroke="#9eb9cb"/>
+    <circle cx="340" cy="428" r="10" fill="#f7c948"/>
+    <circle cx="384" cy="428" r="10" fill="#63a1d1"/>
+    <circle cx="428" cy="428" r="10" fill="#f08a5d"/>
+  </svg>

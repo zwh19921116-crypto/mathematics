@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1f8fc"/><stop offset="1" stop-color="#dbeaf4"/></linearGradient>
+      <linearGradient id="card" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#eff6fa"/></linearGradient>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#bg)"/>
+    <rect x="24" y="24" width="976" height="66" rx="12" fill="#0f6b5f"/>
+    <text x="40" y="62" font-size="28" fill="#ffffff" font-family="Public Sans,Segoe UI,sans-serif" font-weight="700">Worksheet Illustration</text>
+    <text x="40" y="84" font-size="12" fill="#d6f2ea" font-family="Public Sans,Segoe UI,sans-serif">AI key not configured, showing local fallback visual</text>
+
+    <rect x="48" y="116" width="928" height="844" rx="14" fill="url(#card)" stroke="#9ab7ca" stroke-width="2"/>
+    <text x="66" y="146" font-size="14" fill="#345267" font-family="Public Sans,Segoe UI,sans-serif">Study the lithium atom diagram and answer the questions.</text>
+
+    <rect x="84" y="570" width="856" height="300" rx="12" fill="#ffffff" stroke="#9db9cc" stroke-width="2"/>
+    <line x1="84" y1="614" x2="940" y2="614" stroke="#d7e5ee" stroke-width="2"/>
+    <line x1="72" y1="918" x2="952" y2="918" stroke="#6f96b1" stroke-width="3"/>
+
+    <circle cx="395" cy="436" r="22" fill="#f2b782"/>
+    <rect x="373" y="458" width="44" height="66" rx="10" fill="#4c86b7" stroke="#2c5c86"/>
+    <rect x="373" y="512" width="14" height="34" rx="6" fill="#2b5f88" stroke="#1f4362"/>
+    <rect x="397" y="512" width="14" height="34" rx="6" fill="#2b5f88" stroke="#1f4362"/>
+
+    <circle cx="510" cy="430" r="22" fill="#f2b782"/>
+    <rect x="488" y="452" width="44" height="72" rx="10" fill="#156b4f" stroke="#0b4f47"/>
+    <rect x="493" y="512" width="14" height="34" rx="6" fill="#0b4f47" stroke="#083b35"/>
+    <rect x="517" y="512" width="14" height="34" rx="6" fill="#0b4f47" stroke="#083b35"/>
+
+    <circle cx="639" cy="436" r="22" fill="#f2b782"/>
+    <rect x="617" y="458" width="44" height="66" rx="10" fill="#d9963c" stroke="#9e6118"/>
+    <rect x="613" y="512" width="14" height="34" rx="6" fill="#b66f1e" stroke="#864f14"/>
+    <rect x="637" y="512" width="14" height="34" rx="6" fill="#b66f1e" stroke="#864f14"/>
+
+    <rect x="426" y="530" width="172" height="52" rx="9" fill="#ffffff" stroke="#7ea0b6" stroke-width="2"/>
+    <circle cx="468" cy="556" r="10" fill="#f7c948"/>
+    <circle cx="512" cy="556" r="10" fill="#63a1d1"/>
+    <circle cx="556" cy="556" r="10" fill="#f08a5d"/>
+
+    <polyline points="68,832 956,832" fill="none" stroke="#d2e1ea" stroke-width="2"/>
+    <polyline points="68,856 956,856" fill="none" stroke="#d2e1ea" stroke-width="2"/>
+    <polyline points="68,880 956,880" fill="none" stroke="#d2e1ea" stroke-width="2"/>
+    <text x="68" y="822" font-size="12" fill="#567183" font-family="Public Sans,Segoe UI,sans-serif">Teacher notes / student observations</text>
+  </svg>

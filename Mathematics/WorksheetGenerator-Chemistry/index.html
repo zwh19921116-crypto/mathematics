@@ -290,9 +290,17 @@
         <button id="formulaLookupBtn" class="btn-secondary" type="button">Formula Lookup</button>
         <button id="fullscreenBtn" class="btn-secondary" type="button" aria-pressed="false">Fullscreen</button>
       </div>
+      <p class="generate-status" id="worksheetGenerateStatus" role="status" aria-live="polite" style="display:none"></p>
     </section>
 
     <div class="preview-wrapper">
+      <div class="preview-tabs" id="previewTabs">
+        <button id="worksheetTabBtn" class="preview-tab-button is-active" type="button" aria-pressed="true">Worksheet</button>
+        <button id="statusTabBtn" class="preview-tab-button" type="button" aria-pressed="false">Server Status</button>
+        <button id="clearStatusBtn" class="preview-tab-clear" type="button">Clear Log</button>
+      </div>
+
+      <div id="worksheetPanel" class="preview-panel is-active">
       <div class="preview-toolbar" id="previewToolbar" style="display:none">
         <div class="pagination-actions">
           <div class="pagination" id="pagination" style="display:none">
@@ -313,6 +321,12 @@
       <!-- Pagination controls -->
       <section class="preview" id="worksheetPreview">
         <p class="placeholder">Your worksheet will appear here after you click <strong>Generate Worksheet</strong>.</p>
+      </section>
+      </div>
+
+      <section id="statusPanel" class="preview-panel status-panel" aria-live="polite" style="display:none">
+        <p class="status-panel-description">Live generation events, selected server, and fallback diagnostics.</p>
+        <div id="worksheetStatusLog" class="status-log"></div>
       </section>
     </div>
   </main>

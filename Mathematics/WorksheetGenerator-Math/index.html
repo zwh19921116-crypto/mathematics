@@ -275,8 +275,13 @@
         <label class="checkbox-label" for="formulaSheetRequired"><input type="checkbox" id="formulaSheetRequired" /> Formula Sheet Required</label>
       </div>
 
-      <div class="form-group">
+      <div class="form-group checkbox-pair">
         <label class="checkbox-label" for="solutionsRequired"><input type="checkbox" id="solutionsRequired" /> Solutions Required</label>
+        <label class="checkbox-label" for="separateSolutions"><input type="checkbox" id="separateSolutions" disabled /> Separate solutions</label>
+      </div>
+
+      <div class="form-group">
+        <label class="checkbox-label" for="resourcesCheckbox"><input type="checkbox" id="resourcesCheckbox" /> Resources</label>
       </div>
 
       <div class="form-group">
@@ -295,6 +300,7 @@
         <button id="printBtn" class="btn-secondary" disabled>Print / Save PDF</button>
         <button id="bulkAddBtn" class="btn-secondary" type="button">Bulk Add</button>
         <button id="formulaLookupBtn" class="btn-secondary" type="button">Formula Lookup</button>
+        <button id="resourcesBtn" class="btn-secondary" type="button">Resources</button>
         <button id="fullscreenBtn" class="btn-secondary" type="button" aria-pressed="false">Fullscreen</button>
       </div>
     </section>
@@ -332,7 +338,7 @@
       </div>
 
       <div class="modal-body">
-        <p class="modal-hint">Design a day-by-day program: give each day its own worksheets so the program builds towards different skills. Set how many folders to generate and the day plan repeats to fill them - each folder gets its own merged PDF with freshly randomised questions.</p>
+        <p class="modal-hint">Configure one worksheet, then generate a fresh set of questions for each day.</p>
 
         <div class="form-row">
           <div class="form-group">
@@ -340,8 +346,9 @@
             <input type="text" id="bulkBatchName" value="Bulk Worksheets" maxlength="60" />
           </div>
           <div class="form-group">
-            <label for="bulkFolderCount">Number of Folders to Generate</label>
+            <label for="bulkFolderCount">Number of Days to Generate</label>
             <input type="number" id="bulkFolderCount" value="30" min="1" max="365" />
+            <small class="field-hint">One ZIP folder is created with Day 1.pdf, Day 2.pdf, Day 3.pdf, and so on.</small>
           </div>
         </div>
 
@@ -376,7 +383,7 @@
 
         <div class="bulk-day-plan">
           <h3 class="modal-subheading">Day Plan</h3>
-          <p class="modal-hint">Folders are filled by cycling through the days defined here, in order. Define as many days as your program needs (e.g. 5 days that repeat for 6 weeks = 30 folders).</p>
+          <p class="modal-hint">This setup is hidden because the same worksheet configuration is regenerated for each day.</p>
           <div class="bulk-day-nav">
             <button type="button" id="bulkPrevDayBtn" class="btn-page" aria-label="Previous day">&#8592;</button>
             <input type="text" id="bulkDayLabelInput" maxlength="40" />
@@ -413,11 +420,30 @@
           </div>
         </div>
 
-        <h3 class="modal-subheading">Worksheets for this day</h3>
-        <ul class="bulk-items-list" id="bulkItemsList"></ul>
-        <p class="bulk-items-empty" id="bulkItemsEmpty">No worksheets added yet.</p>
-
-        <div class="bulk-item-form">
+        <h3 class="modal-subheading">Worksheet Configuration</h3>
+        <div class="bulk-builder-layout">
+          <div class="bulk-item-form">
+          <div class="search-modal-backdrop" id="bulkModuleTopicSearchBackdrop" style="display:none"></div>
+          <div class="search-filter-section search-filter-popup" id="bulkModuleTopicSearchPopup" role="search" aria-labelledby="bulkSearchPopupTitle" style="display:none">
+            <div class="search-popup-title" id="bulkSearchPopupTitle">Search</div>
+            <label for="bulkModuleTopicSearch">Find a Module or Topic</label>
+            <input type="search" id="bulkModuleTopicSearch" placeholder="Search modules and topics" autocomplete="off" />
+            <select id="bulkModuleTopicSearchResults" class="module-topic-search-results" size="5" aria-label="Search results" style="display:none"></select>
+          </div>
+          <div class="form-group">
+            <div class="form-label-with-search">
+              <label for="bulkYearLevel">Year Level</label>
+              <button type="button" id="bulkModuleTopicSearchToggle" class="search-icon-button" aria-label="Search modules and topics" aria-expanded="false">&#128269;</button>
+            </div>
+            <select id="bulkYearLevel">
+              <option value="primary">Primary</option>
+              <option value="secondary">Secondary</option>
+              <option value="general-mathematics-12">VCE General Mathematics - Units 1 &amp; 2</option>
+              <option value="general-mathematics-34">VCE General Mathematics - Units 3 &amp; 4</option>
+              <option value="mathematical-methods-12">VCE Mathematical Methods - Units 1 &amp; 2</option>
+              <option value="mathematical-methods-34">VCE Mathematical Methods - Units 3 &amp; 4</option>
+            </select>
+          </div>
           <div class="form-group">
             <label for="bulkModule">Module</label>
             <select id="bulkModule">
@@ -540,13 +566,49 @@
             <span>Solutions Required</span>
           </div>
 
-          <button type="button" id="bulkAddItemBtn" class="btn-secondary">+ Add Worksheet to Folder</button>
+            <button type="button" id="bulkAddItemBtn" class="btn-secondary">+ Add Worksheet</button>
+          </div>
+
+          <div class="bulk-stitch-list">
+            <h3 class="modal-subheading">Worksheet(s) Generated Each Day</h3>
+            <ul class="bulk-items-list" id="bulkItemsList"></ul>
+            <p class="bulk-items-empty" id="bulkItemsEmpty">No worksheets added yet.</p>
+            <h3 class="modal-subheading">Worksheet Preview</h3>
+            <p class="bulk-preview-hint">Preview the pages that will be stitched for this day.</p>
+            <div class="bulk-preview-toolbar">
+              <button type="button" id="bulkPreviewPrevBtn" class="btn-page btn-page-neutral">Previous</button>
+              <span id="bulkPreviewIndicator">Page 0 of 0</span>
+              <button type="button" id="bulkPreviewNextBtn" class="btn-page btn-page-neutral">Next</button>
+            </div>
+            <div class="bulk-worksheet-preview" id="bulkWorksheetPreview">
+              <p class="bulk-preview-empty">Add a worksheet to see its preview.</p>
+            </div>
+          </div>
         </div>
 
-        <p class="bulk-progress" id="bulkProgress" style="display:none"></p>
+        <div class="bulk-progress-panel" id="bulkProgressPanel" style="display:none">
+          <p class="bulk-progress" id="bulkProgress"></p>
+          <progress id="bulkProgressBar" class="bulk-progress-bar" value="0" max="100"></progress>
+          <div class="bulk-progress-track" aria-hidden="true">
+            <span id="bulkProgressFill" class="bulk-progress-fill" style="width:0%"></span>
+          </div>
+          <div class="bulk-progress-meta">
+            <div class="bulk-progress-stats">
+              <span id="bulkProgressPercent" class="bulk-progress-percent">0%</span>
+              <span id="bulkElapsedTime" class="bulk-progress-stat">Elapsed: 00:00</span>
+              <span id="bulkEtaTime" class="bulk-progress-stat">Remaining: --:--</span>
+              <span id="bulkFinishTime" class="bulk-progress-stat">Finish: --:--</span>
+            </div>
+            <div class="bulk-progress-actions">
+              <button type="button" id="bulkPauseResumeBtn" class="btn-secondary">Pause Export</button>
+              <button type="button" id="bulkStopBtn" class="btn-secondary">Cancel Export</button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="modal-footer">
+        <span id="bulkFooterStatus" class="bulk-footer-status" style="display:none">Exporting... 0% | Remaining: --:--</span>
         <button type="button" id="bulkCancelBtn" class="btn-secondary">Cancel</button>
         <button type="button" id="bulkGenerateBtn" class="btn-primary" disabled>Generate Bulk PDFs</button>
       </div>
@@ -597,6 +659,32 @@
       <div class="modal-footer">
         <button type="button" id="formulaModalCancelBtn" class="btn-secondary">Close</button>
         <button type="button" id="formulaPrintBtn" class="btn-primary">Print / Save PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="resourcesModalOverlay" style="display:none">
+    <div class="modal resources-modal" id="resourcesModal" role="dialog" aria-modal="true" aria-labelledby="resourcesModalTitle">
+      <div class="modal-header">
+        <h2 id="resourcesModalTitle">Registered Resources</h2>
+        <button type="button" class="modal-close" id="resourcesModalCloseBtn" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-hint">Resources registered while the Resources option was enabled. Export this registry as JSON to keep a portable copy.</p>
+        <div class="resources-table-wrap">
+          <table class="resources-table">
+            <thead>
+              <tr><th>Created</th><th>Resource</th><th>Pages</th><th>Files</th></tr>
+            </thead>
+            <tbody id="resourcesTableBody"></tbody>
+          </table>
+          <p class="bulk-preview-empty" id="resourcesEmpty">No resources registered yet.</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="resourcesClearBtn" class="btn-secondary">Clear Registry</button>
+        <button type="button" id="resourcesExportBtn" class="btn-secondary">Export JSON</button>
+        <button type="button" id="resourcesModalCancelBtn" class="btn-primary">Close</button>
       </div>
     </div>
   </div>

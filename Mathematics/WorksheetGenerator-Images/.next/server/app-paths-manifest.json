@@ -1,0 +1,5 @@
+{
+  "/api/generate-resource/route": "app/api/generate-resource/route.js",
+  "/page": "app/page.js",
+  "/api/create-image/route": "app/api/create-image/route.js"
+}

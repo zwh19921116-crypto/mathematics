@@ -691,6 +691,32 @@ main {
   margin-top: 1rem;
 }
 
+.generate-status {
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin: 0.8rem 0 0;
+  padding: 0.65rem 0.75rem;
+}
+
+.generate-status.is-info {
+  background: #ebf8ff;
+  border: 1px solid #90cdf4;
+  color: #1a4f83;
+}
+
+.generate-status.is-success {
+  background: #f0fff4;
+  border: 1px solid #9ae6b4;
+  color: #1f6f43;
+}
+
+.generate-status.is-error {
+  background: #fff5f5;
+  border: 1px solid #feb2b2;
+  color: #9b2c2c;
+}
+
 .btn-primary,
 .btn-secondary {
   padding: 0.65rem 1.25rem;
@@ -731,6 +757,56 @@ main {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+}
+
+.preview-tabs {
+  align-items: center;
+  display: flex;
+  gap: 0.55rem;
+}
+
+.preview-tab-button,
+.preview-tab-clear {
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.84rem;
+  font-weight: 700;
+  padding: 0.45rem 0.8rem;
+}
+
+.preview-tab-button {
+  background: #edf2f7;
+  border: 1px solid #cbd5e0;
+  color: #2d3748;
+}
+
+.preview-tab-button.is-active {
+  background: #2b6cb0;
+  border-color: #2b6cb0;
+  color: #fff;
+}
+
+.preview-tab-button.has-alert {
+  box-shadow: 0 0 0 2px rgba(198, 40, 40, 0.18);
+}
+
+.preview-tab-clear {
+  background: #fff;
+  border: 1px solid #cbd5e0;
+  color: #4a5568;
+  margin-left: auto;
+}
+
+.preview-tab-clear:hover {
+  background: #f7fafc;
+}
+
+.preview-panel {
+  display: none;
+}
+
+.preview-panel.is-active {
+  display: block;
 }
 
 .preview-toolbar {
@@ -875,6 +951,52 @@ main {
   font-size: 1rem;
   text-align: center;
   margin-top: 4rem;
+}
+
+.status-panel {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  min-height: 500px;
+  padding: 1rem;
+}
+
+.status-panel-description {
+  color: #4a5568;
+  font-size: 0.85rem;
+  margin: 0 0 0.75rem;
+}
+
+.status-log {
+  background: #0f172a;
+  border-radius: 8px;
+  color: #e2e8f0;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  max-height: 430px;
+  min-height: 430px;
+  overflow: auto;
+  padding: 0.7rem 0.8rem;
+  white-space: pre-wrap;
+}
+
+.status-log-line {
+  margin: 0;
+  padding: 0.1rem 0;
+}
+
+.status-log-line.status-log-error {
+  color: #fca5a5;
+}
+
+.status-log-line.status-log-success {
+  color: #86efac;
+}
+
+.status-log-line.status-log-warn {
+  color: #fbd38d;
 }
 
 /* ---- Fullscreen Mode ---- */
@@ -1388,13 +1510,13 @@ body.is-fullscreen .preview.is-dragging {
 
 .chemistry-atom-diagram {
   align-self: center;
-  min-height: 13rem;
-  width: min(100%, 24rem);
+  min-height: 11rem;
+  width: min(100%, 21rem);
 }
 
 .chemistry-atom-diagram .chemistry-generated-image {
-  height: 13rem;
-  max-height: 13rem;
+  height: 11rem;
+  max-height: 11rem;
   width: 100%;
 }
 
@@ -2942,8 +3064,8 @@ body.is-fullscreen .preview.is-dragging {
 
 .atom-activity-visual .chemistry-generated-image {
   height: auto;
-  max-height: none;
-  width: 100%;
+  max-height: 11.5rem;
+  width: min(100%, 21rem);
 }
 
 .atom-activity-questions {

@@ -7,6 +7,7 @@ const generateBtn      = document.getElementById('generateBtn');
 const refreshBtn       = document.getElementById('refreshBtn');
 const printBtn         = document.getElementById('printBtn');
 const fullscreenBtn    = document.getElementById('fullscreenBtn');
+const resourcesBtn     = document.getElementById('resourcesBtn');
 const preview          = document.getElementById('worksheetPreview');
 const previewToolbar   = document.getElementById('previewToolbar');
 const pagination       = document.getElementById('pagination');
@@ -51,6 +52,15 @@ const graphQuestionsPerPageSelect = document.getElementById('graphQuestionsPerPa
 const rangeRow         = document.getElementById('rangeRow');
 const titleInput       = document.getElementById('title');
 const solutionsCheckbox = document.getElementById('solutionsRequired');
+const separateSolutionsCheckbox = document.getElementById('separateSolutions');
+const resourcesCheckbox = document.getElementById('resourcesCheckbox');
+const resourcesModalOverlay = document.getElementById('resourcesModalOverlay');
+const resourcesModalCloseBtn = document.getElementById('resourcesModalCloseBtn');
+const resourcesModalCancelBtn = document.getElementById('resourcesModalCancelBtn');
+const resourcesTableBody = document.getElementById('resourcesTableBody');
+const resourcesEmpty = document.getElementById('resourcesEmpty');
+const resourcesExportBtn = document.getElementById('resourcesExportBtn');
+const resourcesClearBtn = document.getElementById('resourcesClearBtn');
 const coverPageCheckbox = document.getElementById('coverPageRequired');
 const examCheckbox = document.getElementById('examRequired');
 const examDisclaimerEditBtn = document.getElementById('examDisclaimerEditBtn');
@@ -809,8 +819,11 @@ const STATISTICS_TOPICS = new Set([
 ]);
 
 let allPages    = [];
+let separateSolutionPages = [];
 let currentPage = 0;
 let lastGeneratedQuestions = [];
+let currentResource = null;
+const RESOURCE_REGISTRY_KEY = 'worksheetGenerator.resources';
 let titleTouched = false;
 let isPrintPreviewActive = false;
 let pageBeforePrint = 0;
@@ -940,6 +953,22 @@ function updateCoverPageTitleVisibility() {
 
 coverPageCheckbox.addEventListener('change', updateCoverPageTitleVisibility);
 examCheckbox.addEventListener('change', updateCoverPageTitleVisibility);
+solutionsCheckbox.addEventListener('change', () => {
+  separateSolutionsCheckbox.disabled = !solutionsCheckbox.checked;
+  if (!solutionsCheckbox.checked) {
+    separateSolutionsCheckbox.checked = false;
+  }
+  updatePrintButtonLabel();
+  if (lastGeneratedQuestions.length > 0) {
+    renderWorksheetPages(lastGeneratedQuestions);
+  }
+});
+separateSolutionsCheckbox.addEventListener('change', () => {
+  updatePrintButtonLabel();
+  if (lastGeneratedQuestions.length > 0) {
+    renderWorksheetPages(lastGeneratedQuestions);
+  }
+});
 examDisclaimerEditBtn.addEventListener('click', () => {
   const isOpen = examDisclaimerEditor.style.display !== 'none';
   examDisclaimerEditor.style.display = isOpen ? 'none' : 'block';
@@ -1040,10 +1069,30 @@ updateExamEditorFields();
 renderExamDisclaimerPresets();
 
 const DEFAULT_LOGO_SRC = 'assets/logo/edgeducate-logo.png';
+const DEFAULT_EXPORT_LOGO_SRC = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+  <svg xmlns="http://www.w3.org/2000/svg" width="1118" height="312" viewBox="0 0 1118 312">
+    <text x="20" y="174" textLength="1080" lengthAdjust="spacingAndGlyphs" font-family="Arial, sans-serif" font-size="166" font-weight="700"><tspan fill="#fdbb12">Edge</tspan><tspan fill="#0d3b83">ducate</tspan></text>
+    <path d="M28 264H184 M918 264H1092" stroke="#0d3b83" stroke-width="5"/>
+    <text x="559" y="276" text-anchor="middle" textLength="600" lengthAdjust="spacingAndGlyphs" font-family="Arial, sans-serif" font-size="42" font-weight="600" fill="#0d3b83">Leading Edge in Education</text>
+  </svg>
+`)}`;
 let customLogoDataUrl = null;
+let defaultLogoDataUrl = null;
 
 function getActiveLogoSrc() {
-  return whiteLabelCheckbox.checked && customLogoDataUrl ? customLogoDataUrl : DEFAULT_LOGO_SRC;
+  if (whiteLabelCheckbox.checked && customLogoDataUrl) {
+    return customLogoDataUrl;
+  }
+
+  return defaultLogoDataUrl || DEFAULT_LOGO_SRC;
+}
+
+async function prepareLogoForCanvasExport() {
+  if (whiteLabelCheckbox.checked && customLogoDataUrl) {
+    return;
+  }
+
+  defaultLogoDataUrl = DEFAULT_EXPORT_LOGO_SRC;
 }
 
 function updateLiveLogos() {
@@ -1471,12 +1520,23 @@ function updateBulkPrimaryControlVisibility() {
 
 generateBtn.addEventListener('click', generateWorksheet);
 refreshBtn.addEventListener('click', refreshWorksheet);
-printBtn.addEventListener('click', () => {
+printBtn.addEventListener('click', async () => {
   if (allPages.length === 0) {
     return;
   }
 
-  document.title = buildPrintableFileName();
+  const resource = resourcesCheckbox.checked ? currentResource : null;
+  if (resourcesCheckbox.checked && !resource) {
+    alert('Generate the worksheet again while Resources is enabled before exporting.');
+    return;
+  }
+
+  if (separateSolutionsCheckbox.checked) {
+    await exportSeparateSolutionPdfs(resource);
+    return;
+  }
+
+  document.title = resource ? resource.filename.replace(/\.pdf$/, '') : buildPrintableFileName();
   window.print();
 });
 prevBtn.addEventListener('click', () => showPage(currentPage - 1));
@@ -1489,6 +1549,28 @@ pageNumberInput.addEventListener('keydown', (event) => {
 });
 solutionsJumpBtn.addEventListener('click', jumpToSolutions);
 fullscreenBtn.addEventListener('click', toggleFullscreenMode);
+resourcesBtn.addEventListener('click', openResourcesModal);
+resourcesCheckbox.addEventListener('change', () => {
+  currentResource = null;
+  if (resourcesCheckbox.checked && allPages.length > 0 && lastGeneratedQuestions.length > 0) {
+    currentResource = registerCurrentResource();
+  }
+});
+resourcesModalCloseBtn.addEventListener('click', closeResourcesModal);
+resourcesModalCancelBtn.addEventListener('click', closeResourcesModal);
+resourcesModalOverlay.addEventListener('click', (event) => {
+  if (event.target === resourcesModalOverlay) {
+    closeResourcesModal();
+  }
+});
+resourcesExportBtn.addEventListener('click', exportResourceRegistry);
+resourcesClearBtn.addEventListener('click', () => {
+  if (!confirm('Clear the registered resource history? This cannot be undone.')) {
+    return;
+  }
+  saveResourceRegistry([]);
+  renderResourcesTable();
+});
 zoomOutBtn.addEventListener('click', () => changePreviewZoom(-PREVIEW_ZOOM_STEP));
 zoomResetBtn.addEventListener('click', resetPreviewZoom);
 zoomInBtn.addEventListener('click', () => changePreviewZoom(PREVIEW_ZOOM_STEP));
@@ -1829,6 +1911,7 @@ function generateWorksheet() {
   const questions = buildQuestions(topic, minNum, maxNum, numQ, timesTable, denominatorMode, parseInt(magicSquareSizeSelect.value, 10), pythagorasModeSelect.value, patternModeSelect.value, parseInt(termCountSelect.value, 10), roundingPlaceSelect.value, matrixDimension, matrixOperation);
   lastGeneratedQuestions = questions;
   renderWorksheetPages(questions);
+  currentResource = resourcesCheckbox.checked ? registerCurrentResource() : null;
 }
 
 function refreshWorksheet() {
@@ -1847,13 +1930,41 @@ function renderWorksheetPages(questions) {
   const titleSuffix = titleInput.value.trim() || defaultTitleSuffix();
   const title       = titleSuffix;
   const includeSolutions = solutionsCheckbox.checked;
+  const separateSolutions = includeSolutions && separateSolutionsCheckbox.checked;
   const includeFormulaSheet = formulaSheetCheckbox.checked;
   const coverPage = coverPageCheckbox.checked || examCheckbox.checked
     ? { title: coverPageTitleInput.value.trim() || title, exam: examCheckbox.checked }
     : null;
 
   lastRenderedTitle = title;
-  allPages = paginateQuestions(questions, title, module, includeSolutions, topic, timesTable, coverPage, includeFormulaSheet, parseInt(mixedQuestionsPerPageSelect.value, 10), parseInt(graphQuestionsPerPageSelect.value, 10));
+  allPages = paginateQuestions(
+    questions,
+    title,
+    module,
+    separateSolutions ? false : includeSolutions,
+    topic,
+    timesTable,
+    coverPage,
+    includeFormulaSheet,
+    parseInt(mixedQuestionsPerPageSelect.value, 10),
+    parseInt(graphQuestionsPerPageSelect.value, 10),
+    separateSolutions ? 'worksheet' : 'combined'
+  );
+  separateSolutionPages = separateSolutions
+    ? paginateQuestions(
+      questions,
+      title,
+      module,
+      true,
+      topic,
+      timesTable,
+      null,
+      false,
+      parseInt(mixedQuestionsPerPageSelect.value, 10),
+      parseInt(graphQuestionsPerPageSelect.value, 10),
+      'solutions'
+    )
+    : [];
   currentPage = 0;
   showPage(0);
   printBtn.disabled = false;
@@ -2128,34 +2239,36 @@ function topicLabel(topic, timesTable) {
   return map[topic] || 'Math Practice';
 }
 
-function paginateQuestions(questions, title, module, includeSolutions, topic, timesTable, coverPage, includeFormulaSheet = false, mixedQuestionsPerPage = 6, graphQuestionsPerPage = 2) {
+function paginateQuestions(questions, title, module, includeSolutions, topic, timesTable, coverPage, includeFormulaSheet = false, mixedQuestionsPerPage = 6, graphQuestionsPerPage = 2, pageMode = 'combined') {
   const pageModels = [];
   const questionsPerPage = getQuestionsPerPage(questions, topic, mixedQuestionsPerPage, graphQuestionsPerPage);
   const worksheetPageCount = Math.ceil(questions.length / questionsPerPage);
 
-  if (coverPage) {
+  if (pageMode !== 'solutions' && coverPage) {
     pageModels.push({ type: 'cover', title: coverPage.title, module, topic, timesTable, exam: coverPage.exam });
   }
 
-  if (includeFormulaSheet || questions[0]?.topic === 'unit-conversions') {
+  if (pageMode !== 'solutions' && (includeFormulaSheet || questions[0]?.topic === 'unit-conversions')) {
     pageModels.push(...createFormulaSheetPageModels(title, module, topic));
   }
 
-  for (let p = 0; p < worksheetPageCount; p++) {
-    const slice    = questions.slice(p * questionsPerPage, (p + 1) * questionsPerPage);
-    const startIdx = p * questionsPerPage;
-    pageModels.push({
-      type: 'worksheet',
-      questions: slice,
-      startIdx,
-      title,
-      module,
-      topic,
-      timesTable,
-    });
+  if (pageMode !== 'solutions') {
+    for (let p = 0; p < worksheetPageCount; p++) {
+      const slice    = questions.slice(p * questionsPerPage, (p + 1) * questionsPerPage);
+      const startIdx = p * questionsPerPage;
+      pageModels.push({
+        type: 'worksheet',
+        questions: slice,
+        startIdx,
+        title,
+        module,
+        topic,
+        timesTable,
+      });
+    }
   }
 
-  if (includeSolutions) {
+  if (includeSolutions && pageMode !== 'worksheet') {
     const chartTopics = new Set(['plot-cartesian-plane', 'linear-graphs', 'gradient', 'box-plots', 'cumulative-frequency', 'stem-and-leaf', 'histograms', 'dot-plots', 'scatter-plots', 'frequency-distributions', 'draw-charts', 'distributions']);
     const solutionsPerPage = topic === 'sudoku'
       ? 1
@@ -2229,7 +2342,6 @@ function buildCoverPageHTML(title, module, topic, timesTable, pageNum, totalPage
         ${isExam ? buildExamCoverBoxesHTML() : ''}
         <div class="cover-page-fields">
           ${buildInfoStripBlankItem('user', 'Name', 'name')}
-          ${buildInfoStripBlankItem('calendar', 'Date', 'date')}
         </div>
       </div>
       <div class="page-footer">
@@ -2630,9 +2742,9 @@ function buildStructuredFormulaSheetHTML({ title, module, topic, groups, instruc
 
   const infoStrip = showHeaderInfo ? `
     <div class="worksheet-info-strip">
+      ${buildInfoStripBlankItem('user', 'Name', 'name')}
       ${buildInfoStripItem('book', 'Module', moduleLabel(module))}
       ${buildInfoStripItem('clipboard', 'Topic', topicName)}
-      ${buildInfoStripBlankItem('calendar', 'Date', 'date')}
     </div>` : '';
 
   const sectionHead = (num, label) => `
@@ -2908,6 +3020,150 @@ function buildPrintableFileName() {
   return `${baseTitle}_${timestamp}`;
 }
 
+function updatePrintButtonLabel() {
+  printBtn.textContent = separateSolutionsCheckbox.checked ? 'Save 2 PDFs' : 'Print / Save PDF';
+}
+
+function getResourceRegistry() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(RESOURCE_REGISTRY_KEY) || '[]');
+    return Array.isArray(stored) ? stored : [];
+  } catch (error) {
+    console.error('Resource registry could not be read:', error);
+    return [];
+  }
+}
+
+function saveResourceRegistry(registry) {
+  localStorage.setItem(RESOURCE_REGISTRY_KEY, JSON.stringify(registry, null, 2));
+}
+
+function toSeoSlug(value) {
+  return String(value || '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function buildResourceBaseFileName() {
+  const parts = [
+    'edgeducate',
+    'mathematics',
+    moduleLabel(moduleSelect.value),
+    topicLabel(topicSelect.value, parseInt(document.getElementById('timesTable').value, 10)),
+  ];
+  const worksheetTitle = titleInput.value.trim();
+  if (worksheetTitle) {
+    parts.push(worksheetTitle);
+  }
+  return parts.map(toSeoSlug).filter(Boolean).join('-');
+}
+
+function hashResourceContent(value) {
+  let hash = 2166136261;
+  for (let index = 0; index < value.length; index++) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(16);
+}
+
+function registerCurrentResource() {
+  const registry = getResourceRegistry();
+  const separateSolutions = separateSolutionsCheckbox.checked;
+  const generationKey = hashResourceContent(JSON.stringify({
+    questions: lastGeneratedQuestions,
+    title: lastRenderedTitle,
+    separateSolutions,
+  }));
+  if (registry.some((resource) => resource.generationKey === generationKey)) {
+    alert('This worksheet has already been registered in Resources. Generate a new worksheet before exporting it again.');
+    return null;
+  }
+
+  const baseFileName = buildResourceBaseFileName();
+  const files = separateSolutions
+    ? [`${baseFileName}-worksheet.pdf`, `${baseFileName}-solutions.pdf`]
+    : [`${baseFileName}.pdf`];
+  const resource = {
+    id: `${Date.now()}-${generationKey}`,
+    createdAt: new Date().toISOString(),
+    filename: files[0],
+    files,
+    pageCount: allPages.length + (separateSolutions ? separateSolutionPages.length : 0),
+    worksheetPages: allPages.length,
+    solutionPages: separateSolutions ? separateSolutionPages.length : allPages.filter((page) => page.includes('solutions-page')).length,
+    subject: 'Mathematics',
+    module: moduleLabel(moduleSelect.value),
+    topic: topicLabel(topicSelect.value, parseInt(document.getElementById('timesTable').value, 10)),
+    title: titleInput.value.trim(),
+    generationKey,
+  };
+  registry.push(resource);
+  saveResourceRegistry(registry);
+  return resource;
+}
+
+function renderResourcesTable() {
+  const registry = getResourceRegistry().slice().reverse();
+  resourcesTableBody.innerHTML = registry.map((resource) => `
+    <tr>
+      <td>${escapeHtml(new Date(resource.createdAt).toLocaleString())}</td>
+      <td>${escapeHtml(resource.filename)}</td>
+      <td>${escapeHtml(String(resource.pageCount))}</td>
+      <td>${escapeHtml(resource.files.join(', '))}</td>
+    </tr>
+  `).join('');
+  resourcesEmpty.style.display = registry.length > 0 ? 'none' : 'block';
+}
+
+function openResourcesModal() {
+  renderResourcesTable();
+  resourcesModalOverlay.style.display = 'flex';
+}
+
+function closeResourcesModal() {
+  resourcesModalOverlay.style.display = 'none';
+}
+
+function exportResourceRegistry() {
+  const json = JSON.stringify(getResourceRegistry(), null, 2);
+  downloadBlobAsFile(new Blob([json], { type: 'application/json' }), 'edgeducate-resource-registry.json');
+}
+
+async function exportSeparateSolutionPdfs(resource) {
+  const missingLibraries = getMissingBulkExportLibraries();
+  if (missingLibraries.length > 0) {
+    alert(`Separate PDF export cannot start because required libraries are missing: ${missingLibraries.join(', ')}.`);
+    return;
+  }
+
+  if (separateSolutionPages.length === 0) {
+    alert('No solution pages are available to export.');
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const baseFileName = resource ? resource.filename.replace(/-worksheet\.pdf$/, '') : buildPrintableFileName();
+  const worksheetPdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+  const solutionsPdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+
+  try {
+    await prepareLogoForCanvasExport();
+    await renderPagesIntoPdf(worksheetPdf, allPages, false);
+    await renderPagesIntoPdf(solutionsPdf, separateSolutionPages, false);
+    downloadBlobAsFile(worksheetPdf.output('blob'), resource ? resource.files[0] : `${baseFileName}_worksheet.pdf`);
+    downloadBlobAsFile(solutionsPdf.output('blob'), resource ? resource.files[1] : `${baseFileName}_solutions.pdf`);
+  } catch (error) {
+    console.error('Separate PDF generation failed:', error);
+    const details = error && error.message ? `\n\nDetails: ${error.message}` : '';
+    alert(`Something went wrong while generating the separate PDFs. Please try again.${details}`);
+  }
+}
+
 function sanitizeFileNamePart(value) {
   return String(value)
     .trim()
@@ -2977,7 +3233,10 @@ function isSafeImageSrcForCanvas(src) {
       return true;
     }
 
-    // On non-http(s) app/file webviews, treat URL-based images as taint risks.
+    if (parsed.protocol === 'file:') {
+      return false;
+    }
+
     if (window.location.protocol !== 'http:' && window.location.protocol !== 'https:') {
       return false;
     }
@@ -3001,6 +3260,14 @@ function stripUnsafeImagesForCanvas(rootEl) {
   });
 }
 
+function stripAllImagesForCanvas(rootEl) {
+  const transparentPixel = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+  rootEl.querySelectorAll('img').forEach((img) => {
+    img.setAttribute('src', transparentPixel);
+    img.setAttribute('data-export-image-stripped', 'true');
+  });
+}
+
 function buildPageHTML(questions, startIdx, title, module, pageNum, totalPages, topic, timesTable) {
   const opSymbol = { addition: '+', subtraction: '−', multiplication: '×', division: '÷' };
   const pageTopic = questions[0]?.topic;
@@ -3016,9 +3283,9 @@ function buildPageHTML(questions, startIdx, title, module, pageNum, totalPages, 
   if (pageNum === 1) {
     const headerTopic = buildWorksheetTopicLabel(questions, topic, timesTable);
     html += `<div class="worksheet-info-strip">
+      ${buildInfoStripBlankItem('user', 'Name', 'name')}
       ${buildInfoStripItem('book', 'Module', moduleLabel(module))}
       ${buildInfoStripItem('clipboard', 'Topic', headerTopic)}
-      ${buildInfoStripBlankItem('calendar', 'Date', 'date')}
     </div>`;
   } else {
     html += `<div class="worksheet-info-strip worksheet-info-strip-divider" aria-hidden="true"></div>`;
@@ -7856,6 +8123,29 @@ function getPdfCaptureSandbox() {
   return sandbox;
 }
 
+async function waitForCanvasImages(rootEl) {
+  const images = Array.from(rootEl.querySelectorAll('img'));
+  await Promise.all(images.map(async (image) => {
+    if (image.complete && image.naturalWidth > 0) {
+      return;
+    }
+
+    if (typeof image.decode === 'function') {
+      try {
+        await image.decode();
+        return;
+      } catch (error) {
+        return;
+      }
+    }
+
+    await new Promise((resolve) => {
+      image.addEventListener('load', resolve, { once: true });
+      image.addEventListener('error', resolve, { once: true });
+    });
+  }));
+}
+
 async function renderPagesIntoPdf(pdf, pageHtmlList, hasExistingPages, controller = null, stepLabel = '') {
   const sandbox = getPdfCaptureSandbox();
   let addedFirstPage = hasExistingPages;
@@ -7873,9 +8163,18 @@ async function renderPagesIntoPdf(pdf, pageHtmlList, hasExistingPages, controlle
 
     // Let the browser lay out/paint the page before capturing it.
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    await waitForCanvasImages(pageEl);
 
-    const canvas = await html2canvas(pageEl, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-    const imgData = canvas.toDataURL('image/jpeg', 0.92);
+    let canvas = await html2canvas(pageEl, { scale: 2, useCORS: true, allowTaint: false, backgroundColor: '#ffffff' });
+    let imgData;
+    try {
+      imgData = canvas.toDataURL('image/jpeg', 0.92);
+    } catch (error) {
+      console.warn('Canvas export encountered an unsafe image; retrying without worksheet images.', error);
+      stripAllImagesForCanvas(pageEl);
+      canvas = await html2canvas(pageEl, { scale: 2, useCORS: true, allowTaint: false, backgroundColor: '#ffffff' });
+      imgData = canvas.toDataURL('image/jpeg', 0.92);
+    }
 
     if (addedFirstPage) {
       pdf.addPage('a4', 'portrait');
@@ -7933,6 +8232,7 @@ async function generateBulkPdfs() {
   updateBulkProgressUI('Preparing export...', controller);
 
   try {
+    await prepareLogoForCanvasExport();
     const zip = new JSZip();
     const batchFolder = zip.folder(sanitizeFileNamePart(batchName));
     const previousWorksheetSignatures = [];

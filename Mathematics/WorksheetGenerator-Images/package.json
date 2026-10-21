@@ -2,9 +2,25 @@
   "name": "worksheet-generator-images",
   "version": "1.0.0",
   "private": true,
-  "description": "Local SVG image and diagram generator for worksheet projects",
-  "main": "server.js",
+  "description": "Worksheet resource generator for educational content",
   "scripts": {
-    "start": "node server.js"
+    "dev": "next dev",
+    "dev:clean": "node -e \"const fs=require('fs');try{fs.rmSync('.next',{recursive:true,force:true});}catch(e){}\"",
+    "build": "next build",
+    "start": "next start",
+    "start:legacy": "node server.js",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "14.2.16",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "sharp": "0.33.5"
+  },
+  "devDependencies": {
+    "@types/node": "22.7.6",
+    "@types/react": "18.3.11",
+    "@types/react-dom": "18.3.1",
+    "typescript": "5.6.3"
   }
 }

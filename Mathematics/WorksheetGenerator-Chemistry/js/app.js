@@ -9,6 +9,13 @@ const printBtn         = document.getElementById('printBtn');
 const fullscreenBtn    = document.getElementById('fullscreenBtn');
 const imageGeneratorBtn = document.getElementById('imageGeneratorBtn');
 const preview          = document.getElementById('worksheetPreview');
+const worksheetPanel   = document.getElementById('worksheetPanel');
+const statusPanel      = document.getElementById('statusPanel');
+const worksheetTabBtn  = document.getElementById('worksheetTabBtn');
+const statusTabBtn     = document.getElementById('statusTabBtn');
+const clearStatusBtn   = document.getElementById('clearStatusBtn');
+const worksheetGenerateStatus = document.getElementById('worksheetGenerateStatus');
+const worksheetStatusLog = document.getElementById('worksheetStatusLog');
 const previewToolbar   = document.getElementById('previewToolbar');
 const pagination       = document.getElementById('pagination');
 const prevBtn          = document.getElementById('prevBtn');
@@ -146,9 +153,19 @@ const MIN_PREVIEW_ZOOM = 40;
 const MAX_PREVIEW_ZOOM = 250;
 const PREVIEW_ZOOM_STEP = 10;
 const IMAGE_SERVER_URL = 'http://127.0.0.1:4317';
+const WORKSHEET_RESOURCE_SERVER_CANDIDATES = [
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:3001',
+  'http://127.0.0.1:3002',
+  'http://127.0.0.1:3003',
+  'http://127.0.0.1:3010',
+];
 const imageResourceCache = new Map();
 const imageResourceRequests = new Set();
 let imageServerAvailable = false;
+let activeWorksheetResourceServer = '';
+let activeWorksheetResourceServerPromise = null;
+let worksheetGenerationInProgress = false;
 
 imageGeneratorBtn.addEventListener('click', () => {
   window.open(`${IMAGE_SERVER_URL}/console`, '_blank', 'noopener');
@@ -1671,6 +1688,20 @@ function updateBulkPrimaryControlVisibility() {
 
 generateBtn.addEventListener('click', generateWorksheet);
 refreshBtn.addEventListener('click', refreshWorksheet);
+if (worksheetTabBtn) {
+  worksheetTabBtn.addEventListener('click', () => setPreviewTab('worksheet'));
+}
+if (statusTabBtn) {
+  statusTabBtn.addEventListener('click', () => setPreviewTab('status'));
+}
+if (clearStatusBtn) {
+  clearStatusBtn.addEventListener('click', () => {
+    if (worksheetStatusLog) {
+      worksheetStatusLog.textContent = '';
+    }
+    appendStatusLog('Status log cleared by user.', 'info');
+  });
+}
 printBtn.addEventListener('click', () => {
   if (allPages.length === 0) {
     return;
@@ -1710,6 +1741,9 @@ document.addEventListener('webkitfullscreenchange', syncFullscreenUI);
 
 applyPreviewZoom();
 syncFullscreenUI();
+setPreviewTab('worksheet');
+setGenerateStatus('Ready. Click Generate Worksheet to start.', 'info');
+appendStatusLog('Generator initialized. Waiting for first run.', 'info');
 
 async function toggleFullscreenMode() {
   const fullscreenElement = getFullscreenElement();
@@ -1948,6 +1982,70 @@ function syncPreviewToolbar() {
   previewToolbar.style.display = hasPages ? '' : 'none';
 }
 
+function formatStatusTime(date = new Date()) {
+  return date.toLocaleTimeString([], { hour12: false });
+}
+
+function appendStatusLog(message, level = 'info') {
+  if (!worksheetStatusLog) return;
+  const line = document.createElement('p');
+  line.className = `status-log-line status-log-${level}`;
+  line.textContent = `[${formatStatusTime()}] ${message}`;
+  worksheetStatusLog.prepend(line);
+  if (statusTabBtn && !statusTabBtn.classList.contains('is-active') && (level === 'warn' || level === 'error')) {
+    statusTabBtn.classList.add('has-alert');
+  }
+}
+
+function setGenerateStatus(message, tone = 'info') {
+  if (!worksheetGenerateStatus) return;
+  worksheetGenerateStatus.style.display = message ? '' : 'none';
+  worksheetGenerateStatus.textContent = message;
+  worksheetGenerateStatus.classList.remove('is-info', 'is-success', 'is-error');
+  worksheetGenerateStatus.classList.add(tone === 'error' ? 'is-error' : tone === 'success' ? 'is-success' : 'is-info');
+}
+
+function setGenerateBusy(isBusy) {
+  generateBtn.disabled = isBusy;
+  refreshBtn.disabled = isBusy;
+  generateBtn.textContent = isBusy ? 'Generating...' : 'Generate Worksheet';
+}
+
+function setPreviewTab(tab) {
+  const showingWorksheet = tab !== 'status';
+  if (worksheetPanel) {
+    worksheetPanel.style.display = showingWorksheet ? '' : 'none';
+    worksheetPanel.classList.toggle('is-active', showingWorksheet);
+  }
+  if (statusPanel) {
+    statusPanel.style.display = showingWorksheet ? 'none' : '';
+    statusPanel.classList.toggle('is-active', !showingWorksheet);
+  }
+  if (worksheetTabBtn) {
+    worksheetTabBtn.classList.toggle('is-active', showingWorksheet);
+    worksheetTabBtn.setAttribute('aria-pressed', showingWorksheet ? 'true' : 'false');
+  }
+  if (statusTabBtn) {
+    statusTabBtn.classList.toggle('is-active', !showingWorksheet);
+    statusTabBtn.setAttribute('aria-pressed', showingWorksheet ? 'false' : 'true');
+    if (!showingWorksheet) {
+      statusTabBtn.classList.remove('has-alert');
+    }
+  }
+}
+
+async function withTimeout(promise, timeoutMs, timeoutMessage) {
+  let timeoutId;
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error(timeoutMessage || `Timed out after ${timeoutMs}ms`)), timeoutMs);
+  });
+  try {
+    return await Promise.race([promise, timeoutPromise]);
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
 function supportsNativeFullscreen() {
   const root = document.documentElement;
   return Boolean(
@@ -1987,6 +2085,12 @@ async function exitNativeFullscreen() {
 }
 
 async function generateWorksheet() {
+  if (worksheetGenerationInProgress) {
+    appendStatusLog('Generate click ignored because a generation is already running.', 'warn');
+    setGenerateStatus('A generation is already in progress. Please wait.', 'info');
+    return;
+  }
+
   const module      = moduleSelect.value;
   const topic       = topicSelect.value;
   const minNum      = parseInt(document.getElementById('minNum').value, 10);
@@ -2005,11 +2109,48 @@ async function generateWorksheet() {
     return;
   }
 
-  chemistryGenerationSeed += 1;
-  const questions = buildQuestions(topic, minNum, maxNum, numQ, timesTable, denominatorMode, parseInt(magicSquareSizeSelect.value, 10), pythagorasModeSelect.value, patternModeSelect.value, parseInt(termCountSelect.value, 10), roundingPlaceSelect.value, matrixDimension, matrixOperation);
-  await requestRequiredWorksheetImage(topic, questions);
-  lastGeneratedQuestions = questions;
-  renderWorksheetPages(questions);
+  worksheetGenerationInProgress = true;
+  setGenerateBusy(true);
+  setGenerateStatus('Generating worksheet and preparing diagrams...', 'info');
+  appendStatusLog(`Generation started: module=${module}, topic=${topic}, questions=${numQ}.`, 'info');
+  const generationStartedAt = performance.now();
+
+  try {
+    chemistryGenerationSeed += 1;
+    appendStatusLog(`Using generation seed ${chemistryGenerationSeed}.`, 'info');
+    const questions = buildQuestions(topic, minNum, maxNum, numQ, timesTable, denominatorMode, parseInt(magicSquareSizeSelect.value, 10), pythagorasModeSelect.value, patternModeSelect.value, parseInt(termCountSelect.value, 10), roundingPlaceSelect.value, matrixDimension, matrixOperation);
+    lastGeneratedQuestions = questions;
+    renderWorksheetPages(questions);
+    appendStatusLog(`Worksheet text rendered (${questions.length} questions).`, 'success');
+
+    const visualQuestions = questions.filter((question) => question.showDiagram);
+    if (visualQuestions.length) {
+      appendStatusLog(`Preparing ${visualQuestions.length} worksheet diagram(s)...`, 'info');
+      const imageStartedAt = performance.now();
+      try {
+        await withTimeout(requestRequiredWorksheetImage(topic, questions), 45000, 'Image server timed out after 45 seconds.');
+        renderWorksheetPages(questions);
+        appendStatusLog(`Diagram generation complete in ${Math.round(performance.now() - imageStartedAt)} ms.`, 'success');
+      } catch (imageError) {
+        const reason = imageError instanceof Error ? imageError.message : 'Unknown image generation error.';
+        appendStatusLog(`Diagram generation warning: ${reason}`, 'warn');
+      }
+    } else {
+      appendStatusLog('No diagrams required for this worksheet.', 'info');
+    }
+
+    const totalMs = Math.round(performance.now() - generationStartedAt);
+    setGenerateStatus(`Worksheet ready in ${totalMs} ms.`, 'success');
+    appendStatusLog(`Generation finished in ${totalMs} ms.`, 'success');
+    setPreviewTab('worksheet');
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : 'Unknown generation error.';
+    setGenerateStatus(`Generation failed: ${reason}`, 'error');
+    appendStatusLog(`Generation failed: ${reason}`, 'error');
+  } finally {
+    worksheetGenerationInProgress = false;
+    setGenerateBusy(false);
+  }
 }
 
 function refreshWorksheet() {
@@ -3083,7 +3224,6 @@ function renderChemistryAtomDiagram(question) {
   if (imageServerAvailable && serverResource) {
     return `<div class="chemistry-diagram chemistry-atom-diagram" data-image-source="server" aria-label="Atom structure diagram"><img class="chemistry-generated-image" src="${serverResource}" alt="Atom with nucleus, protons, neutrons and electron shells" /></div>`;
   }
-  requestImageResource('atom', {});
   return `<div class="chemistry-diagram chemistry-atom-diagram" aria-label="Atom structure diagram"><svg class="chemistry-atom-svg" viewBox="0 0 360 170" role="img" aria-label="Atom with nucleus, electron shells and electrons"><circle cx="180" cy="76" r="62" fill="none" stroke="#2b6cb0" stroke-width="3"/><circle cx="180" cy="76" r="36" fill="none" stroke="#5b89ad" stroke-width="3"/><circle cx="180" cy="76" r="22" fill="#d97706" stroke="#9a4f00" stroke-width="2"/><text x="180" y="71" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="700">p⁺</text><text x="180" y="87" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="700">n⁰</text><circle cx="180" cy="14" r="12" fill="#183b56"/><text x="180" y="19" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="700">e⁻</text><circle cx="180" cy="138" r="12" fill="#183b56"/><text x="180" y="143" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="700">e⁻</text><circle cx="180" cy="40" r="10" fill="#4a6b82"/><text x="180" y="44" text-anchor="middle" fill="#ffffff" font-size="11" font-weight="700">e⁻</text><circle cx="180" cy="112" r="10" fill="#4a6b82"/><text x="180" y="116" text-anchor="middle" fill="#ffffff" font-size="11" font-weight="700">e⁻</text><text x="180" y="163" text-anchor="middle" fill="#183b56" font-size="12" font-weight="700">Nucleus • inner shell • outer shell</text></svg></div>`;
 }
 
@@ -3092,24 +3232,90 @@ function getImageResourceUrl(type, question) {
   return imageResourceCache.get(cacheKey) || '';
 }
 
+async function resolveWorksheetResourceServer() {
+  if (activeWorksheetResourceServer) return activeWorksheetResourceServer;
+  if (activeWorksheetResourceServerPromise) {
+    return activeWorksheetResourceServerPromise;
+  }
+  activeWorksheetResourceServerPromise = (async () => {
+    for (const baseUrl of WORKSHEET_RESOURCE_SERVER_CANDIDATES) {
+      try {
+        appendStatusLog(`Checking worksheet resource server at ${baseUrl}...`, 'info');
+        const response = await fetch(`${baseUrl}/api/generate-resource`);
+        if (response.ok) {
+          activeWorksheetResourceServer = baseUrl;
+          appendStatusLog(`Connected to worksheet resource server: ${baseUrl}`, 'success');
+          return baseUrl;
+        }
+      } catch {
+        // Try next candidate.
+      }
+    }
+    appendStatusLog('No worksheet resource server detected on known ports.', 'warn');
+    return '';
+  })();
+
+  try {
+    return await activeWorksheetResourceServerPromise;
+  } finally {
+    activeWorksheetResourceServerPromise = null;
+  }
+}
+
 async function requestImageResource(type, options = {}, force = false, cacheKey = type) {
   if (!force && imageResourceRequests.has(cacheKey)) {
+    appendStatusLog(`Skipped duplicate image request for ${cacheKey}.`, 'info');
     return null;
   }
   imageResourceRequests.add(cacheKey);
   try {
+    const prompt = String(options.prompt || '').trim();
+    if (prompt) {
+      appendStatusLog(`Requesting generated image: ${cacheKey}.`, 'info');
+      const worksheetResourceBase = await resolveWorksheetResourceServer();
+      if (worksheetResourceBase) {
+        const customResponse = await fetch(`${worksheetResourceBase}/api/create-image`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt,
+            style: 'Science Illustration',
+            yearLevel: 'General',
+            width: 1024,
+            height: 1024,
+            quality: 95,
+            freeMode: true,
+            variationSeed: options.variationSeed || cacheKey,
+          }),
+        });
+        const customResult = customResponse.ok ? await customResponse.json() : null;
+        if (customResult?.imageUrl) {
+          imageResourceCache.set(cacheKey, `${worksheetResourceBase}${customResult.imageUrl}`);
+          imageServerAvailable = true;
+          appendStatusLog(`Image ready (${cacheKey}): ${customResult.imageUrl}`, 'success');
+          return customResult;
+        }
+        appendStatusLog(`Worksheet resource server returned no image for ${cacheKey}.`, 'warn');
+      }
+    }
+
+    appendStatusLog(`Falling back to legacy image server for ${cacheKey}.`, 'warn');
     const response = await fetch(`${IMAGE_SERVER_URL}/api/generate?type=${encodeURIComponent(type)}&${new URLSearchParams(options)}`);
     const result = response.ok ? await response.json() : null;
     if (result?.url) {
       imageResourceCache.set(cacheKey, `${IMAGE_SERVER_URL}${result.url}`);
       imageServerAvailable = true;
-    } else {
-      imageResourceCache.delete(cacheKey);
+      appendStatusLog(`Legacy image ready (${cacheKey}): ${result.url}`, 'success');
+      return result;
     }
-    return result;
+
+    imageResourceCache.delete(cacheKey);
+    appendStatusLog(`Image request returned empty for ${cacheKey}.`, 'warn');
+    return null;
   } catch {
-    imageResourceCache.clear();
-    imageServerAvailable = false;
+    imageResourceCache.delete(cacheKey);
+    imageServerAvailable = imageResourceCache.size > 0;
+    appendStatusLog(`Image request failed for ${cacheKey}.`, 'error');
     return null;
   } finally {
     imageResourceRequests.delete(cacheKey);
@@ -3136,6 +3342,8 @@ async function requestRequiredWorksheetImage(topic, questions = []) {
     return requestImageResource(imageType, {
       name: `chemistry-${topic}-${chemistryGenerationSeed}-${index}`,
       type: imageType,
+      prompt: question.prompt,
+      variationSeed: `${chemistryGenerationSeed}-${index}-${question.imageKey || imageType}`,
       ...imageOptions,
       ...(imageType === 'spectrum' ? { spectrum: topic === 'nmr-spectroscopy' ? 'nmr' : 'ir' } : {}),
     }, true, question.imageKey);

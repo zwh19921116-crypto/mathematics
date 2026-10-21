@@ -1,0 +1,4 @@
+node_modules/
+sheet-*.png
+playwright-report/
+test-results/
